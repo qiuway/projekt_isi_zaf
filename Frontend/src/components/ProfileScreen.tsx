@@ -13,12 +13,13 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   useEffect(() => {
     if (!userId) return;
     fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
-      .then(res => res.json())
-      .then(data => setUserData(data));
+      .then((res) => res.json())
+      .then((data) => setUserData(data))
+      .catch((err) => console.error('Błąd ładowania profilu:', err));
   }, [userId]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userId'); // Usuwamy ID z pamięci
+    localStorage.removeItem('userId');
     onNavigate('login');
   };
 
@@ -32,11 +33,20 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
 
       <section className="profile-card">
         <div className="avatar-column">
-          <div className="avatar-circle">
-            <div className="avatar-head" />
-            <div className="avatar-body" />
+<div className="avatar-circle" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {userData?.zdjecie_profilowe ? (
+              <img 
+                src={`http://127.0.0.1:8000${userData.zdjecie_profilowe}?t=${Date.now()}`} 
+                alt="Awatar użytkownika" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <>
+                <div className="avatar-head" />
+                <div className="avatar-body" />
+              </>
+            )}
           </div>
-          <button className="secondary-button">Zmień zdjęcie</button>
         </div>
 
         <div className="profile-info">

@@ -17,6 +17,8 @@ class Uzytkownik(Base):
     id_typ_konta = Column(Integer, nullable=True)
     
     punkty = Column(Integer, default=0)
+    
+    zdjecie_profilowe = Column(String(255), nullable=True)
 
 
 class Restauracja(Base):

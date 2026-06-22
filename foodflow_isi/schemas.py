@@ -42,3 +42,14 @@ class UzytkownikUpdate(BaseModel):
     email: str
     numer_telefonu: int | None = None
     adres: str | None = None
+
+class UzytkownikOut(BaseModel):
+    id_uzytkownik: int
+    imie: str
+    nazwisko: str
+    email: str
+    numer_telefonu: int | None = None
+    adres: str | None = None
+    zdjecie_profilowe: str | None = None
+
+    model_config = {"from_attributes": True}

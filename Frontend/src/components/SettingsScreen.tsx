@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 
@@ -7,15 +7,19 @@ interface SettingsScreenProps {
 }
 
 export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
+  // Stany formularza tekstowego
   const [imie, setImie] = useState('');
   const [nazwisko, setNazwisko] = useState('');
   const [email, setEmail] = useState('');
   const [telefon, setTelefon] = useState('');
   const [adres, setAdres] = useState('');
+  
+  const [zdjecie, setZdjecie] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const userId = localStorage.getItem('userId');
 
-  useEffect(() => {
+  const fetchUserData = () => {
     if (!userId) return;
     fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
       .then(res => res.json())
@@ -25,11 +29,16 @@ export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
         setEmail(data.email || '');
         setTelefon(data.numer_telefonu ? String(data.numer_telefonu) : '');
         setAdres(data.adres || '');
+        setZdjecie(data.zdjecie_profilowe || null);
       })
       .catch(err => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchUserData();
   }, [userId]);
 
-  const handleSave = async () => {
+  const handleSaveTextData = async () => {
     if (!userId) return;
     
     const payload = {
@@ -47,10 +56,36 @@ export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
     });
 
     if (res.ok) {
-      alert('Zapisano zmiany pomyślnie!');
+      alert('Zapisano dane profilu pomyślnie!');
       onNavigate('profile');
     } else {
       alert('Wystąpił błąd podczas zapisywania');
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0 || !userId) return;
+
+    const fileToUpload = files[0];
+    const formData = new FormData();
+    formData.append('file', fileToUpload);
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/avatar`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        fetchUserData(); 
+      } else {
+        alert(data.detail || 'Błąd podczas wgrywania zdjęcia.');
+      }
+    } catch (error) {
+      console.error('Błąd sieciowy:', error);
+      alert('Błąd połączenia z serwerem.');
     }
   };
 
@@ -63,7 +98,36 @@ export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
       </div>
 
       <section className="settings-content">
-        <h3>Edytuj dane profilu</h3>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '30px' }}>
+          <div className="avatar-circle" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '15px' }}>
+            {zdjecie ? (
+              <img 
+                src={`http://127.0.0.1:8000${zdjecie}?t=${Date.now()}`} 
+                alt="Awatar użytkownika" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <>
+                <div className="avatar-head" />
+                <div className="avatar-body" />
+              </>
+            )}
+          </div>
+          
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            style={{ display: 'none' }} 
+            accept="image/*" 
+            onChange={handleFileChange}
+          />
+          <button className="secondary-button" onClick={() => fileInputRef.current?.click()}>
+            Zmień zdjęcie
+          </button>
+        </div>
+
+        <h3 style={{ borderBottom: '1px solid #dccbbd', paddingBottom: '10px', marginBottom: '20px', color: '#5d4537' }}>Dane tekstowe</h3>
         <div className="settings-form-grid">
           <label>
             Imię
@@ -87,8 +151,8 @@ export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
           </label>
         </div>
         
-        <div className="settings-actions">
-          <button className="mint-button" onClick={handleSave}>Zapisz zmiany</button>
+        <div className="settings-actions" style={{ marginTop: '30px' }}>
+          <button className="mint-button" onClick={handleSaveTextData}>Zapisz zmiany profilu</button>
         </div>
       </section>
     </div>

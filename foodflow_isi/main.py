@@ -1,7 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import uuid
+
+import os
+import shutil
+from fastapi.staticfiles import StaticFiles
 
 import models
 import schemas
@@ -16,6 +20,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+os.makedirs("static/avatars", exist_ok=True)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/restauracje/", response_model=list[schemas.RestauracjaOut])
 def pobierz_restauracje(db: Session = Depends(get_db)):
@@ -160,3 +168,22 @@ def aktualizuj_profil(user_id: int, dane: schemas.UzytkownikUpdate, db: Session 
     
     db.commit()
     return {"msg": "Profil zaktualizowany pomyślnie!"}
+
+@app.post("/uzytkownik/{user_id}/avatar")
+def upload_avatar(user_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Użytkownik nie istnieje")
+
+    file_extension = os.path.splitext(file.filename)[1]
+    filename = f"avatar_{user_id}{file_extension}"
+    file_path = os.path.join("static/avatars", filename)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    avatar_url = f"/static/avatars/{filename}"
+    user.zdjecie_profilowe = avatar_url
+    db.commit()
+
+    return {"msg": "Zdjęcie profilowe zaktualizowane!", "avatar_url": avatar_url}

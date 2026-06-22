@@ -119,3 +119,5 @@ CREATE TABLE osoby_placace (
     Foreign Key (id_platnosc) REFERENCES platnosc(id_platnosc),
     Foreign Key (id_uzytkownik) REFERENCES uzytkownik(id_uzytkownik)
 );
+
+ALTER TABLE uzytkownik ADD COLUMN zdjecie_profilowe VARCHAR(255);
