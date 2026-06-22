@@ -31,21 +31,31 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
   }, []);
 
     useEffect(() => {
-        const userId = localStorage.getItem('userId');
+        const fetchPunkty = () => {
+            const userId = localStorage.getItem('userId');
 
-        if (!userId) {
-            setPunkty('0');
-            return;
-        }
+            if (!userId) {
+                setPunkty('0');
+                return;
+            }
 
-        fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/punkty`)
-            .then((res) => res.json())
-            .then((data) => {
-                const aktualnePunkty = String(data.punkty ?? 0);
-                setPunkty(aktualnePunkty);
-                localStorage.setItem('punkty', aktualnePunkty);
-            })
-            .catch((err) => console.error(err));
+            fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/punkty`)
+                .then((res) => res.json())
+                .then((data) => {
+                    const aktualnePunkty = String(data.punkty ?? 0);
+                    setPunkty(aktualnePunkty);
+                    localStorage.setItem('punkty', aktualnePunkty);
+                })
+                .catch((err) => console.error(err));
+        };
+
+        fetchPunkty();
+
+        window.addEventListener('punktyChanged', fetchPunkty);
+
+        return () => {
+            window.removeEventListener('punktyChanged', fetchPunkty);
+        };
     }, []);
 
   const handleNavigate = (screen: Screen) => {

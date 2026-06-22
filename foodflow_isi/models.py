@@ -82,3 +82,25 @@ class OsobaPlacaca(Base):
     id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), primary_key=True)
     kwota = Column(Numeric(10, 2))
     czy_oplacone = Column(Boolean, default=False)
+
+class KuponSklep(Base):
+    __tablename__ = "kupony_sklep"
+
+    id_kupon = Column(Integer, primary_key=True, index=True)
+    nazwa = Column(String(100), nullable=False)
+    opis = Column(Text, nullable=True)
+    koszt_punktowy = Column(Integer, nullable=False)
+    wartosc_znizki = Column(String(50), nullable=True)
+    ikona = Column(String(20), nullable=True)
+
+
+class PosiadanyKupon(Base):
+    __tablename__ = "posiadane_kupony"
+
+    id_posiadany_kupon = Column(Integer, primary_key=True, index=True)
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=False)
+    id_kupon = Column(Integer, ForeignKey("kupony_sklep.id_kupon"), nullable=False)
+    wykorzystany = Column(Boolean, default=False)
+
+    kupon = relationship("KuponSklep")
+

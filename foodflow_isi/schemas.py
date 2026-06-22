@@ -53,3 +53,19 @@ class UzytkownikOut(BaseModel):
     zdjecie_profilowe: str | None = None
 
     model_config = {"from_attributes": True}
+
+class KuponOut(BaseModel):
+    id_kupon: int
+    nazwa: str
+    opis: Optional[str] = None
+    koszt_punktowy: int
+    wartosc_znizki: Optional[str] = None
+    ikona: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ZakupKuponu(BaseModel):
+    id_uzytkownik: int
+    id_kupon: int

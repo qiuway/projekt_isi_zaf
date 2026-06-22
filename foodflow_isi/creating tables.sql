@@ -32,16 +32,21 @@ CREATE TABLE zdobyte_osiagniecia (
 );
 
 CREATE TABLE kupony_sklep (
-    id_kupon INT PRIMARY KEY,
-    nazwa VARCHAR(50)
+    id_kupon SERIAL PRIMARY KEY,
+    nazwa VARCHAR(100),
+    opis TEXT,
+    koszt_punktowy INTEGER,
+    wartosc_znizki VARCHAR(50),
+    ikona VARCHAR(20)
 );
 
 CREATE TABLE posiadane_kupony (
-    id_kupon INT,
-    id_uzytkownik INT,
-    status_kuponu BOOLEAN,
-    Foreign Key (id_kupon) REFERENCES kupony_sklep(id_kupon),
-    Foreign Key (id_uzytkownik) REFERENCES uzytkownik(id_uzytkownik)
+    id_posiadany_kupon SERIAL PRIMARY KEY,
+    id_uzytkownik INTEGER,
+    id_kupon INTEGER,
+    wykorzystany BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_uzytkownik) REFERENCES uzytkownik(id_uzytkownik),
+    FOREIGN KEY (id_kupon) REFERENCES kupony_sklep(id_kupon)
 );
 
 CREATE TABLE restauracja (
@@ -121,3 +126,4 @@ CREATE TABLE osoby_placace (
 );
 
 ALTER TABLE uzytkownik ADD COLUMN zdjecie_profilowe VARCHAR(255);
+
