@@ -1,0 +1,19 @@
+# Frontend
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.vite/
+
+# IntelliJ
+.idea/
+**/.idea/
+
+# Python
+__pycache__/
+*.pyc
+
+# TypeScript
+*.tsbuildinfo
+
+# System
+.DS_Store
+Thumbs.db
