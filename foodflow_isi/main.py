@@ -136,3 +136,27 @@ def logowanie(user: schemas.UzytkownikLogin, db: Session = Depends(get_db)):
         "user_id": db_user.id_uzytkownik,
         "imie": db_user.imie
     }
+
+
+@app.get("/uzytkownik/{user_id}")
+def pobierz_profil(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
+    return user
+
+
+@app.put("/uzytkownik/{user_id}")
+def aktualizuj_profil(user_id: int, dane: schemas.UzytkownikUpdate, db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
+        
+    user.imie = dane.imie
+    user.nazwisko = dane.nazwisko
+    user.email = dane.email
+    user.numer_telefonu = dane.numer_telefonu
+    user.adres = dane.adres
+    
+    db.commit()
+    return {"msg": "Profil zaktualizowany pomyślnie!"}

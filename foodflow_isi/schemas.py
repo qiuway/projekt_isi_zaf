@@ -35,3 +35,10 @@ class UzytkownikCreate(BaseModel):
 class UzytkownikLogin(BaseModel):
     email: str
     haslo: str
+
+class UzytkownikUpdate(BaseModel):
+    imie: str
+    nazwisko: str
+    email: str
+    numer_telefonu: int | None = None
+    adres: str | None = None

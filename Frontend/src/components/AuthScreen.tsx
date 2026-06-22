@@ -57,6 +57,9 @@ const handleSubmit = async () => {
       alert(data.msg); 
       
       if (isLogin) {
+
+        localStorage.setItem('userId', data.user_id);
+
         onNavigate('home');
       } else {
         onNavigate('login');

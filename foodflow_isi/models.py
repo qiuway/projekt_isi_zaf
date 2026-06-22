@@ -12,7 +12,6 @@ class Uzytkownik(Base):
     nazwisko = Column(String(30))
     email = Column(String(50), unique=True)
     
-    # BARKUJĄCE POLA DODANE PONIŻEJ:
     haslo = Column(String(32))
     numer_telefonu = Column(Integer, nullable=True)
     adres = Column(String(70), nullable=True)
@@ -66,7 +65,7 @@ class Platnosc(Base):
     id_platnosc = Column(Integer, primary_key=True, index=True)
     id_zamowienia = Column(Integer, ForeignKey("zamowienia.id_zamowienia"))
     kwota = Column(Numeric(10, 2))
-    typ = Column(Boolean)  # False = Indywidualna, True = Składka
+    typ = Column(Boolean)
     status_platnosci = Column(String(30), default="OCZEKUJĄCA")
 
 
