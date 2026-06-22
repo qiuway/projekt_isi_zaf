@@ -11,12 +11,10 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   const [managedRestaurants, setManagedRestaurants] = useState<any[]>([]);
   const userId = localStorage.getItem('userId');
 
-  // Stany dla Pop-upa (Modala)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [currentRestId, setCurrentRestId] = useState<number | null>(null);
   
-  // Dane formularza wewnątrz Pop-upa
   const [formNazwa, setFormNazwa] = useState('');
   const [formOpis, setFormOpis] = useState('');
   const [formAdres, setFormAdres] = useState('');
@@ -26,12 +24,10 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   const fetchProfileAndRestaurants = () => {
     if (!userId) return;
     
-    // 1. Pobieranie danych profilu
     fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
       .then((res) => res.json())
       .then((data) => {
         setUserData(data);
-        // 2. Jeśli to Właściciel (2) lub Admin (3), pobierz listę restauracji
         if (data.id_typ_konta === 2 || data.id_typ_konta === 3) {
           fetch(`http://127.0.0.1:8000/restauracje/zarzadzaj/${userId}`)
             .then(r => r.json())
@@ -92,7 +88,7 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
     if (res.ok) {
       alert(modalMode === 'add' ? 'Dodano restaurację!' : 'Zapisano zmiany!');
       setIsModalOpen(false);
-      fetchProfileAndRestaurants(); // Odśwież listę po zapisie
+      fetchProfileAndRestaurants();
     } else {
       alert('Wystąpił błąd podczas zapisywania.');
     }
@@ -103,11 +99,10 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
 
     const res = await fetch(`http://127.0.0.1:8000/restauracje/zarzadzaj/${restId}`, { method: 'DELETE' });
     if (res.ok) {
-      fetchProfileAndRestaurants(); // Odśwież listę
+      fetchProfileAndRestaurants();
     }
   };
 
-  // Czy użytkownik ma uprawnienia do panelu zarządzania?
   const canManage = userData && (userData.id_typ_konta === 2 || userData.id_typ_konta === 3);
   const rolaTekst = userData?.id_typ_konta === 3 ? "Administrator" : userData?.id_typ_konta === 2 ? "Właściciel restauracji" : "Klient";
 
@@ -135,7 +130,6 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
               </>
             )}
           </div>
-          {/* Typ konta wyświetlany pod avatarem dla pewności */}
           <div style={{ marginTop: '10px', fontWeight: 'bold', color: '#6d4b3a', fontSize: '0.9rem' }}>
             Konto: {rolaTekst}
           </div>
@@ -154,9 +148,9 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
           )}
 
           <div className="profile-actions">
-            <button className="secondary-button" onClick={() => onNavigate('settings')}>
-              EDYTUJ PROFIL
-            </button>
+              <button className="secondary-button" onClick={() => onNavigate('profileEdit')}>
+                      EDYTUJ PROFIL
+              </button>
             <button className="mint-button logout-button" onClick={handleLogout}>
               WYLOGUJ
             </button>
@@ -164,7 +158,6 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
         </div>
       </section>
 
-      {/* --- SEKCJA ZARZĄDZANIA RESTAURACJAMI (Tylko Admin i Właściciel) --- */}
       {canManage && (
         <section className="management-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -197,7 +190,6 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
         </section>
       )}
 
-      {/* --- POP-UP (MODAL) DO DODAWANIA I EDYCJI --- */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
