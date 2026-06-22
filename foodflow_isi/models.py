@@ -11,7 +11,6 @@ class Uzytkownik(Base):
     imie = Column(String(30))
     nazwisko = Column(String(30))
     email = Column(String(50), unique=True)
-    
     haslo = Column(String(32))
     numer_telefonu = Column(Integer, nullable=True)
     adres = Column(String(70), nullable=True)
@@ -22,6 +21,7 @@ class Uzytkownik(Base):
 
 class Restauracja(Base):
     __tablename__ = "restauracja"
+
     id_restauracja = Column(Integer, primary_key=True, index=True)
     nazwa = Column(String(30))
     opis = Column(Text)
@@ -32,6 +32,7 @@ class Restauracja(Base):
 
 class Produkt(Base):
     __tablename__ = "produkt"
+
     id_produkt = Column(Integer, primary_key=True, index=True)
     id_restauracja = Column(Integer, ForeignKey("restauracja.id_restauracja"))
     nazwa = Column(String(30))
@@ -43,6 +44,7 @@ class Produkt(Base):
 
 class Zamowienie(Base):
     __tablename__ = "zamowienia"
+
     id_zamowienia = Column(Integer, primary_key=True, index=True)
     id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"))
     id_restauracja = Column(Integer, ForeignKey("restauracja.id_restauracja"))
@@ -54,6 +56,7 @@ class Zamowienie(Base):
 
 class PozycjaZamowienia(Base):
     __tablename__ = "pozycje_zamowienia"
+
     id_pozycje_zamowienia = Column(Integer, primary_key=True, index=True)
     id_zamowienia = Column(Integer, ForeignKey("zamowienia.id_zamowienia"))
     id_produkt = Column(Integer, ForeignKey("produkt.id_produkt"))
@@ -62,15 +65,17 @@ class PozycjaZamowienia(Base):
 
 class Platnosc(Base):
     __tablename__ = "platnosc"
+
     id_platnosc = Column(Integer, primary_key=True, index=True)
     id_zamowienia = Column(Integer, ForeignKey("zamowienia.id_zamowienia"))
     kwota = Column(Numeric(10, 2))
-    typ = Column(Boolean)
+    typ = Column(Boolean)  # False = Indywidualna, True = Składka
     status_platnosci = Column(String(30), default="OCZEKUJĄCA")
 
 
 class OsobaPlacaca(Base):
     __tablename__ = "osoby_placace"
+
     id_platnosc = Column(Integer, ForeignKey("platnosc.id_platnosc"), primary_key=True)
     id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), primary_key=True)
     kwota = Column(Numeric(10, 2))

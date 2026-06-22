@@ -11,13 +11,13 @@ class RestauracjaOut(BaseModel):
 
     model_config = {"from_attributes": True}
 
-class PozycjaKoszyka(BaseModel):
-    id_produkt: int
-    ilosc: int
-
 class UczestnikSkladki(BaseModel):
     id_uzytkownik: int
     kwota_deklarowana: float
+
+class PozycjaKoszyka(BaseModel):
+    id_produkt: int
+    ilosc: int
 
 class TworzenieZamowienia(BaseModel):
     id_uzytkownik: int
