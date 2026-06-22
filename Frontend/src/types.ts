@@ -5,6 +5,7 @@ export type Screen =
   | 'restaurant'
   | 'cart'
   | 'profile'
+  | 'profileEdit'
   | 'settings'
   | 'help'
   | 'achievements'

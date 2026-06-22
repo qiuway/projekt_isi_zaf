@@ -62,7 +62,7 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
           )}
 
           <div className="profile-actions">
-            <button className="secondary-button" onClick={() => onNavigate('settings')}>
+            <button className="secondary-button" onClick={() => onNavigate('profileEdit')}>
               EDYTUJ PROFIL
             </button>
             <button className="mint-button logout-button" onClick={handleLogout}>

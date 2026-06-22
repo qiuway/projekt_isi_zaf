@@ -9,6 +9,7 @@ import { PointsShopScreen } from './components/PointsShopScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { RestaurantScreen } from './components/RestaurantScreen';
 import { SettingsScreen } from './components/SettingsScreen';
+import { ProfileEditScreen } from './components/ProfileEditScreen';
 import type { Screen } from './types';
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
         return <CartScreen onNavigate={setCurrentScreen} />;
       case 'profile':
         return <ProfileScreen onNavigate={setCurrentScreen} />;
+      case 'profileEdit':
+        return <ProfileEditScreen onNavigate={setCurrentScreen} />;
       case 'settings':
         return <SettingsScreen onNavigate={setCurrentScreen} />;
       case 'help':
