@@ -135,15 +135,25 @@ def rejestracja(user: schemas.UzytkownikCreate, db: Session = Depends(get_db)):
 @app.post("/logowanie")
 def logowanie(user: schemas.UzytkownikLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.Uzytkownik).filter(models.Uzytkownik.email == user.email).first()
-    
+
     if not db_user or db_user.haslo != user.haslo:
         raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
-        
+
     return {
-        "msg": f"Witaj {db_user.imie}, zalogowano pomyślnie!", 
+        "msg": f"Witaj {db_user.imie}, zalogowano pomyślnie!",
         "user_id": db_user.id_uzytkownik,
-        "imie": db_user.imie
+        "imie": db_user.imie,
+        "punkty": db_user.punkty
     }
+
+@app.get("/uzytkownik/{user_id}/punkty")
+def pobierz_punkty(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
+
+    return {"punkty": user.punkty}
 
 
 @app.get("/uzytkownik/{user_id}")
