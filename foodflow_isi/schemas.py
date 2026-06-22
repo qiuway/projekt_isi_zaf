@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from pydantic import BaseModel, Field
 
 class RestauracjaOut(BaseModel):
     id_restauracja: int
@@ -26,10 +27,10 @@ class TworzenieZamowienia(BaseModel):
     uczestnicy_skladki: Optional[List[UczestnikSkladki]] = None
 
 class UzytkownikCreate(BaseModel):
-    imie: str
-    nazwisko: str
-    email: str
-    haslo: str
+    imie: str = Field(..., min_length=2)
+    nazwisko: str = Field(..., min_length=2)
+    email: str = Field(..., min_length=5, pattern="^.+@.+$")
+    haslo: str = Field(..., min_length=4)
 
 class UzytkownikLogin(BaseModel):
     email: str

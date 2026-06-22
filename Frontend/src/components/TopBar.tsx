@@ -59,7 +59,6 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
         Sklep za punkty
       </button>
       
-      {/* Usunięto zdjęcia, został sam tytuł */}
       <div className="brand-title">{title}</div>
       
       <button className="mint-button" onClick={() => onNavigate('cart')}>

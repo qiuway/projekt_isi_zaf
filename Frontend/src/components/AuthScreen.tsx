@@ -9,19 +9,29 @@ interface AuthScreenProps {
 export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
   const isLogin = mode === 'login';
 
-  // Stany przechowujące to, co użytkownik wpisuje w formularz
   const [imie, setImie] = useState('');
   const [nazwisko, setNazwisko] = useState('');
   const [email, setEmail] = useState('');
   const [haslo, setHaslo] = useState('');
   
-  // Stan na wyświetlanie błędów z serwera (np. "zły email")
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Funkcja wysyłająca dane do backendu
-  const handleSubmit = async () => {
-    setErrorMsg(''); // Czyszczenie starych błędów
+const handleSubmit = async () => {
+    setErrorMsg('');
     
+    if (!email || !haslo) {
+      setErrorMsg('Email i hasło są wymagane!');
+      return;
+    }
+    if (!isLogin && (!imie || !nazwisko)) {
+      setErrorMsg('Wypełnij imię i nazwisko!');
+      return;
+    }
+    if (!email.includes('@')) {
+      setErrorMsg('Podaj poprawny adres email!');
+      return;
+    }
+
     const url = isLogin ? 'http://127.0.0.1:8000/logowanie' : 'http://127.0.0.1:8000/rejestracja';
     const payload = isLogin ? { email, haslo } : { imie, nazwisko, email, haslo };
 
@@ -35,8 +45,11 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        // Serwer zwrócił błąd (np. 400 lub 401)
-        setErrorMsg(data.detail || 'Wystąpił błąd');
+        if (Array.isArray(data.detail)) {
+          setErrorMsg(`Błąd wprowadzonych danych: ${data.detail[0].msg}`);
+        } else {
+          setErrorMsg(data.detail || 'Wystąpił błąd z serwerem');
+        }
         return;
       }
 
@@ -44,10 +57,8 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
       alert(data.msg); 
       
       if (isLogin) {
-        // Po zalogowaniu wpuszczamy użytkownika do aplikacji
         onNavigate('home');
       } else {
-        // Po udanej rejestracji przełączamy na ekran logowania
         onNavigate('login');
       }
     } catch (error) {
@@ -61,7 +72,6 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
         <h1 className="auth-logo">FoodFlow</h1>
         <div className="banner-ribbon">{isLogin ? 'ZALOGUJ SIĘ' : 'ZAREJESTRUJ SIĘ'}</div>
 
-        {/* Wyświetlanie błędu nad formularzem */}
         {errorMsg && <div style={{ color: 'red', marginTop: '10px', fontWeight: 'bold' }}>{errorMsg}</div>}
 
         <div className="form-stack">
@@ -94,10 +104,7 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
             value={haslo} 
             onChange={(e) => setHaslo(e.target.value)} 
           />
-        </div>
-
-        {/* Podpięcie funkcji handleSubmit do przycisku */}
-        <button className="mint-button wide-button" onClick={handleSubmit}>
+        </div>        <button className="mint-button wide-button" onClick={handleSubmit}>
           {isLogin ? 'ZALOGUJ SIĘ' : 'ZAREJESTRUJ SIĘ'}
         </button>
 
@@ -106,7 +113,7 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
         <button
           className="secondary-button wide-button"
           onClick={() => {
-            setErrorMsg(''); // Czyszczenie błędów przy zmianie ekranu
+            setErrorMsg('');
             onNavigate(isLogin ? 'register' : 'login');
           }}
         >
