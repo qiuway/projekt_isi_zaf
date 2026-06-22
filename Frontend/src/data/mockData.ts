@@ -1,4 +1,4 @@
-import type { Achievement, Restaurant, Reward } from '../types';
+import type { Achievement, Restaurant} from '../types';
 
 export const restaurants: Restaurant[] = [
   {
@@ -114,40 +114,5 @@ export const achievements: Achievement[] = [
     earnedAt: '01.04.2026',
     points: 500,
     icon: '⭐',
-  },
-];
-
-export const rewards: Reward[] = [
-  {
-    id: 1,
-    name: 'Rabat 10%',
-    description: 'Jednorazowy rabat na całe zamówienie.',
-    priceInPoints: 250,
-    discount: '10% zniżki',
-    icon: '🎟️',
-  },
-  {
-    id: 2,
-    name: 'Darmowa dostawa',
-    description: 'Kupon na darmową dostawę do dowolnego zamówienia.',
-    priceInPoints: 400,
-    discount: '0 zł dostawy',
-    icon: '🚚',
-  },
-  {
-    id: 3,
-    name: 'Rabat 20 zł',
-    description: 'Stała zniżka kwotowa przy większych zamówieniach.',
-    priceInPoints: 700,
-    discount: '20 zł zniżki',
-    icon: '💸',
-  },
-  {
-    id: 4,
-    name: 'Mega rabat 25%',
-    description: 'Największy kupon promocyjny dostępny w sklepie punktowym.',
-    priceInPoints: 1200,
-    discount: '25% zniżki',
-    icon: '👑',
   },
 ];

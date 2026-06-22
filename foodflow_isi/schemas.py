@@ -62,3 +62,19 @@ class RestauracjaCreateUpdate(BaseModel):
     adres: str | None = None
     numer_telefonu: int | None = None
     czynne: bool = False
+
+class KuponOut(BaseModel):
+    id_kupon: int
+    nazwa: str
+    opis: Optional[str] = None
+    koszt_punktowy: int
+    wartosc_znizki: Optional[str] = None
+    ikona: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ZakupKuponu(BaseModel):
+    id_uzytkownik: int
+    id_kupon: int
