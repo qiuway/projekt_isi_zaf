@@ -13,10 +13,10 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
   const [nazwisko, setNazwisko] = useState('');
   const [email, setEmail] = useState('');
   const [haslo, setHaslo] = useState('');
-  
+  const [isOwner, setIsOwner] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     setErrorMsg('');
     
     if (!email || !haslo) {
@@ -33,7 +33,9 @@ const handleSubmit = async () => {
     }
 
     const url = isLogin ? 'http://127.0.0.1:8000/logowanie' : 'http://127.0.0.1:8000/rejestracja';
-    const payload = isLogin ? { email, haslo } : { imie, nazwisko, email, haslo };
+    const payload = isLogin 
+      ? { email, haslo } 
+      : { imie, nazwisko, email, haslo, is_owner: isOwner };
 
     try {
       const response = await fetch(url, {
@@ -53,15 +55,11 @@ const handleSubmit = async () => {
         return;
       }
 
-      // Sukces!
       alert(data.msg); 
       
       if (isLogin) {
-
-          localStorage.setItem('userId', data.user_id);
-          localStorage.setItem('punkty', String(data.punkty ?? 0));
-
-          onNavigate('home');
+        localStorage.setItem('userId', data.user_id);
+        onNavigate('home');
       } else {
         onNavigate('login');
       }
@@ -76,7 +74,8 @@ const handleSubmit = async () => {
         <h1 className="auth-logo">FoodFlow</h1>
         <div className="banner-ribbon">{isLogin ? 'ZALOGUJ SIĘ' : 'ZAREJESTRUJ SIĘ'}</div>
 
-        {errorMsg && <div style={{ color: 'red', marginTop: '10px', fontWeight: 'bold' }}>{errorMsg}</div>}
+        {/* Klasa zamiast stylu inline */}
+        {errorMsg && <div className="auth-error-msg">{errorMsg}</div>}
 
         <div className="form-stack">
           {!isLogin && (
@@ -108,7 +107,21 @@ const handleSubmit = async () => {
             value={haslo} 
             onChange={(e) => setHaslo(e.target.value)} 
           />
-        </div>        <button className="mint-button wide-button" onClick={handleSubmit}>
+
+          {!isLogin && (
+            <label className="auth-role-label">
+              <input 
+                type="checkbox" 
+                className="auth-role-checkbox"
+                checked={isOwner} 
+                onChange={(e) => setIsOwner(e.target.checked)} 
+              />
+              <span>Zarejestruj jako właściciel restauracji</span>
+            </label>
+          )}
+        </div>
+
+        <button className="mint-button wide-button auth-submit-btn" onClick={handleSubmit}>
           {isLogin ? 'ZALOGUJ SIĘ' : 'ZAREJESTRUJ SIĘ'}
         </button>
 
@@ -118,6 +131,7 @@ const handleSubmit = async () => {
           className="secondary-button wide-button"
           onClick={() => {
             setErrorMsg('');
+            setIsOwner(false);
             onNavigate(isLogin ? 'register' : 'login');
           }}
         >

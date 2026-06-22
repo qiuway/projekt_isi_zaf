@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
 
-
 class Uzytkownik(Base):
     __tablename__ = "uzytkownik"
     
@@ -26,9 +25,13 @@ class Restauracja(Base):
 
     id_restauracja = Column(Integer, primary_key=True, index=True)
     nazwa = Column(String(30))
-    opis = Column(Text)
-    czynne = Column(Boolean, default=True)
-
+    opis = Column(Text, nullable=True)
+    adres = Column(String(70), nullable=True)
+    numer_telefonu = Column(Integer, nullable=True)
+    czynne = Column(Boolean, default=False)
+    
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=True)
+    
     produkty = relationship("Produkt", back_populates="restauracja")
 
 

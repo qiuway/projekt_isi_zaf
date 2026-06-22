@@ -116,16 +116,18 @@ def zloz_zamowienie(dane: schemas.TworzenieZamowienia, db: Session = Depends(get
 
 @app.post("/rejestracja")
 def rejestracja(user: schemas.UzytkownikCreate, db: Session = Depends(get_db)):
-
     istniejacy = db.query(models.Uzytkownik).filter(models.Uzytkownik.email == user.email).first()
     if istniejacy:
         raise HTTPException(status_code=400, detail="Ten email jest już zajęty!")
+    
+    wybrany_typ_konta = 2 if user.is_owner else 1
     
     nowy_uzytkownik = models.Uzytkownik(
         imie=user.imie,
         nazwisko=user.nazwisko,
         email=user.email,
         haslo=user.haslo,
+        id_typ_konta=wybrany_typ_konta,
         punkty=0
     )
     db.add(nowy_uzytkownik)
@@ -197,3 +199,43 @@ def upload_avatar(user_id: int, file: UploadFile = File(...), db: Session = Depe
     db.commit()
 
     return {"msg": "Zdjęcie profilowe zaktualizowane!", "avatar_url": avatar_url}
+
+@app.get("/restauracje/zarzadzaj/{user_id}")
+def pobierz_moje_restauracje(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
+        
+    if user.id_typ_konta == 3:
+        return db.query(models.Restauracja).all()
+    elif user.id_typ_konta == 2:
+        return db.query(models.Restauracja).filter(models.Restauracja.id_uzytkownik == user_id).all()
+    else:
+        return []
+
+@app.post("/restauracje/zarzadzaj/{user_id}")
+def dodaj_restauracje(user_id: int, rest: schemas.RestauracjaCreateUpdate, db: Session = Depends(get_db)):
+    nowa = models.Restauracja(**rest.model_dump(), id_uzytkownik=user_id)
+    db.add(nowa)
+    db.commit()
+    return {"msg": "Dodano restaurację"}
+
+@app.put("/restauracje/zarzadzaj/{rest_id}")
+def edytuj_restauracje(rest_id: int, rest: schemas.RestauracjaCreateUpdate, db: Session = Depends(get_db)):
+    db_rest = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
+    if not db_rest:
+        raise HTTPException(status_code=404)
+    
+    for key, value in rest.model_dump().items():
+        setattr(db_rest, key, value)
+        
+    db.commit()
+    return {"msg": "Zaktualizowano restaurację"}
+
+@app.delete("/restauracje/zarzadzaj/{rest_id}")
+def usun_restauracje(rest_id: int, db: Session = Depends(get_db)):
+    db_rest = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
+    if db_rest:
+        db.delete(db_rest)
+        db.commit()
+    return {"msg": "Usunięto restaurację"}

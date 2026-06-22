@@ -31,6 +31,7 @@ class UzytkownikCreate(BaseModel):
     nazwisko: str = Field(..., min_length=2)
     email: str = Field(..., min_length=5, pattern="^.+@.+$")
     haslo: str = Field(..., min_length=4)
+    is_owner: bool = False
 
 class UzytkownikLogin(BaseModel):
     email: str
@@ -53,3 +54,11 @@ class UzytkownikOut(BaseModel):
     zdjecie_profilowe: str | None = None
 
     model_config = {"from_attributes": True}
+    id_typ_konta: int | None = None
+
+class RestauracjaCreateUpdate(BaseModel):
+    nazwa: str
+    opis: str | None = None
+    adres: str | None = None
+    numer_telefonu: int | None = None
+    czynne: bool = False

@@ -121,3 +121,11 @@ CREATE TABLE osoby_placace (
 );
 
 ALTER TABLE uzytkownik ADD COLUMN zdjecie_profilowe VARCHAR(255);
+
+INSERT INTO typ_konta (id_typ_konta, nazwa) VALUES 
+(1, 'Klient'),
+(2, 'Właściciel restauracji'),
+(3, 'Administrator')
+ON CONFLICT (id_typ_konta) DO NOTHING;
+
+ALTER TABLE restauracja ADD COLUMN id_uzytkownik INT REFERENCES uzytkownik(id_uzytkownik);
