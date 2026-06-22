@@ -58,11 +58,11 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
                             </div>
                             <div className="achievement-line two-up">
                                 <div>
-                                    <span>Wartość</span>
+                                    <span>Wartość </span>
                                     <strong>{reward.discount}</strong>
                                 </div>
                                 <div>
-                                    <span>Cena</span>
+                                    <span>Cena </span>
                                     <strong>{reward.priceInPoints} pkt</strong>
                                 </div>
                             </div>
