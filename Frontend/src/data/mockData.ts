@@ -1,0 +1,153 @@
+import type { Achievement, Restaurant, Reward } from '../types';
+
+export const restaurants: Restaurant[] = [
+  {
+    id: 1,
+    name: 'Bella Pasta',
+    tagline: 'Włoskie smaki i szybka dostawa',
+    category: 'Włoska',
+    rating: '4.8',
+    deliveryTime: '25-35 min',
+    minimumOrder: '30 zł',
+    dishes: [
+      { id: 1, name: 'Margherita', price: '29,99 zł', description: 'Klasyczna pizza z mozzarellą.' },
+      { id: 2, name: 'Carbonara', price: '33,99 zł', description: 'Makaron w kremowym sosie.' },
+      { id: 3, name: 'Tiramisu', price: '17,99 zł', description: 'Delikatny włoski deser.' },
+      { id: 4, name: 'Lemoniada', price: '11,99 zł', description: 'Cytrusowy napój.' },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Burger Spot',
+    tagline: 'Soczyste burgery i dodatki',
+    category: 'Fast food',
+    rating: '4.7',
+    deliveryTime: '20-30 min',
+    minimumOrder: '25 zł',
+    dishes: [
+      { id: 1, name: 'Classic Burger', price: '28,99 zł', description: 'Wołowina, ser i sos.' },
+      { id: 2, name: 'Frytki', price: '12,99 zł', description: 'Chrupiące frytki.' },
+      { id: 3, name: 'Chicken Box', price: '24,99 zł', description: 'Kawałki kurczaka.' },
+      { id: 4, name: 'Shake Waniliowy', price: '14,99 zł', description: 'Gęsty koktajl.' },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Sushi Wave',
+    tagline: 'Świeże rolki i zestawy',
+    category: 'Japońska',
+    rating: '4.9',
+    deliveryTime: '35-45 min',
+    minimumOrder: '40 zł',
+    dishes: [
+      { id: 1, name: 'California Roll', price: '31,99 zł', description: 'Krab, awokado, ogórek.' },
+      { id: 2, name: 'Hosomaki Łosoś', price: '21,99 zł', description: 'Klasyczne hosomaki.' },
+      { id: 3, name: 'Tempura', price: '26,99 zł', description: 'Krewetki w tempurze.' },
+      { id: 4, name: 'Mochi', price: '16,99 zł', description: 'Japoński deser.' },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Fit Bowl',
+    tagline: 'Zdrowe i lekkie posiłki',
+    category: 'Healthy',
+    rating: '4.6',
+    deliveryTime: '20-25 min',
+    minimumOrder: '22 zł',
+    dishes: [
+      { id: 1, name: 'Chicken Bowl', price: '27,99 zł', description: 'Kurczak, ryż i warzywa.' },
+      { id: 2, name: 'Wrap Wege', price: '23,99 zł', description: 'Warzywa i hummus.' },
+      { id: 3, name: 'Smoothie', price: '13,99 zł', description: 'Mango i banan.' },
+      { id: 4, name: 'Sałatka Cezar', price: '24,99 zł', description: 'Sałata, kurczak, grzanki.' },
+    ],
+  },
+  { id: 5, name: 'Pizza Hut', tagline: 'Znane pizze i dodatki', category: 'Pizza', rating: '4.5', deliveryTime: '25-35 min', minimumOrder: '25 zł', dishes: [] },
+  { id: 6, name: 'KFC', tagline: 'Kurczak i zestawy', category: 'Fast food', rating: '4.4', deliveryTime: '20-30 min', minimumOrder: '25 zł', dishes: [] },
+  { id: 7, name: "McDonald's", tagline: 'Burgery i klasyki', category: 'Fast food', rating: '4.3', deliveryTime: '15-25 min', minimumOrder: '20 zł', dishes: [] },
+  { id: 8, name: "Domino's Pizza", tagline: 'Pizza na szybko', category: 'Pizza', rating: '4.4', deliveryTime: '25-35 min', minimumOrder: '28 zł', dishes: [] },
+  { id: 9, name: 'Subway', tagline: 'Kanapki na zamówienie', category: 'Kanapki', rating: '4.2', deliveryTime: '20-30 min', minimumOrder: '20 zł', dishes: [] },
+  { id: 10, name: 'Costa Coffee', tagline: 'Kawa i słodkości', category: 'Kawiarnia', rating: '4.6', deliveryTime: '15-20 min', minimumOrder: '15 zł', dishes: [] },
+  { id: 11, name: 'Starbucks', tagline: 'Napoje i przekąski', category: 'Kawiarnia', rating: '4.5', deliveryTime: '15-25 min', minimumOrder: '18 zł', dishes: [] },
+  { id: 12, name: 'Taco Bell', tagline: 'Meksykańskie smaki', category: 'Meksykańska', rating: '4.3', deliveryTime: '20-30 min', minimumOrder: '24 zł', dishes: [] },
+  { id: 13, name: "Papa John's", tagline: 'Pizze premium', category: 'Pizza', rating: '4.5', deliveryTime: '25-35 min', minimumOrder: '30 zł', dishes: [] },
+  { id: 14, name: 'Burger King', tagline: 'Grillowane burgery', category: 'Fast food', rating: '4.4', deliveryTime: '20-30 min', minimumOrder: '22 zł', dishes: [] },
+  { id: 15, name: "Dunkin", tagline: 'Pączki i kawa', category: 'Słodkości', rating: '4.3', deliveryTime: '15-20 min', minimumOrder: '15 zł', dishes: [] },
+  { id: 16, name: "Wendy's", tagline: 'Burgery i frytki', category: 'Fast food', rating: '4.2', deliveryTime: '20-30 min', minimumOrder: '22 zł', dishes: [] },
+];
+
+export const cartItems = [
+  { id: 1, name: 'Margherita', price: '29,99 zł', qty: 1, total: '29,99 zł' },
+  { id: 2, name: 'Carbonara', price: '33,99 zł', qty: 1, total: '33,99 zł' },
+  { id: 3, name: 'Lemoniada', price: '11,99 zł', qty: 1, total: '11,99 zł' },
+  { id: 4, name: 'Tiramisu', price: '17,99 zł', qty: 1, total: '17,99 zł' },
+];
+
+export const achievements: Achievement[] = [
+  {
+    id: 1,
+    name: 'Pierwsze zamówienie',
+    description: 'Użytkownik złożył swoje pierwsze zamówienie w aplikacji FoodFlow.',
+    earnedAt: '12.03.2026',
+    points: 100,
+    icon: '🏅',
+  },
+  {
+    id: 2,
+    name: 'Łowca promocji',
+    description: 'Skorzystano z oferty promocyjnej lub kodu rabatowego podczas zakupów.',
+    earnedAt: '18.03.2026',
+    points: 150,
+    icon: '🎁',
+  },
+  {
+    id: 3,
+    name: 'Smakosz tygodnia',
+    description: 'Użytkownik zamówił jedzenie przez 7 dni z rzędu.',
+    earnedAt: '25.03.2026',
+    points: 300,
+    icon: '🍜',
+  },
+  {
+    id: 4,
+    name: 'Stały klient',
+    description: 'W aplikacji złożono co najmniej 10 zamówień.',
+    earnedAt: '01.04.2026',
+    points: 500,
+    icon: '⭐',
+  },
+];
+
+export const rewards: Reward[] = [
+  {
+    id: 1,
+    name: 'Rabat 10%',
+    description: 'Jednorazowy rabat na całe zamówienie.',
+    priceInPoints: 250,
+    discount: '10% zniżki',
+    icon: '🎟️',
+  },
+  {
+    id: 2,
+    name: 'Darmowa dostawa',
+    description: 'Kupon na darmową dostawę do dowolnego zamówienia.',
+    priceInPoints: 400,
+    discount: '0 zł dostawy',
+    icon: '🚚',
+  },
+  {
+    id: 3,
+    name: 'Rabat 20 zł',
+    description: 'Stała zniżka kwotowa przy większych zamówieniach.',
+    priceInPoints: 700,
+    discount: '20 zł zniżki',
+    icon: '💸',
+  },
+  {
+    id: 4,
+    name: 'Mega rabat 25%',
+    description: 'Największy kupon promocyjny dostępny w sklepie punktowym.',
+    priceInPoints: 1200,
+    discount: '25% zniżki',
+    icon: '👑',
+  },
+];
