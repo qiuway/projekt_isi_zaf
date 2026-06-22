@@ -37,15 +37,20 @@ class Restauracja(Base):
 
 class Produkt(Base):
     __tablename__ = "produkt"
-
     id_produkt = Column(Integer, primary_key=True, index=True)
     id_restauracja = Column(Integer, ForeignKey("restauracja.id_restauracja"))
+    id_kategoria = Column(Integer, ForeignKey("kategoria.id_kategoria"))
     nazwa = Column(String(30))
     cena = Column(Numeric(10, 2))
     dostepny = Column(Boolean, default=True)
 
+    kategoria = relationship("Kategoria")
     restauracja = relationship("Restauracja", back_populates="produkty")
 
+class Kategoria(Base):
+    __tablename__ = "kategoria"
+    id_kategoria = Column(Integer, primary_key=True, index=True)
+    nazwa = Column(String(30))
 
 class Zamowienie(Base):
     __tablename__ = "zamowienia"

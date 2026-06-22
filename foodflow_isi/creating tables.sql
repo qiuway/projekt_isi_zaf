@@ -135,3 +135,11 @@ ON CONFLICT (id_typ_konta) DO NOTHING;
 
 ALTER TABLE restauracja ADD COLUMN id_uzytkownik INT REFERENCES uzytkownik(id_uzytkownik);
 
+INSERT INTO kategoria (id_kategoria, nazwa) VALUES 
+(1, 'Dania główne'),
+(2, 'Zupy'),
+(3, 'Przystawki'),
+(4, 'Napoje'),
+(5, 'Desery'),
+(6, 'Fast Food')
+ON CONFLICT (id_kategoria) DO NOTHING;

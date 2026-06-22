@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import uuid
-
+from typing import List
 import os
 import shutil
 from fastapi.staticfiles import StaticFiles
@@ -15,7 +15,7 @@ app = FastAPI(title="FoodFlow API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"], # Adresy frontendu
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -307,3 +307,54 @@ def usun_restauracje(rest_id: int, db: Session = Depends(get_db)):
         db.delete(db_rest)
         db.commit()
     return {"msg": "Usunięto restaurację"}
+
+
+@app.get("/restauracja/{rest_id}", response_model=schemas.RestauracjaOut)
+def pobierz_restauracje(rest_id: int, db: Session = Depends(get_db)):
+    rest = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
+    if not rest:
+        raise HTTPException(status_code=404, detail="Restauracja nie istnieje")
+    return rest
+
+@app.get("/kategorie", response_model=List[schemas.KategoriaOut])
+def pobierz_kategorie(db: Session = Depends(get_db)):
+    return db.query(models.Kategoria).all()
+
+@app.get("/restauracja/{rest_id}/produkty", response_model=List[schemas.ProduktOut])
+def pobierz_produkty(rest_id: int, db: Session = Depends(get_db)):
+    return db.query(models.Produkt).filter(models.Produkt.id_restauracja == rest_id).all()
+
+@app.post("/restauracja/{rest_id}/produkty")
+def dodaj_produkt(rest_id: int, prod: schemas.ProduktCreate, db: Session = Depends(get_db)):
+    nowy_produkt = models.Produkt(
+        id_restauracja=rest_id,
+        id_kategoria=prod.id_kategoria,
+        nazwa=prod.nazwa,
+        cena=prod.cena,
+        dostepny=prod.dostepny
+    )
+    db.add(nowy_produkt)
+    db.commit()
+    return {"msg": "Dodano produkt do menu"}
+
+@app.put("/produkty/{prod_id}")
+def edytuj_produkt(prod_id: int, prod: schemas.ProduktCreate, db: Session = Depends(get_db)):
+    db_prod = db.query(models.Produkt).filter(models.Produkt.id_produkt == prod_id).first()
+    if not db_prod:
+        raise HTTPException(status_code=404, detail="Produkt nie istnieje")
+    
+    db_prod.nazwa = prod.nazwa
+    db_prod.cena = prod.cena
+    db_prod.id_kategoria = prod.id_kategoria
+    db_prod.dostepny = prod.dostepny
+    
+    db.commit()
+    return {"msg": "Zaktualizowano produkt!"}
+
+@app.delete("/produkty/{prod_id}")
+def usun_produkt(prod_id: int, db: Session = Depends(get_db)):
+    db_prod = db.query(models.Produkt).filter(models.Produkt.id_produkt == prod_id).first()
+    if db_prod:
+        db.delete(db_prod)
+        db.commit()
+    return {"msg": "Usunięto produkt!"}

@@ -85,7 +85,6 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
 
       <div className="two-column-layout home-layout">
         <section className="column-panel divider-right">
-          {/* WYŚRODKOWANA WSTĄŻKA */}
           <div className="single-ribbon-wrap">
             <div className="section-ribbon blue-ribbon home-ribbon" style={{ margin: 0 }}>POLECANE I NOWOŚCI</div>
           </div>
@@ -98,7 +97,10 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
                     <button
                       key={restaurant.id_restauracja}
                       className="tile home-restaurant-tile"
-                      onClick={() => onNavigate('restaurant')}
+                      onClick={() => {
+                            localStorage.setItem('currentRestId', String(restaurant.id_restauracja));
+                            onNavigate('restaurant');
+                        }}
                     >
                       <strong>{restaurant.nazwa}</strong>
                       {(restaurant.opis || restaurant.adres) && (
@@ -122,7 +124,6 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
         </section>
 
         <section className="column-panel">
-          {/* WYŚRODKOWANA WSTĄŻKA - pojawia się tylko, gdy są wyniki */}
           {rightGroups.length > 0 && (
             <>
               <div className="single-ribbon-wrap">
@@ -136,7 +137,10 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
                       <button
                         key={restaurant.id_restauracja}
                         className="tile home-restaurant-tile"
-                        onClick={() => onNavigate('restaurant')}
+                            onClick={() => {
+                            localStorage.setItem('currentRestId', String(restaurant.id_restauracja));
+                            onNavigate('restaurant');
+                        }}
                       >
                         <strong>{restaurant.nazwa}</strong>
                         {(restaurant.opis || restaurant.adres) && (

@@ -78,3 +78,25 @@ class KuponOut(BaseModel):
 class ZakupKuponu(BaseModel):
     id_uzytkownik: int
     id_kupon: int
+
+class KategoriaOut(BaseModel):
+    id_kategoria: int
+    nazwa: str
+    model_config = {"from_attributes": True}
+
+class ProduktOut(BaseModel):
+    id_produkt: int
+    id_restauracja: int
+    id_kategoria: int
+    nazwa: str
+    cena: float
+    dostepny: bool
+    kategoria: Optional[KategoriaOut] = None
+
+    model_config = {"from_attributes": True}
+
+class ProduktCreate(BaseModel):
+    nazwa: str
+    cena: float
+    id_kategoria: int
+    dostepny: bool = True
