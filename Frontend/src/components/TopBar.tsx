@@ -15,8 +15,9 @@ const menuItems: { label: string; screen: Screen }[] = [
 ];
 
 export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [punkty, setPunkty] = useState(localStorage.getItem('punkty') || '0');
+    const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -28,6 +29,24 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+    useEffect(() => {
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            setPunkty('0');
+            return;
+        }
+
+        fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/punkty`)
+            .then((res) => res.json())
+            .then((data) => {
+                const aktualnePunkty = String(data.punkty ?? 0);
+                setPunkty(aktualnePunkty);
+                localStorage.setItem('punkty', aktualnePunkty);
+            })
+            .catch((err) => console.error(err));
+    }, []);
 
   const handleNavigate = (screen: Screen) => {
     setIsOpen(false);
@@ -54,7 +73,7 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
         )}
       </div>
 
-      <div className="pill small-pill">Punkty: 9999</div>
+        <div className="pill small-pill">Punkty: {punkty}</div>
         <button
             className="secondary-button points-shop-button"
             onClick={() => onNavigate('home')}>
