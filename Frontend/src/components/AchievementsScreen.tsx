@@ -33,11 +33,11 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
               </div>
               <div className="achievement-line two-up">
                 <div>
-                  <span>Data zdobycia</span>
+                  <span>Data zdobycia </span>
                   <strong>{achievement.earnedAt}</strong>
                 </div>
                 <div>
-                  <span>Ilość punktów</span>
+                  <span>Ilość punktów </span>
                   <strong>{achievement.points} pkt</strong>
                 </div>
               </div>
