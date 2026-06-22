@@ -1186,3 +1186,172 @@ button {
   padding: 0 16px !important;
   box-sizing: border-box;
 }
+
+/* ===== SETTINGS SCREEN ===== */
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 2px solid rgba(153, 121, 103, 0.25);
+}
+
+.settings-row-text {
+    display: grid;
+    gap: 6px;
+}
+
+.settings-row-text strong {
+    color: #3d2b20;
+}
+
+.settings-row-text p {
+    margin: 0;
+    color: #6d4b3a;
+}
+
+.settings-switch {
+    position: relative;
+    width: 58px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.settings-switch input {
+    display: none;
+}
+
+.settings-slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background: #d7c5b7;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.settings-slider::before {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 3px;
+    top: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.settings-switch input:checked + .settings-slider {
+    background: var(--mint);
+}
+
+.settings-switch input:checked + .settings-slider::before {
+    transform: translateX(28px);
+}
+
+/* ===== DARK MODE ===== */
+
+body.dark-mode {
+    background: #1f1f24;
+    color: #f5f0ea;
+}
+
+body.dark-mode .page-shell,
+body.dark-mode .auth-page {
+    background: #1f1f24;
+    color: #f5f0ea;
+}
+
+body.dark-mode .topbar,
+body.dark-mode .dropdown-menu,
+body.dark-mode .auth-card,
+body.dark-mode .profile-card,
+body.dark-mode .settings-content,
+body.dark-mode .settings-menu,
+body.dark-mode .summary-card,
+body.dark-mode .restaurant-card,
+body.dark-mode .home-restaurant-card,
+body.dark-mode .home-restaurant-panel,
+body.dark-mode .info-card,
+body.dark-mode .cart-item,
+body.dark-mode .dish-card,
+body.dark-mode .help-card,
+body.dark-mode .help-item,
+body.dark-mode .achievement-card,
+body.dark-mode .reward-card,
+body.dark-mode .payment-card,
+body.dark-mode .payment-summary-box,
+body.dark-mode .modal-card,
+body.dark-mode .reward-choice,
+body.dark-mode .payment-option,
+body.dark-mode .coupon-checkbox,
+body.dark-mode .tile,
+body.dark-mode .pill,
+body.dark-mode .mini-photo,
+body.dark-mode .filter-box {
+    background: #2b2b33;
+    color: #f5f0ea;
+    border-color: #555565;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode strong,
+body.dark-mode label,
+body.dark-mode button,
+body.dark-mode .brand-title,
+body.dark-mode .restaurant-meta,
+body.dark-mode .meta-address,
+body.dark-mode .achievement-line span,
+body.dark-mode .help-item h3,
+body.dark-mode .modal-note,
+body.dark-mode .dropdown-item,
+body.dark-mode .settings-menu-item,
+body.dark-mode .tile,
+body.dark-mode .small-pill,
+body.dark-mode .address-pill,
+body.dark-mode .settings-row-text strong,
+body.dark-mode .settings-row-text p {
+    color: #f5f0ea;
+}
+
+body.dark-mode .settings-row {
+    border-bottom-color: #555565;
+}
+
+body.dark-mode .soft-input,
+body.dark-mode .coupon-input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background: #3a3a44;
+    color: #ffffff;
+    border-color: #666677;
+}
+
+body.dark-mode .soft-input::placeholder,
+body.dark-mode .coupon-input::placeholder,
+body.dark-mode input::placeholder {
+    color: #beb6ae;
+}
+
+body.dark-mode .icon-button span {
+    background: #f5f0ea;
+}
+
+body.dark-mode .dropdown-item,
+body.dark-mode .secondary-button,
+body.dark-mode .mini-action {
+    background: #3a3a44;
+    color: #f5f0ea;
+}
+
+body.dark-mode .mint-button {
+    color: #24463d;
+}
