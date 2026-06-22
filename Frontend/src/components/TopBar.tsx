@@ -7,11 +7,11 @@ interface TopBarProps {
 }
 
 const menuItems: { label: string; screen: Screen }[] = [
-  { label: 'Strona główna', screen: 'home' },
-  { label: 'Profil', screen: 'profile' },
-  { label: 'Ustawienia', screen: 'settings' },
-  { label: 'Osiągnięcia', screen: 'achievements' },
-  { label: 'Pomoc', screen: 'help' },
+    { label: 'Profil', screen: 'profile' },
+    { label: 'Ustawienia', screen: 'settings' },
+    { label: 'Sklep za punkty', screen: 'pointsShop' },
+    { label: 'Osiągnięcia', screen: 'achievements' },
+    { label: 'Pomoc', screen: 'help' },
 ];
 
 export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
@@ -55,9 +55,11 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
       </div>
 
       <div className="pill small-pill">Punkty: 9999</div>
-      <button className="secondary-button points-shop-button" onClick={() => onNavigate('pointsShop')}>
-        Sklep za punkty
-      </button>
+        <button
+            className="secondary-button points-shop-button"
+            onClick={() => onNavigate('home')}>
+            Strona główna
+        </button>
       
       <div className="brand-title">{title}</div>
       
