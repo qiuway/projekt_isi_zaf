@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AchievementsScreen } from './components/AchievementsScreen';
 import { AuthScreen } from './components/AuthScreen';
 import { CartScreen } from './components/CartScreen';
@@ -14,6 +14,16 @@ import type { Screen } from './types';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('register');
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    }, []);
 
   const screen = useMemo(() => {
     switch (currentScreen) {
