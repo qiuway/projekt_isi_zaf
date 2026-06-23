@@ -84,7 +84,7 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
       </div>
 
       <div className="two-column-layout home-layout">
-        <section className="column-panel divider-right">
+        <section className="column-panel">
           <div className="single-ribbon-wrap">
             <div className="section-ribbon blue-ribbon home-ribbon" style={{ margin: 0 }}>POLECANE I NOWOŚCI</div>
           </div>
