@@ -303,7 +303,17 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                                 Zamknij
                             </button>
 
-                            <button className="mint-button" onClick={() => setIsPopupOpen(false)}>
+                            <button
+                                className="mint-button"
+                                onClick={() => {
+                                    if (!selectedKupon) {
+                                        alert('Nie wybrano rabatu.');
+                                        return;
+                                    }
+
+                                    setIsPopupOpen(false);
+                                }}
+                            >
                                 Użyj wybranego rabatu
                             </button>
                         </div>
