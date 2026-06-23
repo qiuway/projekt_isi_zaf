@@ -406,3 +406,58 @@ def dodaj_do_koszyka(dane: schemas.DodajDoKoszyka, db: Session = Depends(get_db)
     db.commit()
 
     return {"msg": "Dodano produkt do koszyka"}
+
+@app.get("/koszyk/{id_uzytkownik}")
+def pobierz_koszyk(id_uzytkownik: int, db: Session = Depends(get_db)):
+    koszyk = db.query(models.Koszyk).filter(
+        models.Koszyk.id_uzytkownik == id_uzytkownik
+    ).first()
+
+    if not koszyk:
+        return {"pozycje": [], "suma": 0}
+
+    pozycje = []
+    suma = 0
+
+    for pozycja in koszyk.pozycje:
+        produkt = pozycja.produkt
+        cena = float(produkt.cena)
+        cena_calkowita = cena * pozycja.ilosc
+        suma += cena_calkowita
+
+        pozycje.append({
+            "id_pozycja_koszyka": pozycja.id_pozycja_koszyka,
+            "id_produkt": produkt.id_produkt,
+            "nazwa": produkt.nazwa,
+            "cena": cena,
+            "ilosc": pozycja.ilosc,
+            "cena_calkowita": cena_calkowita
+        })
+
+    return {"pozycje": pozycje, "suma": suma}
+
+@app.put("/koszyk/aktualizuj")
+def aktualizuj_koszyk(dane: schemas.AktualizujKoszyk, db: Session = Depends(get_db)):
+    koszyk = db.query(models.Koszyk).filter(
+        models.Koszyk.id_uzytkownik == dane.id_uzytkownik
+    ).first()
+
+    if not koszyk:
+        raise HTTPException(status_code=404, detail="Koszyk nie istnieje")
+
+    pozycja = db.query(models.PozycjaWKoszyku).filter(
+        models.PozycjaWKoszyku.id_koszyk == koszyk.id_koszyk,
+        models.PozycjaWKoszyku.id_produkt == dane.id_produkt
+    ).first()
+
+    if not pozycja:
+        raise HTTPException(status_code=404, detail="Produktu nie ma w koszyku")
+
+    if dane.ilosc <= 0:
+        db.delete(pozycja)
+    else:
+        pozycja.ilosc = dane.ilosc
+
+    db.commit()
+
+    return {"msg": "Zaktualizowano koszyk"}

@@ -6,6 +6,15 @@ interface CartScreenProps {
     onNavigate: (screen: Screen) => void;
 }
 
+type PozycjaKoszyka = {
+    id_pozycja_koszyka: number;
+    id_produkt: number;
+    nazwa: string;
+    cena: number;
+    ilosc: number;
+    cena_calkowita: number;
+};
+
 type KuponUzytkownika = {
     id_posiadany_kupon: number;
     id_kupon: number;
@@ -18,9 +27,30 @@ type KuponUzytkownika = {
 };
 
 export function CartScreen({ onNavigate }: CartScreenProps) {
+    const [pozycje, setPozycje] = useState<PozycjaKoszyka[]>([]);
+    const [suma, setSuma] = useState(0);
+
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [kupony, setKupony] = useState<KuponUzytkownika[]>([]);
     const [selectedKupon, setSelectedKupon] = useState<KuponUzytkownika | null>(null);
+
+    const fetchKoszyk = () => {
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            setPozycje([]);
+            setSuma(0);
+            return;
+        }
+
+        fetch(`http://127.0.0.1:8000/koszyk/${userId}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setPozycje(data.pozycje || []);
+                setSuma(data.suma || 0);
+            })
+            .catch((err) => console.error(err));
+    };
 
     const fetchKupony = () => {
         const userId = localStorage.getItem('userId');
@@ -37,8 +67,39 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
     };
 
     useEffect(() => {
+        fetchKoszyk();
         fetchKupony();
     }, []);
+
+    const zmienIlosc = async (idProduktu: number, nowaIlosc: number) => {
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            alert('Musisz być zalogowany.');
+            return;
+        }
+
+        try {
+            await fetch('http://127.0.0.1:8000/koszyk/aktualizuj', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id_uzytkownik: Number(userId),
+                    id_produkt: idProduktu,
+                    ilosc: nowaIlosc,
+                }),
+            });
+
+            fetchKoszyk();
+        } catch (error) {
+            alert('Błąd połączenia z serwerem.');
+        }
+    };
+
+    const kosztDostawy = pozycje.length > 0 ? 7.99 : 0;
+    const sumaDoZaplaty = suma + kosztDostawy;
 
     return (
         <div className="page-shell">
@@ -53,7 +114,47 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                     <div className="section-ribbon blue-ribbon small-ribbon">TWOJE PRODUKTY</div>
 
                     <div className="list-stack">
-                        <p>Koszyk jest pusty.</p>
+                        {pozycje.length === 0 ? (
+                            <p>Koszyk jest pusty.</p>
+                        ) : (
+                            pozycje.map((item) => (
+                                <article className="cart-item" key={item.id_pozycja_koszyka}>
+                                    <div className="cart-thumb">&lt;zdj. potrawa&gt;</div>
+
+                                    <div className="cart-copy">
+                                        <strong>{item.nazwa}</strong>
+                                        <span>Cena jednostkowa: {item.cena.toFixed(2)} zł</span>
+                                        <span>
+                                            Ilość: {item.ilosc} • cena całkowita{' '}
+                                            {item.cena_calkowita.toFixed(2)} zł
+                                        </span>
+
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                            <button
+                                                className="secondary-button"
+                                                onClick={() => zmienIlosc(item.id_produkt, item.ilosc - 1)}
+                                            >
+                                                -
+                                            </button>
+
+                                            <button
+                                                className="secondary-button"
+                                                onClick={() => zmienIlosc(item.id_produkt, item.ilosc + 1)}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className="trash-button"
+                                        onClick={() => zmienIlosc(item.id_produkt, 0)}
+                                    >
+                                        ❌
+                                    </button>
+                                </article>
+                            ))
+                        )}
                     </div>
                 </section>
 
@@ -65,12 +166,12 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                     <div className="summary-card">
                         <div className="summary-row">
                             <span>Suma częściowa</span>
-                            <strong>93,96 zł</strong>
+                            <strong>{suma.toFixed(2)} zł</strong>
                         </div>
 
                         <div className="summary-row">
                             <span>Koszt dostawy</span>
-                            <strong>7,99 zł</strong>
+                            <strong>{kosztDostawy.toFixed(2)} zł</strong>
                         </div>
 
                         <div className="summary-row discount-action-row">
@@ -90,7 +191,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
 
                         <div className="summary-row total-row">
                             <span>Suma do zapłaty</span>
-                            <strong>101,95 zł</strong>
+                            <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
                         </div>
                     </div>
 
@@ -113,7 +214,8 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                             )}
 
                             {kupony.map((kupon) => {
-                                const isActive = selectedKupon?.id_posiadany_kupon === kupon.id_posiadany_kupon;
+                                const isActive =
+                                    selectedKupon?.id_posiadany_kupon === kupon.id_posiadany_kupon;
 
                                 return (
                                     <button
