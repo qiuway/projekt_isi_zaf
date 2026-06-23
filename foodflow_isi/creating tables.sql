@@ -127,19 +127,34 @@ CREATE TABLE osoby_placace (
 
 ALTER TABLE uzytkownik ADD COLUMN zdjecie_profilowe VARCHAR(255);
 
-INSERT INTO typ_konta (id_typ_konta, nazwa) VALUES 
-(1, 'Klient'),
-(2, 'Właściciel restauracji'),
-(3, 'Administrator')
-ON CONFLICT (id_typ_konta) DO NOTHING;
+INSERT INTO typ_konta (id_typ_konta, nazwa) VALUES
+    (1, 'Klient'),
+    (2, 'Właściciel restauracji'),
+    (3, 'Administrator')
+    ON CONFLICT (id_typ_konta) DO NOTHING;
 
 ALTER TABLE restauracja ADD COLUMN id_uzytkownik INT REFERENCES uzytkownik(id_uzytkownik);
 
 INSERT INTO kategoria (id_kategoria, nazwa) VALUES 
-(1, 'Dania główne'),
-(2, 'Zupy'),
-(3, 'Przystawki'),
-(4, 'Napoje'),
-(5, 'Desery'),
-(6, 'Fast Food')
-ON CONFLICT (id_kategoria) DO NOTHING;
+    (1, 'Dania główne'),
+    (2, 'Zupy'),
+    (3, 'Przystawki'),
+    (4, 'Napoje'),
+    (5, 'Desery'),
+    (6, 'Fast Food')
+    ON CONFLICT (id_kategoria) DO NOTHING;
+
+CREATE TABLE koszyk (
+    id_koszyk SERIAL PRIMARY KEY,
+    id_uzytkownik INTEGER,
+    FOREIGN KEY (id_uzytkownik) REFERENCES uzytkownik(id_uzytkownik)
+);
+
+CREATE TABLE pozycje_koszyka (
+    id_pozycja_koszyka SERIAL PRIMARY KEY,
+    id_koszyk INTEGER,
+    id_produkt INTEGER,
+    ilosc INTEGER,
+    FOREIGN KEY (id_koszyk) REFERENCES koszyk(id_koszyk),
+    FOREIGN KEY (id_produkt) REFERENCES produkt(id_produkt)
+);

@@ -358,3 +358,51 @@ def usun_produkt(prod_id: int, db: Session = Depends(get_db)):
         db.delete(db_prod)
         db.commit()
     return {"msg": "Usunięto produkt!"}
+
+@app.post("/koszyk/dodaj")
+def dodaj_do_koszyka(dane: schemas.DodajDoKoszyka, db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(
+        models.Uzytkownik.id_uzytkownik == dane.id_uzytkownik
+    ).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Użytkownik nie istnieje")
+
+    produkt = db.query(models.Produkt).filter(
+        models.Produkt.id_produkt == dane.id_produkt
+    ).first()
+
+    if not produkt:
+        raise HTTPException(status_code=404, detail="Produkt nie istnieje")
+
+    if not produkt.dostepny:
+        raise HTTPException(status_code=400, detail="Produkt jest niedostępny")
+
+    koszyk = db.query(models.Koszyk).filter(
+        models.Koszyk.id_uzytkownik == dane.id_uzytkownik
+    ).first()
+
+    if not koszyk:
+        koszyk = models.Koszyk(id_uzytkownik=dane.id_uzytkownik)
+        db.add(koszyk)
+        db.commit()
+        db.refresh(koszyk)
+
+    pozycja = db.query(models.PozycjaWKoszyku).filter(
+        models.PozycjaWKoszyku.id_koszyk == koszyk.id_koszyk,
+        models.PozycjaWKoszyku.id_produkt == dane.id_produkt
+    ).first()
+
+    if pozycja:
+        pozycja.ilosc += dane.ilosc
+    else:
+        pozycja = models.PozycjaWKoszyku(
+            id_koszyk=koszyk.id_koszyk,
+            id_produkt=dane.id_produkt,
+            ilosc=dane.ilosc
+        )
+        db.add(pozycja)
+
+    db.commit()
+
+    return {"msg": "Dodano produkt do koszyka"}

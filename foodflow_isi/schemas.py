@@ -26,6 +26,16 @@ class TworzenieZamowienia(BaseModel):
     czy_skladka: bool
     uczestnicy_skladki: Optional[List[UczestnikSkladki]] = None
 
+class DodajDoKoszyka(BaseModel):
+    id_uzytkownik: int
+    id_produkt: int
+    ilosc: int
+
+class AktualizujKoszyk(BaseModel):
+    id_uzytkownik: int
+    id_produkt: int
+    ilosc: int
+
 class UzytkownikCreate(BaseModel):
     imie: str = Field(..., min_length=2)
     nazwisko: str = Field(..., min_length=2)
@@ -71,9 +81,8 @@ class KuponOut(BaseModel):
     wartosc_znizki: Optional[str] = None
     ikona: Optional[str] = None
 
-    class Config:
-        from_attributes = True
-
+class Config:
+    from_attributes = True
 
 class ZakupKuponu(BaseModel):
     id_uzytkownik: int

@@ -73,6 +73,26 @@ class PozycjaZamowienia(Base):
     ilosc = Column(Integer)
     cena = Column(Numeric(10, 2))
 
+class Koszyk(Base):
+    __tablename__ = "koszyk"
+
+    id_koszyk = Column(Integer, primary_key=True, index=True)
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=False, unique=True)
+
+    pozycje = relationship("PozycjaWKoszyku", back_populates="koszyk", cascade="all, delete-orphan")
+
+
+class PozycjaWKoszyku(Base):
+    __tablename__ = "pozycje_koszyka"
+
+    id_pozycja_koszyka = Column(Integer, primary_key=True, index=True)
+    id_koszyk = Column(Integer, ForeignKey("koszyk.id_koszyk"), nullable=False)
+    id_produkt = Column(Integer, ForeignKey("produkt.id_produkt"), nullable=False)
+    ilosc = Column(Integer, nullable=False, default=1)
+
+    koszyk = relationship("Koszyk", back_populates="pozycje")
+    produkt = relationship("Produkt")
+
 class Platnosc(Base):
     __tablename__ = "platnosc"
 

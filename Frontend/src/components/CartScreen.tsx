@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { cartItems } from '../data/mockData';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 
@@ -54,19 +53,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                     <div className="section-ribbon blue-ribbon small-ribbon">TWOJE PRODUKTY</div>
 
                     <div className="list-stack">
-                        {cartItems.map((item) => (
-                            <article className="cart-item" key={item.id}>
-                                <div className="cart-thumb">&lt;zdj. potrawa {item.id}&gt;</div>
-
-                                <div className="cart-copy">
-                                    <strong>{item.name}</strong>
-                                    <span>Cena jednostkowa: {item.price}</span>
-                                    <span>Ilość: {item.qty} (+/-) • cena całkowita {item.total}</span>
-                                </div>
-
-                                <button className="trash-button">🗑</button>
-                            </article>
-                        ))}
+                        <p>Koszyk jest pusty.</p>
                     </div>
                 </section>
 

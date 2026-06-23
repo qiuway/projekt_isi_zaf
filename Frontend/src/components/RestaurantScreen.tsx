@@ -10,7 +10,38 @@ export function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
   const restId = localStorage.getItem('currentRestId');
   const [restauracja, setRestauracja] = useState<any>(null);
   const [produkty, setProdukty] = useState<any[]>([]);
+    const dodajDoKoszyka = async (idProduktu: number) => {
+        const userId = localStorage.getItem('userId');
 
+        if (!userId) {
+            alert('Musisz być zalogowany, aby dodać produkt do koszyka.');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/koszyk/dodaj', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id_uzytkownik: Number(userId),
+                    id_produkt: idProduktu,
+                    ilosc: 1,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Dodano produkt do koszyka.');
+            } else {
+                alert(data.detail || 'Nie udało się dodać produktu do koszyka.');
+            }
+        } catch (error) {
+            alert('Błąd połączenia z serwerem.');
+        }
+    };
   useEffect(() => {
     if (!restId) return;
 
@@ -59,10 +90,15 @@ export function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
 
                    <div style={{ display: 'flex', alignItems: 'center' }}>
                      <strong style={{ color: '#60d3b4', fontSize: '1.3em', marginRight: '15px' }}>{prod.cena} zł</strong>
-                     
-                     <button className="mint-button" style={{ padding: '8px 16px' }} disabled={!prod.dostepny}>
-                       + Dodaj
-                     </button>
+
+                       <button
+                           className="mint-button"
+                           style={{ padding: '8px 16px' }}
+                           disabled={!prod.dostepny}
+                           onClick={() => dodajDoKoszyka(prod.id_produkt)}
+                       >
+                           + Dodaj
+                       </button>
                    </div>
 
                 </div>
