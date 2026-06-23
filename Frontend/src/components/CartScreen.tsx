@@ -98,8 +98,53 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
         }
     };
 
-    const kosztDostawy = pozycje.length > 0 ? 7.99 : 0;
-    const sumaDoZaplaty = suma + kosztDostawy;
+    const podstawowyKosztDostawy = pozycje.length > 0 ? 7.99 : 0;
+
+    const obliczRabat = () => {
+        if (!selectedKupon || !selectedKupon.wartosc_znizki) {
+            return {
+                rabatKwotowy: 0,
+                kosztDostawyPoRabacie: podstawowyKosztDostawy,
+            };
+        }
+
+        const wartosc = selectedKupon.wartosc_znizki.toLowerCase();
+
+        if (wartosc.includes('dostawa')) {
+            return {
+                rabatKwotowy: 0,
+                kosztDostawyPoRabacie: 0,
+            };
+        }
+
+        if (wartosc.includes('%')) {
+            const procent = parseFloat(wartosc.replace('%', '').replace(',', '.'));
+            const rabat = suma * (procent / 100);
+
+            return {
+                rabatKwotowy: rabat,
+                kosztDostawyPoRabacie: podstawowyKosztDostawy,
+            };
+        }
+
+        if (wartosc.includes('zł')) {
+            const kwota = parseFloat(wartosc.replace('zł', '').replace(',', '.'));
+            const rabat = Math.min(kwota, suma);
+
+            return {
+                rabatKwotowy: rabat,
+                kosztDostawyPoRabacie: podstawowyKosztDostawy,
+            };
+        }
+
+        return {
+            rabatKwotowy: 0,
+            kosztDostawyPoRabacie: podstawowyKosztDostawy,
+        };
+    };
+
+    const { rabatKwotowy, kosztDostawyPoRabacie } = obliczRabat();
+    const sumaDoZaplaty = Math.max(suma - rabatKwotowy + kosztDostawyPoRabacie, 0);
 
     return (
         <div className="page-shell">
@@ -171,13 +216,23 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
 
                         <div className="summary-row">
                             <span>Koszt dostawy</span>
-                            <strong>{kosztDostawy.toFixed(2)} zł</strong>
+                            <strong>{kosztDostawyPoRabacie.toFixed(2)} zł</strong>
                         </div>
 
                         <div className="summary-row discount-action-row">
                             <span>Wybrany rabat</span>
                             <strong>{selectedKupon ? selectedKupon.nazwa : 'Brak wybranego rabatu'}</strong>
                         </div>
+
+                        {selectedKupon && (
+                            <div className="summary-row">
+                                <span>Wartość rabatu</span>
+                                <strong>
+                                    {selectedKupon.wartosc_znizki || 'Brak'}
+                                    {rabatKwotowy > 0 && ` (-${rabatKwotowy.toFixed(2)} zł)`}
+                                </strong>
+                            </div>
+                        )}
 
                         <button
                             className="secondary-button discount-select-button"
@@ -229,7 +284,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                                             }
                                         }}
                                     >
-                                        <div className="reward-choice-icon">{kupon.ikona || '🎁'}</div>
+                                        <div className="reward-choice-icon">{kupon.ikona}</div>
 
                                         <div className="reward-choice-copy">
                                             <strong>{kupon.nazwa}</strong>
