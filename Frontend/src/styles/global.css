@@ -1440,3 +1440,39 @@ body.dark-mode .mint-button {
   display: flex;
   gap: 10px;
 }
+
+/* --- POPRAWKI UKŁADU TOPBAR (GÓRNY PASEK) --- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.topbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Nadpisanie marginesów wewnątrz prawej sekcji, żeby elementy się nie odpychały */
+.topbar-right .pill, 
+.topbar-right .mint-button {
+  margin: 0 !important;
+}

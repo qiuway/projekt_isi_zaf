@@ -93,6 +93,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
             });
 
             fetchKoszyk();
+                window.dispatchEvent(new Event('koszykChanged'));
         } catch (error) {
             alert('Błąd połączenia z serwerem.');
         }

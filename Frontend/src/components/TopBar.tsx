@@ -17,10 +17,9 @@ const menuItems: { label: string; screen: Screen }[] = [
 export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [punkty, setPunkty] = useState(localStorage.getItem('punkty') || '0');
-    
-    // --- NOWY STAN: Przechowuje adres użytkownika ---
-    const [adres, setAdres] = useState<string | null>(null); 
-    
+    const [koszykSuma, setKoszykSuma] = useState<number>(0);
+    const [adres, setAdres] = useState<string | null>(null);
+
     const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -35,16 +34,16 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
   }, []);
 
     useEffect(() => {
-        const fetchUserData = () => {
+        const fetchTopBarData = () => {
             const userId = localStorage.getItem('userId');
 
             if (!userId) {
                 setPunkty('0');
+                setKoszykSuma(0);
                 setAdres(null);
                 return;
             }
 
-            // 1. Pobieranie punktów 
             fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/punkty`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -54,7 +53,13 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
                 })
                 .catch((err) => console.error(err));
 
-            // 2. Pobieranie profilu (aby wyciągnąć adres)
+            fetch(`http://127.0.0.1:8000/koszyk/${userId}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setKoszykSuma(data.suma || 0);
+                })
+                .catch((err) => console.error(err));
+
             fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -63,12 +68,14 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
                 .catch((err) => console.error(err));
         };
 
-        fetchUserData();
+        fetchTopBarData();
 
-        window.addEventListener('punktyChanged', fetchUserData);
+        window.addEventListener('punktyChanged', fetchTopBarData);
+        window.addEventListener('koszykChanged', fetchTopBarData);
 
         return () => {
-            window.removeEventListener('punktyChanged', fetchUserData);
+            window.removeEventListener('punktyChanged', fetchTopBarData);
+            window.removeEventListener('koszykChanged', fetchTopBarData);
         };
     }, []);
 
@@ -79,48 +86,56 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
 
   return (
     <header className="topbar">
-      <div className="menu-anchor" ref={menuRef}>
-        <button className="icon-button" aria-label="Menu" onClick={() => setIsOpen((value) => !value)}>
-          <span />
-          <span />
-          <span />
-        </button>
+      
+      <div className="topbar-left">
+          <div className="menu-anchor" ref={menuRef}>
+            <button className="icon-button" aria-label="Menu" onClick={() => setIsOpen((value) => !value)}>
+              <span />
+              <span />
+              <span />
+            </button>
 
-        {isOpen && (
-          <div className="dropdown-menu">
-            {menuItems.map((item) => (
-              <button key={item.screen} className="dropdown-item" onClick={() => handleNavigate(item.screen)}>
-                {item.label}
-              </button>
-            ))}
+            {isOpen && (
+              <div className="dropdown-menu">
+                {menuItems.map((item) => (
+                  <button key={item.screen} className="dropdown-item" onClick={() => handleNavigate(item.screen)}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-        <div className="pill small-pill">Punkty: {punkty}</div>
-        <button
-            className="secondary-button points-shop-button"
-            onClick={() => onNavigate('home')}>
-            Strona główna
-        </button>
-      
-      <div className="brand-title">{title}</div>
-      
-      <button className="mint-button" onClick={() => onNavigate('cart')}>
-        Do Koszyka!
-      </button>
-
-      <div 
-        className="pill address-pill" 
-        style={{ cursor: adres ? 'default' : 'pointer' }}
-        onClick={() => {
-            if (!adres) {
-                onNavigate('profileEdit');
-            }
-        }}
-      >
-        {adres ? `Adres Dostawy: ${adres}` : 'Dodaj adres dostawy'}
+          <div className="pill small-pill">Punkty: {punkty}</div>
+          
+          <button className="secondary-button points-shop-button" onClick={() => onNavigate('home')}>
+              Strona główna
+          </button>
       </div>
+      
+      <div className="topbar-center">
+        <div className="brand-title">{title}</div>
+      </div>
+      
+      <div className="topbar-right">
+          <div className="pill price-pill">
+            Wartość koszyka: {koszykSuma.toFixed(2)} zł
+          </div>
+
+          <button className="mint-button" onClick={() => onNavigate('cart')}>
+            Do Koszyka!
+          </button>
+
+          <div 
+            className={`pill address-pill ${!adres ? 'clickable' : ''}`} 
+            onClick={() => {
+                if (!adres) onNavigate('profileEdit');
+            }}
+          >
+            {adres ? `Adres Dostawy: ${adres}` : 'Dodaj adres dostawy'}
+          </div>
+      </div>
+      
     </header>
   );
 }

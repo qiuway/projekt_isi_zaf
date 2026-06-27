@@ -35,6 +35,7 @@ export function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
 
             if (response.ok) {
                 alert('Dodano produkt do koszyka.');
+                window.dispatchEvent(new Event('koszykChanged'));
             } else {
                 alert(data.detail || 'Nie udało się dodać produktu do koszyka.');
             }
