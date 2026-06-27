@@ -63,7 +63,7 @@ def zloz_zamowienie(dane: schemas.TworzenieZamowienia, db: Session = Depends(get
             raise HTTPException(status_code=400, detail="Brak uczestników składki.")
 
         suma_skladek = sum([u.kwota_deklarowana for u in dane.uczestnicy_skladki])
-        if abs(suma_skladek - laczna_kwota) > 0.01:  # Margin błędu float
+        if abs(suma_skladek - laczna_kwota) > 0.01:
             raise HTTPException(status_code=400, detail="Suma składek nie pokrywa kwoty zamówienia!")
 
     kod_zap = str(uuid.uuid4())[:8] if dane.czy_skladka else None

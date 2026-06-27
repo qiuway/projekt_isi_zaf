@@ -17,6 +17,10 @@ const menuItems: { label: string; screen: Screen }[] = [
 export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [punkty, setPunkty] = useState(localStorage.getItem('punkty') || '0');
+    
+    // --- NOWY STAN: Przechowuje adres użytkownika ---
+    const [adres, setAdres] = useState<string | null>(null); 
+    
     const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -31,14 +35,16 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
   }, []);
 
     useEffect(() => {
-        const fetchPunkty = () => {
+        const fetchUserData = () => {
             const userId = localStorage.getItem('userId');
 
             if (!userId) {
                 setPunkty('0');
+                setAdres(null);
                 return;
             }
 
+            // 1. Pobieranie punktów 
             fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/punkty`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -47,14 +53,22 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
                     localStorage.setItem('punkty', aktualnePunkty);
                 })
                 .catch((err) => console.error(err));
+
+            // 2. Pobieranie profilu (aby wyciągnąć adres)
+            fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setAdres(data.adres || null);
+                })
+                .catch((err) => console.error(err));
         };
 
-        fetchPunkty();
+        fetchUserData();
 
-        window.addEventListener('punktyChanged', fetchPunkty);
+        window.addEventListener('punktyChanged', fetchUserData);
 
         return () => {
-            window.removeEventListener('punktyChanged', fetchPunkty);
+            window.removeEventListener('punktyChanged', fetchUserData);
         };
     }, []);
 
@@ -95,7 +109,18 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
       <button className="mint-button" onClick={() => onNavigate('cart')}>
         Do Koszyka!
       </button>
-      <div className="pill address-pill">Adres Dostawy: [adres]</div>
+
+      <div 
+        className="pill address-pill" 
+        style={{ cursor: adres ? 'default' : 'pointer' }}
+        onClick={() => {
+            if (!adres) {
+                onNavigate('profileEdit');
+            }
+        }}
+      >
+        {adres ? `Adres Dostawy: ${adres}` : 'Dodaj adres dostawy'}
+      </div>
     </header>
   );
 }
