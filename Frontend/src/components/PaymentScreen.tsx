@@ -76,7 +76,11 @@ export function PaymentScreen({ onNavigate }: PaymentScreenProps) {
                                 key={method}
                                 onClick={() => setSelectedMethod(method)}
                             >
-                                <span className="payment-radio" />
+                            <span
+                                className={`payment-radio ${
+                                    selectedMethod === method ? 'payment-radio-selected' : ''
+                                }`}
+                            />
                                 <span>{method}</span>
                             </button>
                         ))}

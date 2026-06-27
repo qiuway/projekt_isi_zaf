@@ -1053,12 +1053,28 @@ button {
 }
 
 .payment-radio {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid #7b5e4d;
-  background: #fffdf8;
-  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #5d4537;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 12px;
+    position: relative;
+    flex-shrink: 0;
+    background: transparent;
+    transition: 0.2s;
+}
+
+.payment-radio-selected::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #60d3b4;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .payment-summary-box {
