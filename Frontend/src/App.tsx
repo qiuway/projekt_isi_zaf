@@ -16,6 +16,26 @@ function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('register');
 
     useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get('googleLogin') === 'success') {
+            const userId = params.get('userId');
+            const punkty = params.get('punkty');
+
+            if (userId) {
+                localStorage.setItem('userId', userId);
+            }
+
+            if (punkty) {
+                localStorage.setItem('punkty', punkty);
+            }
+
+            window.history.replaceState({}, document.title, window.location.pathname);
+            setCurrentScreen('home');
+        }
+    }, []);
+
+    useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
 
         if (savedTheme === 'dark') {

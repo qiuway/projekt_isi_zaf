@@ -125,6 +125,18 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
           {isLogin ? 'ZALOGUJ SIĘ' : 'ZAREJESTRUJ SIĘ'}
         </button>
 
+          {isLogin && (
+              <button
+                  className="secondary-button wide-button"
+                  style={{ marginTop: '12px' }}
+                  onClick={() => {
+                      window.location.href = 'http://127.0.0.1:8000/auth/google/login';
+                  }}
+              >
+                  Zaloguj przez Google
+              </button>
+          )}
+
         <div className="auth-separator">lub</div>
 
         <button
