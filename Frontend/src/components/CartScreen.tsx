@@ -251,7 +251,18 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                         </div>
                     </div>
 
-                    <button className="mint-button order-button" onClick={() => onNavigate('payment')}>
+                    <button
+                        className="mint-button order-button"
+                        onClick={() => {
+                            if (selectedKupon) {
+                                localStorage.setItem('selectedKupon', JSON.stringify(selectedKupon));
+                            } else {
+                                localStorage.removeItem('selectedKupon');
+                            }
+
+                            onNavigate('payment');
+                        }}
+                    >
                         ZŁÓŻ ZAMÓWIENIE
                     </button>
                 </section>
