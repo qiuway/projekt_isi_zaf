@@ -209,5 +209,99 @@
         "description": "Phone: +48 123 456 789 | Email: support@foodflow.pl | Support hours: 8:00 AM - 10:00 PM"
       }
     }
+  },
+  "cart": {
+    "title": "YOUR CART",
+    "products_title": "YOUR PRODUCTS",
+    "empty": "The cart is empty.",
+    "item": {
+      "image_alt": "<dish img>",
+      "unit_price": "Unit price: {{price}} PLN",
+      "total_info": "Quantity: {{amount}} • total price {{total}} PLN"
+    },
+    "summary_title": "ORDER SUMMARY",
+    "summary": {
+      "subtotal": "Subtotal",
+      "delivery": "Delivery cost",
+      "selected_discount": "Selected discount",
+      "no_discount": "No discount selected",
+      "discount_value": "Discount value",
+      "none": "None",
+      "choose_discount_btn": "Choose discount",
+      "total": "Total to pay",
+      "order_btn": "PLACE ORDER",
+      "currency": "PLN"
+    },
+    "modal": {
+      "title": "CHOOSE DISCOUNT",
+      "no_coupons": "You have no active coupons to use.",
+      "no_description": "No description",
+      "no_discount_value": "No discount value",
+      "note": "You can only use one discount per order.",
+      "close": "Close",
+      "use_discount": "Use selected discount"
+    },
+    "alerts": {
+      "not_logged_in": "You must be logged in.",
+      "server_error": "Server connection error.",
+      "no_discount_selected": "No discount selected."
+    }
+  },
+  "payment": {
+    "title": "PAYMENT SELECTION",
+    "available_methods": "Available payment methods",
+    "methods": {
+      "card": "Credit Card",
+      "offline": "Offline Payment",
+      "on_delivery": "Cash on Delivery"
+    },
+    "credit_card_details": "Credit card details",
+    "summary_title": "Summary",
+    "summary": {
+      "products_total": "Products total",
+      "delivery_cost": "Delivery cost",
+      "delivery_address": "Delivery address",
+      "discount_value": "Discount value",
+      "to_pay": "To pay",
+      "no_address": "No address",
+      "currency": "PLN"
+    },
+    "buttons": {
+      "back_to_cart": "Back to cart",
+      "processing": "Processing...",
+      "confirm_payment": "Confirm payment"
+    },
+    "alerts": {
+      "select_method": "Please select a payment method.",
+      "order_placed": "Order placed. Method: {{method}}",
+      "payment_success": "Payment SUCCESSFUL! Order has been paid.",
+      "server_error": "Payment server connection error."
+    },
+    "stripe_errors": {
+      "default": "Payment declined.",
+      "insufficient_funds": "Error: Insufficient funds in the account.",
+      "generic_decline": "Error: Card was declined by the bank.",
+      "expired_card": "Error: Card has expired.",
+      "incorrect_cvc": "Error: Incorrect CVC code.",
+      "incorrect_number": "Error: Incorrect card number."
+    }
+  },
+  "restaurant": {
+    "loading": "Loading restaurant...",
+    "status_open": "Currently open",
+    "status_closed": "Currently closed",
+    "menu_title": "Restaurant Menu",
+    "empty_menu": "This restaurant has no dishes added yet.",
+    "category": "Category: {{category}}",
+    "none": "None",
+    "unavailable": "Currently unavailable",
+    "currency": "PLN",
+    "add_button": "+ Add",
+    "alerts": {
+      "cart_auth_error": "You must be logged in to add a product to the cart.",
+      "add_success": "Product added to cart.",
+      "add_error": "Failed to add the product to the cart.",
+      "server_error": "Server connection error."
+    }
   }
 }

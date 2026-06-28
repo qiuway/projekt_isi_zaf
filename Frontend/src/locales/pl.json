@@ -209,5 +209,99 @@
         "description": "Telefon: +48 123 456 789 | Email: pomoc@foodflow.pl | Godziny wsparcia: 8:00 - 22:00"
       }
     }
+  },
+  "cart": {
+    "title": "TWÓJ KOSZYK",
+    "products_title": "TWOJE PRODUKTY",
+    "empty": "Koszyk jest pusty.",
+    "item": {
+      "image_alt": "<zdj. potrawa>",
+      "unit_price": "Cena jednostkowa: {{price}} zł",
+      "total_info": "Ilość: {{amount}} • cena całkowita {{total}} zł"
+    },
+    "summary_title": "PODSUMOWANIE ZAMÓWIENIA",
+    "summary": {
+      "subtotal": "Suma częściowa",
+      "delivery": "Koszt dostawy",
+      "selected_discount": "Wybrany rabat",
+      "no_discount": "Brak wybranego rabatu",
+      "discount_value": "Wartość rabatu",
+      "none": "Brak",
+      "choose_discount_btn": "Wybierz rabat",
+      "total": "Suma do zapłaty",
+      "order_btn": "ZŁÓŻ ZAMÓWIENIE",
+      "currency": "zł"
+    },
+    "modal": {
+      "title": "WYBIERZ RABAT",
+      "no_coupons": "Nie masz aktywnych kuponów do wykorzystania.",
+      "no_description": "Brak opisu",
+      "no_discount_value": "Brak wartości rabatu",
+      "note": "Na jedno zamówienie możesz użyć tylko jednego rabatu.",
+      "close": "Zamknij",
+      "use_discount": "Użyj wybranego rabatu"
+    },
+    "alerts": {
+      "not_logged_in": "Musisz być zalogowany.",
+      "server_error": "Błąd połączenia z serwerem.",
+      "no_discount_selected": "Nie wybrano rabatu."
+    }
+  },
+  "payment": {
+    "title": "WYBÓR PŁATNOŚCI",
+    "available_methods": "Dostępne metody płatności",
+    "methods": {
+      "card": "Karta płatnicza",
+      "offline": "Płatność Offline",
+      "on_delivery": "Płatność przy odbiorze"
+    },
+    "credit_card_details": "Dane karty kredytowej",
+    "summary_title": "Podsumowanie",
+    "summary": {
+      "products_total": "Suma produktów",
+      "delivery_cost": "Koszt dostawy",
+      "delivery_address": "Adres dostawy",
+      "discount_value": "Wartość rabatu",
+      "to_pay": "Do zapłaty",
+      "no_address": "Brak adresu",
+      "currency": "zł"
+    },
+    "buttons": {
+      "back_to_cart": "Wróć do koszyka",
+      "processing": "Przetwarzanie...",
+      "confirm_payment": "Potwierdź płatność"
+    },
+    "alerts": {
+      "select_method": "Wybierz metodę płatności.",
+      "order_placed": "Złożono zamówienie. Metoda: {{method}}",
+      "payment_success": "Płatność zakończona SUKCESEM! Zamówienie zostało opłacone.",
+      "server_error": "Błąd połączenia z serwerem płatności."
+    },
+    "stripe_errors": {
+      "default": "Płatność odrzucona.",
+      "insufficient_funds": "Błąd: Niewystarczające środki na koncie.",
+      "generic_decline": "Błąd: Karta została odrzucona przez bank.",
+      "expired_card": "Błąd: Karta straciła ważność.",
+      "incorrect_cvc": "Błąd: Nieprawidłowy kod CVC.",
+      "incorrect_number": "Błąd: Nieprawidłowy numer karty."
+    }
+  },
+  "restaurant": {
+    "loading": "Wczytywanie restauracji...",
+    "status_open": "Aktualnie otwarte",
+    "status_closed": "Aktualnie zamknięte",
+    "menu_title": "Menu Restauracji",
+    "empty_menu": "Ta restauracja nie ma jeszcze dodanych dań.",
+    "category": "Kategoria: {{category}}",
+    "none": "Brak",
+    "unavailable": "Chwilowo niedostępne",
+    "currency": "zł",
+    "add_button": "+ Dodaj",
+    "alerts": {
+      "cart_auth_error": "Musisz być zalogowany, aby dodać produkt do koszyka.",
+      "add_success": "Dodano produkt do koszyka.",
+      "add_error": "Nie udało się dodać produktu do koszyka.",
+      "server_error": "Błąd połączenia z serwerem."
+    }
   }
 }
