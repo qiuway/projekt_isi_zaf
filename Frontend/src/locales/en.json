@@ -19,5 +19,40 @@
       "server_error": "Server error occurred",
       "connection_error": "Connection error"
     }
+  },
+  "home": {
+    "toolbar": {
+      "filters": "Filters:",
+      "filter_all": "All",
+      "filter_open": "Open only",
+      "search": "Search:",
+      "search_placeholder": "Type name...",
+      "sorting": "Sorting:",
+      "sort_az": "From A to Z",
+      "sort_za": "From Z to A"
+    },
+    "sections": {
+      "recommended": "RECOMMENDED & NEW",
+      "promotions": "SPECIAL PROMOTIONS"
+    },
+    "no_restaurants": "No restaurants to display.",
+    "errors": {
+      "fetch_error": "Error fetching data:"
+    }
+  },
+  "topbar": {
+    "menu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "pointsShop": "Points Shop",
+      "achievements": "Achievements",
+      "help": "Help"
+    },
+    "points": "Points: {{points}}",
+    "home_button": "Home",
+    "cart_value": "Cart value: {{value}} PLN",
+    "to_cart_button": "To Cart!",
+    "delivery_address": "Delivery Address: {{address}}",
+    "add_address": "Add delivery address"
   }
 }

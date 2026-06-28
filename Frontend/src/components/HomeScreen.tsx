@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 
@@ -15,6 +16,7 @@ interface Restauracja {
 }
 
 export function HomeScreen({ onNavigate }: HomeScreenProps) {
+  const { t } = useTranslation();
   const [restaurants, setRestaurants] = useState<Restauracja[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('name_asc');
@@ -23,8 +25,8 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
     fetch('http://127.0.0.1:8000/restauracje/')
       .then((response) => response.json())
       .then((data) => setRestaurants(data))
-      .catch((error) => console.error('Błąd pobierania danych:', error));
-  }, []);
+      .catch((error) => console.error(t('home.errors.fetch_error'), error));
+  }, [t]);
 
   const filteredRestaurants = restaurants.filter((r) =>
     r.nazwa.toLowerCase().includes(searchTerm.toLowerCase())
@@ -47,21 +49,21 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
       <div className="toolbar-row">
         <div className="filter-box yellow-box">
           <div className="toolbar-group">
-            <span className="toolbar-label">Filtry:</span>
+            <span className="toolbar-label">{t('home.toolbar.filters')}</span>
             <select className="soft-input toolbar-control">
-              <option value="all">Wszystkie</option>
-              <option value="open">Tylko otwarte</option>
+              <option value="all">{t('home.toolbar.filter_all')}</option>
+              <option value="open">{t('home.toolbar.filter_open')}</option>
             </select>
           </div>
         </div>
 
         <div className="filter-box orange-box">
           <div className="toolbar-group">
-            <span className="toolbar-label">Wyszukiwanie:</span>
+            <span className="toolbar-label">{t('home.toolbar.search')}</span>
             <input
               type="text"
               className="soft-input toolbar-control"
-              placeholder="Wpisz nazwę..."
+              placeholder={t('home.toolbar.search_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -70,14 +72,14 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
 
         <div className="filter-box brown-box">
           <div className="toolbar-group">
-            <span className="toolbar-label">Sortowanie:</span>
+            <span className="toolbar-label">{t('home.toolbar.sorting')}</span>
             <select
               className="soft-input toolbar-control"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
-              <option value="name_asc">Od A do Z</option>
-              <option value="name_desc">Od Z do A</option>
+              <option value="name_asc">{t('home.toolbar.sort_az')}</option>
+              <option value="name_desc">{t('home.toolbar.sort_za')}</option>
             </select>
           </div>
         </div>
@@ -86,7 +88,9 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
       <div className="two-column-layout home-layout">
         <section className="column-panel">
           <div className="single-ribbon-wrap">
-            <div className="section-ribbon blue-ribbon home-ribbon" style={{ margin: 0 }}>POLECANE I NOWOŚCI</div>
+            <div className="section-ribbon blue-ribbon home-ribbon" style={{ margin: 0 }}>
+              {t('home.sections.recommended')}
+            </div>
           </div>
           
           <div className="restaurant-stack">
@@ -98,9 +102,9 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
                       key={restaurant.id_restauracja}
                       className="tile home-restaurant-tile"
                       onClick={() => {
-                            localStorage.setItem('currentRestId', String(restaurant.id_restauracja));
-                            onNavigate('restaurant');
-                        }}
+                        localStorage.setItem('currentRestId', String(restaurant.id_restauracja));
+                        onNavigate('restaurant');
+                      }}
                     >
                       <strong>{restaurant.nazwa}</strong>
                       {(restaurant.opis || restaurant.adres) && (
@@ -117,7 +121,7 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
               </article>
             ) : (
               <p style={{ textAlign: 'center', padding: '20px', color: '#5d4537' }}>
-                Brak restauracji do wyświetlenia.
+                {t('home.no_restaurants')}
               </p>
             )}
           </div>
@@ -127,7 +131,9 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
           {rightGroups.length > 0 && (
             <>
               <div className="single-ribbon-wrap">
-                <div className="section-ribbon green-ribbon home-ribbon" style={{ margin: 0 }}>SPECJALNE PROMOCJE</div>
+                <div className="section-ribbon green-ribbon home-ribbon" style={{ margin: 0 }}>
+                  {t('home.sections.promotions')}
+                </div>
               </div>
               
               <div className="restaurant-stack">
@@ -137,9 +143,9 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
                       <button
                         key={restaurant.id_restauracja}
                         className="tile home-restaurant-tile"
-                            onClick={() => {
-                            localStorage.setItem('currentRestId', String(restaurant.id_restauracja));
-                            onNavigate('restaurant');
+                        onClick={() => {
+                          localStorage.setItem('currentRestId', String(restaurant.id_restauracja));
+                          onNavigate('restaurant');
                         }}
                       >
                         <strong>{restaurant.nazwa}</strong>

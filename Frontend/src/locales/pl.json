@@ -19,5 +19,40 @@
       "server_error": "Wystąpił błąd z serwerem",
       "connection_error": "Błąd połączenia z serwerem"
     }
+  },
+  "home": {
+    "toolbar": {
+      "filters": "Filtry:",
+      "filter_all": "Wszystkie",
+      "filter_open": "Tylko otwarte",
+      "search": "Wyszukiwanie:",
+      "search_placeholder": "Wpisz nazwę...",
+      "sorting": "Sortowanie:",
+      "sort_az": "Od A do Z",
+      "sort_za": "Od Z do A"
+    },
+    "sections": {
+      "recommended": "POLECANE I NOWOŚCI",
+      "promotions": "SPECJALNE PROMOCJE"
+    },
+    "no_restaurants": "Brak restauracji do wyświetlenia.",
+    "errors": {
+      "fetch_error": "Błąd pobierania danych:"
+    }
+  },
+  "topbar": {
+    "menu": {
+      "profile": "Profil",
+      "settings": "Ustawienia",
+      "pointsShop": "Sklep za punkty",
+      "achievements": "Osiągnięcia",
+      "help": "Pomoc"
+    },
+    "points": "Punkty: {{points}}",
+    "home_button": "Strona główna",
+    "cart_value": "Wartość koszyka: {{value}} zł",
+    "to_cart_button": "Do Koszyka!",
+    "delivery_address": "Adres Dostawy: {{address}}",
+    "add_address": "Dodaj adres dostawy"
   }
 }
