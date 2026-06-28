@@ -547,7 +547,7 @@ def aktualizuj_koszyk(dane: schemas.AktualizujKoszyk, db: Session = Depends(get_
 
     return {"msg": "Zaktualizowano koszyk"}
 
-stripe.api_key = "sk_test_51TnE2bCBya6caqe3EjiviLotapIDcRGX4lJtu6WJ5tC6DbC8yGgOGC35T1haLmcZgaoGoNjuSSpmxkDtWUxgvcY500KUKDTkrX"
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 class PaymentIntentRequest(BaseModel):
     amount: float

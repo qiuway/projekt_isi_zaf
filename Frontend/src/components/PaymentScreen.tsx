@@ -5,7 +5,7 @@ import { TopBar } from './TopBar';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe('pk_test_51TnE2bCBya6caqe3f4wb0lX3ecPVXX8HadBXhPRoKiGNyE6Bq1SWhC34gA64hVpXqscFp1gMmdz32fUfQYc1r0hR3fKz000C8mN47xV');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 interface PaymentScreenProps {
     onNavigate: (screen: Screen) => void;
