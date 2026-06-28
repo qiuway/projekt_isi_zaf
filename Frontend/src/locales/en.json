@@ -54,5 +54,160 @@
     "to_cart_button": "To Cart!",
     "delivery_address": "Delivery Address: {{address}}",
     "add_address": "Add delivery address"
+  },
+  "profile": {
+    "title": "MY PROFILE",
+    "avatar_alt": "Avatar",
+    "account_type": "Account: {{type}}",
+    "roles": {
+      "admin": "Admin",
+      "owner": "Owner",
+      "client": "Client"
+    },
+    "info": {
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "address": "Address",
+      "none": "None"
+    },
+    "loading": "Loading...",
+    "actions": {
+      "edit": "EDIT PROFILE",
+      "logout": "LOGOUT"
+    },
+    "management": {
+      "title": "Restaurant Management",
+      "add_restaurant": "+ Add Restaurant",
+      "status_open": "🟢 Open",
+      "status_closed": "🔴 Closed",
+      "btn_menu": "📋 Menu",
+      "btn_edit": "Edit",
+      "btn_delete": "Delete"
+    },
+    "restaurant_modal": {
+      "title_add": "New Restaurant",
+      "title_edit": "Edit Restaurant",
+      "labels": {
+        "name": "Restaurant Name *",
+        "description": "Description",
+        "address": "Address",
+        "phone": "Phone Number",
+        "is_open": "Restaurant is currently open"
+      },
+      "btn_cancel": "Cancel",
+      "btn_save": "Save"
+    },
+    "menu_modal": {
+      "title": "Menu Management",
+      "empty": "No products in the menu. Add the first one below!",
+      "status_available": "Available",
+      "status_unavailable": "Unavailable",
+      "section_add": "Add new dish",
+      "section_edit": "Editing: {{name}}",
+      "cancel_edit": "Cancel editing",
+      "labels": {
+        "name": "Dish Name *",
+        "price": "Price (PLN) *",
+        "price_placeholder": "e.g., 25.50",
+        "category": "Category *",
+        "is_available": "Dish is currently available"
+      },
+      "btn_add": "Add to menu",
+      "btn_save": "Save dish changes"
+    },
+    "alerts": {
+      "rest_added": "Restaurant added!",
+      "rest_saved": "Changes saved!",
+      "rest_delete_confirm": "Delete restaurant?",
+      "prod_required": "Fill in the required fields!",
+      "prod_save_error": "Error saving the product.",
+      "prod_delete_confirm": "Delete this product from the menu?"
+    }
+  },
+  "profile_edit": {
+    "title": "EDIT PROFILE",
+    "avatar_alt": "User avatar",
+    "change_photo": "Change photo",
+    "user_data": "User data",
+    "labels": {
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "Email",
+      "phone": "Phone number",
+      "address": "Delivery address"
+    },
+    "placeholders": {
+      "phone": "e.g., 123456789",
+      "address": "Street, number, city..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save profile changes"
+    },
+    "alerts": {
+      "no_user": "No logged-in user.",
+      "save_success": "Profile data saved successfully!",
+      "save_error": "An error occurred while saving.",
+      "server_error": "Server connection error.",
+      "upload_error": "Error uploading photo."
+    }
+  },
+  "settings": {
+    "title": "SETTINGS",
+    "section_app": "Application settings",
+    "dark_mode": "Dark mode",
+    "language": "App language",
+    "lang_pl": "Polish",
+    "lang_en": "English"
+  },
+  "points_shop": {
+    "title": "POINTS SHOP",
+    "your_points": "Your points",
+    "available_points": "Currently available points:",
+    "reward": {
+      "description": "Description",
+      "value": "Value",
+      "price": "Price",
+      "none": "None",
+      "pts": "pts",
+      "buy_button": "Buy with points"
+    },
+    "alerts": {
+      "not_logged_in": "You must be logged in.",
+      "buy_failed": "Failed to buy the reward.",
+      "server_error": "Server connection error."
+    }
+  },
+  "achievements": {
+    "title": "ACHIEVEMENTS",
+    "labels": {
+      "name": "Achievement name",
+      "description": "Achievement description",
+      "earned_at": "Date earned",
+      "points": "Points amount"
+    },
+    "pts": "pts"
+  },
+  "help": {
+    "title": "HELP",
+    "items": {
+      "order": {
+        "title": "How to order food?",
+        "description": "Choose a restaurant, add dishes to the cart, then go to the cart screen and place your order."
+      },
+      "account": {
+        "title": "How to change account details?",
+        "description": "Go to the settings or profile screen to see sections related to personal details and delivery address."
+      },
+      "points": {
+        "title": "Where can I find my points and achievements?",
+        "description": "Points are visible on the top bar, and achievements can be opened from the dropdown menu under the hamburger icon."
+      },
+      "contact": {
+        "title": "Contact support",
+        "description": "Phone: +48 123 456 789 | Email: support@foodflow.pl | Support hours: 8:00 AM - 10:00 PM"
+      }
+    }
   }
 }

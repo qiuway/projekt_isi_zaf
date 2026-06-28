@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 
@@ -16,6 +17,7 @@ type Kupon = {
 };
 
 export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
+    const { t } = useTranslation();
     const [punkty, setPunkty] = useState(localStorage.getItem('punkty') || '0');
     const [kupony, setKupony] = useState<Kupon[]>([]);
 
@@ -51,7 +53,7 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
 
     const kupKupon = async (idKuponu: number) => {
         if (!userId) {
-            alert('Musisz być zalogowany.');
+            alert(t('points_shop.alerts.not_logged_in'));
             return;
         }
 
@@ -68,17 +70,17 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.detail || 'Nie udało się kupić nagrody.');
+                alert(data.detail || t('points_shop.alerts.buy_failed'));
                 return;
             }
 
-            alert(data.msg);
+            alert(data.msg); 
             const nowePunkty = String(data.punkty ?? 0);
             setPunkty(nowePunkty);
             localStorage.setItem('punkty', nowePunkty);
             window.dispatchEvent(new Event('punktyChanged'));
         } catch (error) {
-            alert('Błąd połączenia z serwerem.');
+            alert(t('points_shop.alerts.server_error'));
         }
     };
 
@@ -87,14 +89,14 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
             <TopBar onNavigate={onNavigate} />
 
             <div className="single-ribbon-wrap">
-                <div className="section-ribbon blue-ribbon large-ribbon">SKLEP ZA PUNKTY</div>
+                <div className="section-ribbon blue-ribbon large-ribbon">{t('points_shop.title')}</div>
             </div>
 
             <section className="help-card">
                 <article className="help-item points-balance-box">
-                    <h3>Twoje punkty</h3>
+                    <h3>{t('points_shop.your_points')}</h3>
                     <p>
-                        Aktualnie dostępne punkty: <strong>{punkty} pkt</strong>
+                        {t('points_shop.available_points')} <strong>{punkty} {t('points_shop.reward.pts')}</strong>
                     </p>
                 </article>
             </section>
@@ -112,19 +114,19 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
                             </div>
 
                             <div className="achievement-line">
-                                <span>Opis</span>
+                                <span>{t('points_shop.reward.description')}</span>
                                 <strong>{kupon.opis}</strong>
                             </div>
 
                             <div className="achievement-line two-up">
                                 <div>
-                                    <span>Wartość</span>
-                                    <strong>{kupon.wartosc_znizki || 'Brak'}</strong>
+                                    <span>{t('points_shop.reward.value')}</span>
+                                    <strong>{kupon.wartosc_znizki || t('points_shop.reward.none')}</strong>
                                 </div>
 
                                 <div>
-                                    <span>Cena</span>
-                                    <strong>{kupon.koszt_punktowy} pkt</strong>
+                                    <span>{t('points_shop.reward.price')}</span>
+                                    <strong>{kupon.koszt_punktowy} {t('points_shop.reward.pts')}</strong>
                                 </div>
                             </div>
                         </div>
@@ -133,7 +135,7 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
                             className="mint-button reward-button"
                             onClick={() => kupKupon(kupon.id_kupon)}
                         >
-                            Kup za punkty
+                            {t('points_shop.reward.buy_button')}
                         </button>
                     </article>
                 ))}

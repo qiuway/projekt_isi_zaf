@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { achievements } from '../data/mockData';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
@@ -7,12 +8,16 @@ interface AchievementsScreenProps {
 }
 
 export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="page-shell">
       <TopBar onNavigate={onNavigate} />
 
       <div className="single-ribbon-wrap">
-        <div className="section-ribbon blue-ribbon large-ribbon">OSIĄGNIĘCIA</div>
+        <div className="section-ribbon blue-ribbon large-ribbon">
+          {t('achievements.title')}
+        </div>
       </div>
 
       <div className="achievements-grid">
@@ -24,21 +29,23 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
 
             <div className="achievement-content">
               <div className="achievement-line">
-                <span>Nazwa osiągnięcia</span>
+                <span>{t('achievements.labels.name')}</span>
                 <strong>{achievement.name}</strong>
               </div>
               <div className="achievement-line">
-                <span>Opis osiągnięcia</span>
+                <span>{t('achievements.labels.description')}</span>
                 <strong>{achievement.description}</strong>
               </div>
               <div className="achievement-line two-up">
                 <div>
-                  <span>Data zdobycia </span>
+                  <span>{t('achievements.labels.earned_at')} </span>
                   <strong>{achievement.earnedAt}</strong>
                 </div>
                 <div>
-                  <span>Ilość punktów </span>
-                  <strong>{achievement.points} pkt</strong>
+                  <span>{t('achievements.labels.points')} </span>
+                  <strong>
+                    {achievement.points} {t('achievements.pts')}
+                  </strong>
                 </div>
               </div>
             </div>

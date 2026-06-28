@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 
@@ -7,6 +8,7 @@ interface SettingsScreenProps {
 }
 
 export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
+    const { t, i18n } = useTranslation();
     const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => {
@@ -39,15 +41,15 @@ export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
             <TopBar onNavigate={onNavigate} />
 
             <div className="single-ribbon-wrap">
-                <div className="section-ribbon blue-ribbon large-ribbon">USTAWIENIA</div>
+                <div className="section-ribbon blue-ribbon large-ribbon">{t('settings.title')}</div>
             </div>
 
             <section className="settings-content">
-                <h3>Ustawienia aplikacji</h3>
+                <h3>{t('settings.section_app')}</h3>
 
                 <div className="settings-row">
                     <div className="settings-row-text">
-                        <strong>Tryb ciemny</strong>
+                        <strong>{t('settings.dark_mode')}</strong>
                     </div>
 
                     <label className="settings-switch">
@@ -58,6 +60,22 @@ export function SettingsScreen({ onNavigate }: SettingsScreenProps) {
                         />
                         <span className="settings-slider"></span>
                     </label>
+                </div>
+
+                <div className="settings-row" style={{ marginTop: '20px' }}>
+                    <div className="settings-row-text">
+                        <strong>{t('settings.language')}</strong>
+                    </div>
+
+                    <select
+                        className="soft-input"
+                        value={i18n.language}
+                        onChange={(e) => i18n.changeLanguage(e.target.value)}
+                        style={{ padding: '5px 10px', width: 'auto', minWidth: '120px' }}
+                    >
+                        <option value="pl">{t('settings.lang_pl')}</option>
+                        <option value="en">{t('settings.lang_en')}</option>
+                    </select>
                 </div>
             </section>
         </div>

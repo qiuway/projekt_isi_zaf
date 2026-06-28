@@ -54,5 +54,160 @@
     "to_cart_button": "Do Koszyka!",
     "delivery_address": "Adres Dostawy: {{address}}",
     "add_address": "Dodaj adres dostawy"
+  },
+  "profile": {
+    "title": "MÓJ PROFIL",
+    "avatar_alt": "Awatar",
+    "account_type": "Konto: {{type}}",
+    "roles": {
+      "admin": "Admin",
+      "owner": "Właściciel",
+      "client": "Klient"
+    },
+    "info": {
+      "name": "Imię i nazwisko",
+      "email": "Email",
+      "phone": "Numer telefonu",
+      "address": "Adres",
+      "none": "Brak"
+    },
+    "loading": "Ładowanie...",
+    "actions": {
+      "edit": "EDYTUJ PROFIL",
+      "logout": "WYLOGUJ"
+    },
+    "management": {
+      "title": "Zarządzanie Restauracjami",
+      "add_restaurant": "+ Dodaj restaurację",
+      "status_open": "🟢 Otwarte",
+      "status_closed": "🔴 Zamknięte",
+      "btn_menu": "📋 Menu",
+      "btn_edit": "Edytuj",
+      "btn_delete": "Usuń"
+    },
+    "restaurant_modal": {
+      "title_add": "Nowa restauracja",
+      "title_edit": "Edytuj restaurację",
+      "labels": {
+        "name": "Nazwa Restauracji *",
+        "description": "Opis",
+        "address": "Adres",
+        "phone": "Numer telefonu",
+        "is_open": "Restauracja aktualnie otwarta"
+      },
+      "btn_cancel": "Anuluj",
+      "btn_save": "Zapisz"
+    },
+    "menu_modal": {
+      "title": "Zarządzanie Menu",
+      "empty": "Brak produktów w menu. Dodaj pierwszy poniżej!",
+      "status_available": "Dostępne",
+      "status_unavailable": "Niedostępne",
+      "section_add": "Dodaj nowe danie",
+      "section_edit": "Edytujesz: {{name}}",
+      "cancel_edit": "Anuluj edycję",
+      "labels": {
+        "name": "Nazwa dania *",
+        "price": "Cena (zł) *",
+        "price_placeholder": "np. 25.50",
+        "category": "Kategoria *",
+        "is_available": "Danie jest aktualnie dostępne"
+      },
+      "btn_add": "Dodaj do menu",
+      "btn_save": "Zapisz zmiany w daniu"
+    },
+    "alerts": {
+      "rest_added": "Dodano restaurację!",
+      "rest_saved": "Zapisano zmiany!",
+      "rest_delete_confirm": "Usunąć restaurację?",
+      "prod_required": "Wypełnij wymagane pola!",
+      "prod_save_error": "Błąd podczas zapisywania produktu.",
+      "prod_delete_confirm": "Usunąć ten produkt z menu?"
+    }
+  },
+  "profile_edit": {
+    "title": "EDYCJA PROFILU",
+    "avatar_alt": "Awatar użytkownika",
+    "change_photo": "Zmień zdjęcie",
+    "user_data": "Dane użytkownika",
+    "labels": {
+      "first_name": "Imię",
+      "last_name": "Nazwisko",
+      "email": "Email",
+      "phone": "Numer telefonu",
+      "address": "Adres dostawy"
+    },
+    "placeholders": {
+      "phone": "Np. 123456789",
+      "address": "Ulica, numer, miasto..."
+    },
+    "buttons": {
+      "cancel": "Anuluj",
+      "save": "Zapisz zmiany profilu"
+    },
+    "alerts": {
+      "no_user": "Brak zalogowanego użytkownika.",
+      "save_success": "Zapisano dane profilu pomyślnie!",
+      "save_error": "Wystąpił błąd podczas zapisywania.",
+      "server_error": "Błąd połączenia z serwerem.",
+      "upload_error": "Błąd podczas wgrywania zdjęcia."
+    }
+  },
+  "settings": {
+    "title": "USTAWIENIA",
+    "section_app": "Ustawienia aplikacji",
+    "dark_mode": "Tryb ciemny",
+    "language": "Język aplikacji",
+    "lang_pl": "Polski",
+    "lang_en": "English"
+  },
+  "points_shop": {
+    "title": "SKLEP ZA PUNKTY",
+    "your_points": "Twoje punkty",
+    "available_points": "Aktualnie dostępne punkty:",
+    "reward": {
+      "description": "Opis",
+      "value": "Wartość",
+      "price": "Cena",
+      "none": "Brak",
+      "pts": "pkt",
+      "buy_button": "Kup za punkty"
+    },
+    "alerts": {
+      "not_logged_in": "Musisz być zalogowany.",
+      "buy_failed": "Nie udało się kupić nagrody.",
+      "server_error": "Błąd połączenia z serwerem."
+    }
+  },
+  "achievements": {
+    "title": "OSIĄGNIĘCIA",
+    "labels": {
+      "name": "Nazwa osiągnięcia",
+      "description": "Opis osiągnięcia",
+      "earned_at": "Data zdobycia",
+      "points": "Ilość punktów"
+    },
+    "pts": "pkt"
+  },
+  "help": {
+    "title": "POMOC",
+    "items": {
+      "order": {
+        "title": "Jak zamówić jedzenie?",
+        "description": "Wybierz restaurację, dodaj potrawy do koszyka, a następnie przejdź do ekranu koszyka i złóż zamówienie."
+      },
+      "account": {
+        "title": "Jak zmienić dane konta?",
+        "description": "Przejdź do ekranu ustawień lub profilu, aby zobaczyć sekcje związane z danymi osobowymi i adresem dostawy."
+      },
+      "points": {
+        "title": "Gdzie znajdę swoje punkty i osiągnięcia?",
+        "description": "Punkty są widoczne na górnym pasku, a osiągnięcia można otworzyć z rozwijanego menu pod ikoną trzech kresek."
+      },
+      "contact": {
+        "title": "Kontakt z pomocą",
+        "description": "Telefon: +48 123 456 789 | Email: pomoc@foodflow.pl | Godziny wsparcia: 8:00 - 22:00"
+      }
+    }
   }
 }
