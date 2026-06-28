@@ -1,0 +1,23 @@
+{
+  "auth": {
+    "login_mode": "ZALOGUJ SIĘ",
+    "register_mode": "ZAREJESTRUJ SIĘ",
+    "name_placeholder": "Imię",
+    "surname_placeholder": "Nazwisko",
+    "email_placeholder": "Email",
+    "password_placeholder": "Hasło",
+    "owner_checkbox": "Zarejestruj jako właściciel restauracji",
+    "google_login": "Zaloguj przez Google",
+    "or": "lub",
+    "switch_to_register": "NIE MASZ KONTA? ZAREJESTRUJ SIĘ",
+    "switch_to_login": "MASZ JUŻ KONTO? ZALOGUJ SIĘ",
+    "errors": {
+      "missing_email_password": "Email i hasło są wymagane!",
+      "missing_name": "Wypełnij imię i nazwisko!",
+      "invalid_email": "Podaj poprawny adres email!",
+      "data_error": "Błąd wprowadzonych danych",
+      "server_error": "Wystąpił błąd z serwerem",
+      "connection_error": "Błąd połączenia z serwerem"
+    }
+  }
+}

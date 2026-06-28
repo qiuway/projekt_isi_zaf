@@ -1,0 +1,23 @@
+{
+  "auth": {
+    "login_mode": "LOG IN",
+    "register_mode": "SIGN UP",
+    "name_placeholder": "First Name",
+    "surname_placeholder": "Last Name",
+    "email_placeholder": "Email",
+    "password_placeholder": "Password",
+    "owner_checkbox": "Register as restaurant owner",
+    "google_login": "Log in with Google",
+    "or": "or",
+    "switch_to_register": "DON'T HAVE AN ACCOUNT? SIGN UP",
+    "switch_to_login": "ALREADY HAVE AN ACCOUNT? LOG IN",
+    "errors": {
+      "missing_email_password": "Email and password are required!",
+      "missing_name": "Please enter your first and last name!",
+      "invalid_email": "Please enter a valid email address!",
+      "data_error": "Invalid data input",
+      "server_error": "Server error occurred",
+      "connection_error": "Connection error"
+    }
+  }
+}
