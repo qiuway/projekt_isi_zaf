@@ -1492,3 +1492,30 @@ body.dark-mode .mint-button {
 .topbar-right .mint-button {
   margin: 0 !important;
 }
+
+/* --- STYLE DLA FORMULARZA PŁATNOŚCI STRIPE --- */
+.stripe-card-container {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #dccbbd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.stripe-card-title {
+  margin: 0 0 15px 0;
+  color: #5d4537;
+}
+
+.stripe-input-wrapper {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.stripe-payment-error {
+  color: #cc0000;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
