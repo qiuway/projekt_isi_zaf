@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 
@@ -11,7 +12,11 @@ interface PaymentScreenProps {
     onNavigate: (screen: Screen) => void;
 }
 
-const paymentMethods = ['Karta płatnicza', 'Płatność Offline', 'Płatność przy odbiorze'];
+const paymentMethodsList = [
+    { id: 'card', translationKey: 'payment.methods.card' },
+    { id: 'offline', translationKey: 'payment.methods.offline' },
+    { id: 'on_delivery', translationKey: 'payment.methods.on_delivery' }
+];
 
 export function PaymentScreen(props: PaymentScreenProps) {
     return (
@@ -22,6 +27,7 @@ export function PaymentScreen(props: PaymentScreenProps) {
 }
 
 function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
+    const { t } = useTranslation();
     const stripe = useStripe();
     const elements = useElements();
 
@@ -47,10 +53,10 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
         ])
             .then(([koszyk, user]) => {
                 setSuma(koszyk.suma || 0);
-                setAdres(user.adres || 'Brak adresu');
+                setAdres(user.adres || t('payment.summary.no_address'));
             })
             .catch(console.error);
-    }, []);
+    }, [t]);
 
     const kosztDostawy = suma > 0 ? 7.99 : 0;
     let rabat = 0;
@@ -71,12 +77,13 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
 
     const handleConfirmPayment = async () => {
         if (!selectedMethod) {
-            alert('Wybierz metodę płatności.');
+            alert(t('payment.alerts.select_method'));
             return;
         }
 
-        if (selectedMethod !== 'Karta płatnicza') {
-            alert(`Złożono zamówienie. Metoda: ${selectedMethod}`);
+        if (selectedMethod !== 'card') {
+            const translatedMethod = t(`payment.methods.${selectedMethod}`);
+            alert(t('payment.alerts.order_placed', { method: translatedMethod }));
             onNavigate('home');
             return;
         }
@@ -103,27 +110,27 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
             });
 
             if (paymentResult.error) {
-                let errorMsg = paymentResult.error.message || 'Płatność odrzucona.';
+                let errorMsg = paymentResult.error.message || t('payment.stripe_errors.default');
                 
                 if (paymentResult.error.decline_code === 'insufficient_funds') {
-                    errorMsg = 'Błąd: Niewystarczające środki na koncie.';
+                    errorMsg = t('payment.stripe_errors.insufficient_funds');
                 } else if (paymentResult.error.decline_code === 'generic_decline') {
-                    errorMsg = 'Błąd: Karta została odrzucona przez bank.';
+                    errorMsg = t('payment.stripe_errors.generic_decline');
                 } else if (paymentResult.error.code === 'expired_card') {
-                    errorMsg = 'Błąd: Karta straciła ważność.';
+                    errorMsg = t('payment.stripe_errors.expired_card');
                 } else if (paymentResult.error.code === 'incorrect_cvc') {
-                    errorMsg = 'Błąd: Nieprawidłowy kod CVC.';
+                    errorMsg = t('payment.stripe_errors.incorrect_cvc');
                 } else if (paymentResult.error.code === 'incorrect_number') {
-                    errorMsg = 'Błąd: Nieprawidłowy numer karty.';
+                    errorMsg = t('payment.stripe_errors.incorrect_number');
                 }
 
                 setPaymentError(errorMsg);
             } else if (paymentResult.paymentIntent?.status === 'succeeded') {
-                alert('Płatność zakończona SUKCESEM! Zamówienie zostało opłacone.');
+                alert(t('payment.alerts.payment_success'));
                 onNavigate('home');
             }
         } catch (error: any) {
-            setPaymentError(error.message || 'Błąd połączenia z serwerem płatności.');
+            setPaymentError(error.message || t('payment.alerts.server_error'));
         }
 
         setIsProcessing(false);
@@ -134,29 +141,29 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
             <TopBar onNavigate={onNavigate} />
 
             <div className="single-ribbon-wrap">
-                <div className="section-ribbon blue-ribbon large-ribbon">WYBÓR PŁATNOŚCI</div>
+                <div className="section-ribbon blue-ribbon large-ribbon">{t('payment.title')}</div>
             </div>
 
             <section className="payment-card">
                 <div className="payment-column">
-                    <h3>Dostępne metody płatności</h3>
+                    <h3>{t('payment.available_methods')}</h3>
 
                     <div className="payment-list">
-                        {paymentMethods.map((method) => (
+                        {paymentMethodsList.map((method) => (
                             <button
-                                className={`payment-option ${selectedMethod === method ? 'reward-choice-active' : ''}`}
-                                key={method}
-                                onClick={() => setSelectedMethod(method)}
+                                className={`payment-option ${selectedMethod === method.id ? 'reward-choice-active' : ''}`}
+                                key={method.id}
+                                onClick={() => setSelectedMethod(method.id)}
                             >
-                                <span className={`payment-radio ${selectedMethod === method ? 'payment-radio-selected' : ''}`} />
-                                <span>{method}</span>
+                                <span className={`payment-radio ${selectedMethod === method.id ? 'payment-radio-selected' : ''}`} />
+                                <span>{t(method.translationKey)}</span>
                             </button>
                         ))}
                     </div>
 
-                    {selectedMethod === 'Karta płatnicza' && (
+                    {selectedMethod === 'card' && (
                         <div className="stripe-card-container">
-                            <h4 className="stripe-card-title">Dane karty kredytowej</h4>
+                            <h4 className="stripe-card-title">{t('payment.credit_card_details')}</h4>
                             <div className="stripe-input-wrapper">
                                 <CardElement options={{
                                     style: { base: { fontSize: '16px', color: '#424770', '::placeholder': { color: '#aab7c4' } } }
@@ -168,25 +175,37 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                 </div>
 
                 <div className="payment-column payment-summary-box">
-                    <h3>Podsumowanie</h3>
+                    <h3>{t('payment.summary_title')}</h3>
 
-                    <div className="summary-row"><span>Suma produktów</span><strong>{suma.toFixed(2)} zł</strong></div>
-                    <div className="summary-row"><span>Koszt dostawy</span><strong>{kosztDostawy.toFixed(2)} zł</strong></div>
-                    <div className="summary-row"><span>Adres dostawy</span><strong>{adres}</strong></div>
-                    <div className="summary-row"><span>Wartość rabatu</span><strong>-{rabat.toFixed(2)} zł</strong></div>
+                    <div className="summary-row">
+                        <span>{t('payment.summary.products_total')}</span>
+                        <strong>{suma.toFixed(2)} {t('payment.summary.currency')}</strong>
+                    </div>
+                    <div className="summary-row">
+                        <span>{t('payment.summary.delivery_cost')}</span>
+                        <strong>{kosztDostawy.toFixed(2)} {t('payment.summary.currency')}</strong>
+                    </div>
+                    <div className="summary-row">
+                        <span>{t('payment.summary.delivery_address')}</span>
+                        <strong>{adres}</strong>
+                    </div>
+                    <div className="summary-row">
+                        <span>{t('payment.summary.discount_value')}</span>
+                        <strong>-{rabat.toFixed(2)} {t('payment.summary.currency')}</strong>
+                    </div>
                     
                     <div className="summary-row total-row">
-                        <span>Do zapłaty</span>
-                        <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
+                        <span>{t('payment.summary.to_pay')}</span>
+                        <strong>{sumaDoZaplaty.toFixed(2)} {t('payment.summary.currency')}</strong>
                     </div>
 
                     <div className="payment-actions">
                         <button className="secondary-button" onClick={() => onNavigate('cart')} disabled={isProcessing}>
-                            Wróć do koszyka
+                            {t('payment.buttons.back_to_cart')}
                         </button>
 
                         <button className="mint-button" onClick={handleConfirmPayment} disabled={isProcessing}>
-                            {isProcessing ? 'Przetwarzanie...' : 'Potwierdź płatność'}
+                            {isProcessing ? t('payment.buttons.processing') : t('payment.buttons.confirm_payment')}
                         </button>
                     </div>
                 </div>

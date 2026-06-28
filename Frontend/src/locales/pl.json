@@ -1,0 +1,307 @@
+{
+  "auth": {
+    "login_mode": "ZALOGUJ SIĘ",
+    "register_mode": "ZAREJESTRUJ SIĘ",
+    "name_placeholder": "Imię",
+    "surname_placeholder": "Nazwisko",
+    "email_placeholder": "Email",
+    "password_placeholder": "Hasło",
+    "owner_checkbox": "Zarejestruj jako właściciel restauracji",
+    "google_login": "Zaloguj przez Google",
+    "or": "lub",
+    "switch_to_register": "NIE MASZ KONTA? ZAREJESTRUJ SIĘ",
+    "switch_to_login": "MASZ JUŻ KONTO? ZALOGUJ SIĘ",
+    "errors": {
+      "missing_email_password": "Email i hasło są wymagane!",
+      "missing_name": "Wypełnij imię i nazwisko!",
+      "invalid_email": "Podaj poprawny adres email!",
+      "data_error": "Błąd wprowadzonych danych",
+      "server_error": "Wystąpił błąd z serwerem",
+      "connection_error": "Błąd połączenia z serwerem"
+    }
+  },
+  "home": {
+    "toolbar": {
+      "filters": "Filtry:",
+      "filter_all": "Wszystkie",
+      "filter_open": "Tylko otwarte",
+      "search": "Wyszukiwanie:",
+      "search_placeholder": "Wpisz nazwę...",
+      "sorting": "Sortowanie:",
+      "sort_az": "Od A do Z",
+      "sort_za": "Od Z do A"
+    },
+    "sections": {
+      "recommended": "POLECANE I NOWOŚCI",
+      "promotions": "SPECJALNE PROMOCJE"
+    },
+    "no_restaurants": "Brak restauracji do wyświetlenia.",
+    "errors": {
+      "fetch_error": "Błąd pobierania danych:"
+    }
+  },
+  "topbar": {
+    "menu": {
+      "profile": "Profil",
+      "settings": "Ustawienia",
+      "pointsShop": "Sklep za punkty",
+      "achievements": "Osiągnięcia",
+      "help": "Pomoc"
+    },
+    "points": "Punkty: {{points}}",
+    "home_button": "Strona główna",
+    "cart_value": "Wartość koszyka: {{value}} zł",
+    "to_cart_button": "Do Koszyka!",
+    "delivery_address": "Adres Dostawy: {{address}}",
+    "add_address": "Dodaj adres dostawy"
+  },
+  "profile": {
+    "title": "MÓJ PROFIL",
+    "avatar_alt": "Awatar",
+    "account_type": "Konto: {{type}}",
+    "roles": {
+      "admin": "Admin",
+      "owner": "Właściciel",
+      "client": "Klient"
+    },
+    "info": {
+      "name": "Imię i nazwisko",
+      "email": "Email",
+      "phone": "Numer telefonu",
+      "address": "Adres",
+      "none": "Brak"
+    },
+    "loading": "Ładowanie...",
+    "actions": {
+      "edit": "EDYTUJ PROFIL",
+      "logout": "WYLOGUJ"
+    },
+    "management": {
+      "title": "Zarządzanie Restauracjami",
+      "add_restaurant": "+ Dodaj restaurację",
+      "status_open": "🟢 Otwarte",
+      "status_closed": "🔴 Zamknięte",
+      "btn_menu": "📋 Menu",
+      "btn_edit": "Edytuj",
+      "btn_delete": "Usuń"
+    },
+    "restaurant_modal": {
+      "title_add": "Nowa restauracja",
+      "title_edit": "Edytuj restaurację",
+      "labels": {
+        "name": "Nazwa Restauracji *",
+        "description": "Opis",
+        "address": "Adres",
+        "phone": "Numer telefonu",
+        "is_open": "Restauracja aktualnie otwarta"
+      },
+      "btn_cancel": "Anuluj",
+      "btn_save": "Zapisz"
+    },
+    "menu_modal": {
+      "title": "Zarządzanie Menu",
+      "empty": "Brak produktów w menu. Dodaj pierwszy poniżej!",
+      "status_available": "Dostępne",
+      "status_unavailable": "Niedostępne",
+      "section_add": "Dodaj nowe danie",
+      "section_edit": "Edytujesz: {{name}}",
+      "cancel_edit": "Anuluj edycję",
+      "labels": {
+        "name": "Nazwa dania *",
+        "price": "Cena (zł) *",
+        "price_placeholder": "np. 25.50",
+        "category": "Kategoria *",
+        "is_available": "Danie jest aktualnie dostępne"
+      },
+      "btn_add": "Dodaj do menu",
+      "btn_save": "Zapisz zmiany w daniu"
+    },
+    "alerts": {
+      "rest_added": "Dodano restaurację!",
+      "rest_saved": "Zapisano zmiany!",
+      "rest_delete_confirm": "Usunąć restaurację?",
+      "prod_required": "Wypełnij wymagane pola!",
+      "prod_save_error": "Błąd podczas zapisywania produktu.",
+      "prod_delete_confirm": "Usunąć ten produkt z menu?"
+    }
+  },
+  "profile_edit": {
+    "title": "EDYCJA PROFILU",
+    "avatar_alt": "Awatar użytkownika",
+    "change_photo": "Zmień zdjęcie",
+    "user_data": "Dane użytkownika",
+    "labels": {
+      "first_name": "Imię",
+      "last_name": "Nazwisko",
+      "email": "Email",
+      "phone": "Numer telefonu",
+      "address": "Adres dostawy"
+    },
+    "placeholders": {
+      "phone": "Np. 123456789",
+      "address": "Ulica, numer, miasto..."
+    },
+    "buttons": {
+      "cancel": "Anuluj",
+      "save": "Zapisz zmiany profilu"
+    },
+    "alerts": {
+      "no_user": "Brak zalogowanego użytkownika.",
+      "save_success": "Zapisano dane profilu pomyślnie!",
+      "save_error": "Wystąpił błąd podczas zapisywania.",
+      "server_error": "Błąd połączenia z serwerem.",
+      "upload_error": "Błąd podczas wgrywania zdjęcia."
+    }
+  },
+  "settings": {
+    "title": "USTAWIENIA",
+    "section_app": "Ustawienia aplikacji",
+    "dark_mode": "Tryb ciemny",
+    "language": "Język aplikacji",
+    "lang_pl": "Polski",
+    "lang_en": "English"
+  },
+  "points_shop": {
+    "title": "SKLEP ZA PUNKTY",
+    "your_points": "Twoje punkty",
+    "available_points": "Aktualnie dostępne punkty:",
+    "reward": {
+      "description": "Opis",
+      "value": "Wartość",
+      "price": "Cena",
+      "none": "Brak",
+      "pts": "pkt",
+      "buy_button": "Kup za punkty"
+    },
+    "alerts": {
+      "not_logged_in": "Musisz być zalogowany.",
+      "buy_failed": "Nie udało się kupić nagrody.",
+      "server_error": "Błąd połączenia z serwerem."
+    }
+  },
+  "achievements": {
+    "title": "OSIĄGNIĘCIA",
+    "labels": {
+      "name": "Nazwa osiągnięcia",
+      "description": "Opis osiągnięcia",
+      "earned_at": "Data zdobycia",
+      "points": "Ilość punktów"
+    },
+    "pts": "pkt"
+  },
+  "help": {
+    "title": "POMOC",
+    "items": {
+      "order": {
+        "title": "Jak zamówić jedzenie?",
+        "description": "Wybierz restaurację, dodaj potrawy do koszyka, a następnie przejdź do ekranu koszyka i złóż zamówienie."
+      },
+      "account": {
+        "title": "Jak zmienić dane konta?",
+        "description": "Przejdź do ekranu ustawień lub profilu, aby zobaczyć sekcje związane z danymi osobowymi i adresem dostawy."
+      },
+      "points": {
+        "title": "Gdzie znajdę swoje punkty i osiągnięcia?",
+        "description": "Punkty są widoczne na górnym pasku, a osiągnięcia można otworzyć z rozwijanego menu pod ikoną trzech kresek."
+      },
+      "contact": {
+        "title": "Kontakt z pomocą",
+        "description": "Telefon: +48 123 456 789 | Email: pomoc@foodflow.pl | Godziny wsparcia: 8:00 - 22:00"
+      }
+    }
+  },
+  "cart": {
+    "title": "TWÓJ KOSZYK",
+    "products_title": "TWOJE PRODUKTY",
+    "empty": "Koszyk jest pusty.",
+    "item": {
+      "image_alt": "<zdj. potrawa>",
+      "unit_price": "Cena jednostkowa: {{price}} zł",
+      "total_info": "Ilość: {{amount}} • cena całkowita {{total}} zł"
+    },
+    "summary_title": "PODSUMOWANIE ZAMÓWIENIA",
+    "summary": {
+      "subtotal": "Suma częściowa",
+      "delivery": "Koszt dostawy",
+      "selected_discount": "Wybrany rabat",
+      "no_discount": "Brak wybranego rabatu",
+      "discount_value": "Wartość rabatu",
+      "none": "Brak",
+      "choose_discount_btn": "Wybierz rabat",
+      "total": "Suma do zapłaty",
+      "order_btn": "ZŁÓŻ ZAMÓWIENIE",
+      "currency": "zł"
+    },
+    "modal": {
+      "title": "WYBIERZ RABAT",
+      "no_coupons": "Nie masz aktywnych kuponów do wykorzystania.",
+      "no_description": "Brak opisu",
+      "no_discount_value": "Brak wartości rabatu",
+      "note": "Na jedno zamówienie możesz użyć tylko jednego rabatu.",
+      "close": "Zamknij",
+      "use_discount": "Użyj wybranego rabatu"
+    },
+    "alerts": {
+      "not_logged_in": "Musisz być zalogowany.",
+      "server_error": "Błąd połączenia z serwerem.",
+      "no_discount_selected": "Nie wybrano rabatu."
+    }
+  },
+  "payment": {
+    "title": "WYBÓR PŁATNOŚCI",
+    "available_methods": "Dostępne metody płatności",
+    "methods": {
+      "card": "Karta płatnicza",
+      "offline": "Płatność Offline",
+      "on_delivery": "Płatność przy odbiorze"
+    },
+    "credit_card_details": "Dane karty kredytowej",
+    "summary_title": "Podsumowanie",
+    "summary": {
+      "products_total": "Suma produktów",
+      "delivery_cost": "Koszt dostawy",
+      "delivery_address": "Adres dostawy",
+      "discount_value": "Wartość rabatu",
+      "to_pay": "Do zapłaty",
+      "no_address": "Brak adresu",
+      "currency": "zł"
+    },
+    "buttons": {
+      "back_to_cart": "Wróć do koszyka",
+      "processing": "Przetwarzanie...",
+      "confirm_payment": "Potwierdź płatność"
+    },
+    "alerts": {
+      "select_method": "Wybierz metodę płatności.",
+      "order_placed": "Złożono zamówienie. Metoda: {{method}}",
+      "payment_success": "Płatność zakończona SUKCESEM! Zamówienie zostało opłacone.",
+      "server_error": "Błąd połączenia z serwerem płatności."
+    },
+    "stripe_errors": {
+      "default": "Płatność odrzucona.",
+      "insufficient_funds": "Błąd: Niewystarczające środki na koncie.",
+      "generic_decline": "Błąd: Karta została odrzucona przez bank.",
+      "expired_card": "Błąd: Karta straciła ważność.",
+      "incorrect_cvc": "Błąd: Nieprawidłowy kod CVC.",
+      "incorrect_number": "Błąd: Nieprawidłowy numer karty."
+    }
+  },
+  "restaurant": {
+    "loading": "Wczytywanie restauracji...",
+    "status_open": "Aktualnie otwarte",
+    "status_closed": "Aktualnie zamknięte",
+    "menu_title": "Menu Restauracji",
+    "empty_menu": "Ta restauracja nie ma jeszcze dodanych dań.",
+    "category": "Kategoria: {{category}}",
+    "none": "Brak",
+    "unavailable": "Chwilowo niedostępne",
+    "currency": "zł",
+    "add_button": "+ Dodaj",
+    "alerts": {
+      "cart_auth_error": "Musisz być zalogowany, aby dodać produkt do koszyka.",
+      "add_success": "Dodano produkt do koszyka.",
+      "add_error": "Nie udało się dodać produktu do koszyka.",
+      "server_error": "Błąd połączenia z serwerem."
+    }
+  }
+}

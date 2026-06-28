@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TopBar } from './TopBar';
 
 interface ProfileEditScreenProps {
@@ -6,6 +7,7 @@ interface ProfileEditScreenProps {
 }
 
 export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
+    const { t } = useTranslation();
     const [imie, setImie] = useState('');
     const [nazwisko, setNazwisko] = useState('');
     const [email, setEmail] = useState('');
@@ -38,7 +40,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
 
     const handleSaveTextData = async () => {
         if (!userId) {
-            alert('Brak zalogowanego użytkownika.');
+            alert(t('profile_edit.alerts.no_user'));
             return;
         }
 
@@ -58,14 +60,14 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
             });
 
             if (res.ok) {
-                alert('Zapisano dane profilu pomyślnie!');
+                alert(t('profile_edit.alerts.save_success'));
                 onNavigate('profile');
             } else {
-                alert('Wystąpił błąd podczas zapisywania.');
+                alert(t('profile_edit.alerts.save_error'));
             }
         } catch (error) {
             console.error(error);
-            alert('Błąd połączenia z serwerem.');
+            alert(t('profile_edit.alerts.server_error'));
         }
     };
 
@@ -91,11 +93,11 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
             if (response.ok) {
                 fetchUserData();
             } else {
-                alert(data.detail || 'Błąd podczas wgrywania zdjęcia.');
+                alert(data.detail || t('profile_edit.alerts.upload_error'));
             }
         } catch (error) {
             console.error('Błąd sieciowy:', error);
-            alert('Błąd połączenia z serwerem.');
+            alert(t('profile_edit.alerts.server_error'));
         }
     };
 
@@ -104,7 +106,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
             <TopBar onNavigate={onNavigate} />
 
             <div className="single-ribbon-wrap">
-                <div className="section-ribbon blue-ribbon large-ribbon">EDYCJA PROFILU</div>
+                <div className="section-ribbon blue-ribbon large-ribbon">{t('profile_edit.title')}</div>
             </div>
 
             <section className="settings-content">
@@ -129,7 +131,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
                         {zdjecie ? (
                             <img
                                 src={`http://127.0.0.1:8000${zdjecie}?t=${Date.now()}`}
-                                alt="Awatar użytkownika"
+                                alt={t('profile_edit.avatar_alt')}
                                 style={{
                                     width: '100%',
                                     height: '100%',
@@ -156,7 +158,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
                         className="secondary-button"
                         onClick={() => fileInputRef.current?.click()}
                     >
-                        Zmień zdjęcie
+                        {t('profile_edit.change_photo')}
                     </button>
                 </div>
 
@@ -168,12 +170,12 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
                         color: '#5d4537',
                     }}
                 >
-                    Dane użytkownika
+                    {t('profile_edit.user_data')}
                 </h3>
 
                 <div className="settings-form-grid">
                     <label>
-                        Imię
+                        {t('profile_edit.labels.first_name')}
                         <input
                             className="soft-input"
                             value={imie}
@@ -182,7 +184,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
                     </label>
 
                     <label>
-                        Nazwisko
+                        {t('profile_edit.labels.last_name')}
                         <input
                             className="soft-input"
                             value={nazwisko}
@@ -191,7 +193,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
                     </label>
 
                     <label>
-                        Email
+                        {t('profile_edit.labels.email')}
                         <input
                             className="soft-input"
                             value={email}
@@ -200,21 +202,21 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
                     </label>
 
                     <label>
-                        Numer telefonu
+                        {t('profile_edit.labels.phone')}
                         <input
                             className="soft-input"
                             type="number"
-                            placeholder="Np. 123456789"
+                            placeholder={t('profile_edit.placeholders.phone')}
                             value={telefon}
                             onChange={(e) => setTelefon(e.target.value)}
                         />
                     </label>
 
                     <label style={{ gridColumn: '1 / -1' }}>
-                        Adres dostawy
+                        {t('profile_edit.labels.address')}
                         <input
                             className="soft-input"
-                            placeholder="Ulica, numer, miasto..."
+                            placeholder={t('profile_edit.placeholders.address')}
                             value={adres}
                             onChange={(e) => setAdres(e.target.value)}
                         />
@@ -223,11 +225,11 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
 
                 <div className="settings-actions" style={{ marginTop: '30px' }}>
                     <button className="secondary-button" onClick={() => onNavigate('profile')}>
-                        Anuluj
+                        {t('profile_edit.buttons.cancel')}
                     </button>
 
                     <button className="mint-button" onClick={handleSaveTextData}>
-                        Zapisz zmiany profilu
+                        {t('profile_edit.buttons.save')}
                     </button>
                 </div>
             </section>

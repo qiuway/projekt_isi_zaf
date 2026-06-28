@@ -1,0 +1,307 @@
+{
+  "auth": {
+    "login_mode": "LOG IN",
+    "register_mode": "SIGN UP",
+    "name_placeholder": "First Name",
+    "surname_placeholder": "Last Name",
+    "email_placeholder": "Email",
+    "password_placeholder": "Password",
+    "owner_checkbox": "Register as restaurant owner",
+    "google_login": "Log in with Google",
+    "or": "or",
+    "switch_to_register": "DON'T HAVE AN ACCOUNT? SIGN UP",
+    "switch_to_login": "ALREADY HAVE AN ACCOUNT? LOG IN",
+    "errors": {
+      "missing_email_password": "Email and password are required!",
+      "missing_name": "Please enter your first and last name!",
+      "invalid_email": "Please enter a valid email address!",
+      "data_error": "Invalid data input",
+      "server_error": "Server error occurred",
+      "connection_error": "Connection error"
+    }
+  },
+  "home": {
+    "toolbar": {
+      "filters": "Filters:",
+      "filter_all": "All",
+      "filter_open": "Open only",
+      "search": "Search:",
+      "search_placeholder": "Type name...",
+      "sorting": "Sorting:",
+      "sort_az": "From A to Z",
+      "sort_za": "From Z to A"
+    },
+    "sections": {
+      "recommended": "RECOMMENDED & NEW",
+      "promotions": "SPECIAL PROMOTIONS"
+    },
+    "no_restaurants": "No restaurants to display.",
+    "errors": {
+      "fetch_error": "Error fetching data:"
+    }
+  },
+  "topbar": {
+    "menu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "pointsShop": "Points Shop",
+      "achievements": "Achievements",
+      "help": "Help"
+    },
+    "points": "Points: {{points}}",
+    "home_button": "Home",
+    "cart_value": "Cart value: {{value}} PLN",
+    "to_cart_button": "To Cart!",
+    "delivery_address": "Delivery Address: {{address}}",
+    "add_address": "Add delivery address"
+  },
+  "profile": {
+    "title": "MY PROFILE",
+    "avatar_alt": "Avatar",
+    "account_type": "Account: {{type}}",
+    "roles": {
+      "admin": "Admin",
+      "owner": "Owner",
+      "client": "Client"
+    },
+    "info": {
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "address": "Address",
+      "none": "None"
+    },
+    "loading": "Loading...",
+    "actions": {
+      "edit": "EDIT PROFILE",
+      "logout": "LOGOUT"
+    },
+    "management": {
+      "title": "Restaurant Management",
+      "add_restaurant": "+ Add Restaurant",
+      "status_open": "🟢 Open",
+      "status_closed": "🔴 Closed",
+      "btn_menu": "📋 Menu",
+      "btn_edit": "Edit",
+      "btn_delete": "Delete"
+    },
+    "restaurant_modal": {
+      "title_add": "New Restaurant",
+      "title_edit": "Edit Restaurant",
+      "labels": {
+        "name": "Restaurant Name *",
+        "description": "Description",
+        "address": "Address",
+        "phone": "Phone Number",
+        "is_open": "Restaurant is currently open"
+      },
+      "btn_cancel": "Cancel",
+      "btn_save": "Save"
+    },
+    "menu_modal": {
+      "title": "Menu Management",
+      "empty": "No products in the menu. Add the first one below!",
+      "status_available": "Available",
+      "status_unavailable": "Unavailable",
+      "section_add": "Add new dish",
+      "section_edit": "Editing: {{name}}",
+      "cancel_edit": "Cancel editing",
+      "labels": {
+        "name": "Dish Name *",
+        "price": "Price (PLN) *",
+        "price_placeholder": "e.g., 25.50",
+        "category": "Category *",
+        "is_available": "Dish is currently available"
+      },
+      "btn_add": "Add to menu",
+      "btn_save": "Save dish changes"
+    },
+    "alerts": {
+      "rest_added": "Restaurant added!",
+      "rest_saved": "Changes saved!",
+      "rest_delete_confirm": "Delete restaurant?",
+      "prod_required": "Fill in the required fields!",
+      "prod_save_error": "Error saving the product.",
+      "prod_delete_confirm": "Delete this product from the menu?"
+    }
+  },
+  "profile_edit": {
+    "title": "EDIT PROFILE",
+    "avatar_alt": "User avatar",
+    "change_photo": "Change photo",
+    "user_data": "User data",
+    "labels": {
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "Email",
+      "phone": "Phone number",
+      "address": "Delivery address"
+    },
+    "placeholders": {
+      "phone": "e.g., 123456789",
+      "address": "Street, number, city..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save profile changes"
+    },
+    "alerts": {
+      "no_user": "No logged-in user.",
+      "save_success": "Profile data saved successfully!",
+      "save_error": "An error occurred while saving.",
+      "server_error": "Server connection error.",
+      "upload_error": "Error uploading photo."
+    }
+  },
+  "settings": {
+    "title": "SETTINGS",
+    "section_app": "Application settings",
+    "dark_mode": "Dark mode",
+    "language": "App language",
+    "lang_pl": "Polish",
+    "lang_en": "English"
+  },
+  "points_shop": {
+    "title": "POINTS SHOP",
+    "your_points": "Your points",
+    "available_points": "Currently available points:",
+    "reward": {
+      "description": "Description",
+      "value": "Value",
+      "price": "Price",
+      "none": "None",
+      "pts": "pts",
+      "buy_button": "Buy with points"
+    },
+    "alerts": {
+      "not_logged_in": "You must be logged in.",
+      "buy_failed": "Failed to buy the reward.",
+      "server_error": "Server connection error."
+    }
+  },
+  "achievements": {
+    "title": "ACHIEVEMENTS",
+    "labels": {
+      "name": "Achievement name",
+      "description": "Achievement description",
+      "earned_at": "Date earned",
+      "points": "Points amount"
+    },
+    "pts": "pts"
+  },
+  "help": {
+    "title": "HELP",
+    "items": {
+      "order": {
+        "title": "How to order food?",
+        "description": "Choose a restaurant, add dishes to the cart, then go to the cart screen and place your order."
+      },
+      "account": {
+        "title": "How to change account details?",
+        "description": "Go to the settings or profile screen to see sections related to personal details and delivery address."
+      },
+      "points": {
+        "title": "Where can I find my points and achievements?",
+        "description": "Points are visible on the top bar, and achievements can be opened from the dropdown menu under the hamburger icon."
+      },
+      "contact": {
+        "title": "Contact support",
+        "description": "Phone: +48 123 456 789 | Email: support@foodflow.pl | Support hours: 8:00 AM - 10:00 PM"
+      }
+    }
+  },
+  "cart": {
+    "title": "YOUR CART",
+    "products_title": "YOUR PRODUCTS",
+    "empty": "The cart is empty.",
+    "item": {
+      "image_alt": "<dish img>",
+      "unit_price": "Unit price: {{price}} PLN",
+      "total_info": "Quantity: {{amount}} • total price {{total}} PLN"
+    },
+    "summary_title": "ORDER SUMMARY",
+    "summary": {
+      "subtotal": "Subtotal",
+      "delivery": "Delivery cost",
+      "selected_discount": "Selected discount",
+      "no_discount": "No discount selected",
+      "discount_value": "Discount value",
+      "none": "None",
+      "choose_discount_btn": "Choose discount",
+      "total": "Total to pay",
+      "order_btn": "PLACE ORDER",
+      "currency": "PLN"
+    },
+    "modal": {
+      "title": "CHOOSE DISCOUNT",
+      "no_coupons": "You have no active coupons to use.",
+      "no_description": "No description",
+      "no_discount_value": "No discount value",
+      "note": "You can only use one discount per order.",
+      "close": "Close",
+      "use_discount": "Use selected discount"
+    },
+    "alerts": {
+      "not_logged_in": "You must be logged in.",
+      "server_error": "Server connection error.",
+      "no_discount_selected": "No discount selected."
+    }
+  },
+  "payment": {
+    "title": "PAYMENT SELECTION",
+    "available_methods": "Available payment methods",
+    "methods": {
+      "card": "Credit Card",
+      "offline": "Offline Payment",
+      "on_delivery": "Cash on Delivery"
+    },
+    "credit_card_details": "Credit card details",
+    "summary_title": "Summary",
+    "summary": {
+      "products_total": "Products total",
+      "delivery_cost": "Delivery cost",
+      "delivery_address": "Delivery address",
+      "discount_value": "Discount value",
+      "to_pay": "To pay",
+      "no_address": "No address",
+      "currency": "PLN"
+    },
+    "buttons": {
+      "back_to_cart": "Back to cart",
+      "processing": "Processing...",
+      "confirm_payment": "Confirm payment"
+    },
+    "alerts": {
+      "select_method": "Please select a payment method.",
+      "order_placed": "Order placed. Method: {{method}}",
+      "payment_success": "Payment SUCCESSFUL! Order has been paid.",
+      "server_error": "Payment server connection error."
+    },
+    "stripe_errors": {
+      "default": "Payment declined.",
+      "insufficient_funds": "Error: Insufficient funds in the account.",
+      "generic_decline": "Error: Card was declined by the bank.",
+      "expired_card": "Error: Card has expired.",
+      "incorrect_cvc": "Error: Incorrect CVC code.",
+      "incorrect_number": "Error: Incorrect card number."
+    }
+  },
+  "restaurant": {
+    "loading": "Loading restaurant...",
+    "status_open": "Currently open",
+    "status_closed": "Currently closed",
+    "menu_title": "Restaurant Menu",
+    "empty_menu": "This restaurant has no dishes added yet.",
+    "category": "Category: {{category}}",
+    "none": "None",
+    "unavailable": "Currently unavailable",
+    "currency": "PLN",
+    "add_button": "+ Add",
+    "alerts": {
+      "cart_auth_error": "You must be logged in to add a product to the cart.",
+      "add_success": "Product added to cart.",
+      "add_error": "Failed to add the product to the cart.",
+      "server_error": "Server connection error."
+    }
+  }
+}

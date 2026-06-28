@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 
@@ -27,6 +28,7 @@ type KuponUzytkownika = {
 };
 
 export function CartScreen({ onNavigate }: CartScreenProps) {
+    const { t } = useTranslation();
     const [pozycje, setPozycje] = useState<PozycjaKoszyka[]>([]);
     const [suma, setSuma] = useState(0);
 
@@ -75,7 +77,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
         const userId = localStorage.getItem('userId');
 
         if (!userId) {
-            alert('Musisz być zalogowany.');
+            alert(t('cart.alerts.not_logged_in'));
             return;
         }
 
@@ -93,9 +95,9 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
             });
 
             fetchKoszyk();
-                window.dispatchEvent(new Event('koszykChanged'));
+            window.dispatchEvent(new Event('koszykChanged'));
         } catch (error) {
-            alert('Błąd połączenia z serwerem.');
+            alert(t('cart.alerts.server_error'));
         }
     };
 
@@ -152,27 +154,26 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
             <TopBar onNavigate={onNavigate} />
 
             <div className="single-ribbon-wrap beige-strip">
-                <div className="section-ribbon blue-ribbon large-ribbon">TWÓJ KOSZYK</div>
+                <div className="section-ribbon blue-ribbon large-ribbon">{t('cart.title')}</div>
             </div>
 
             <div className="cart-layout">
                 <section className="cart-products">
-                    <div className="section-ribbon blue-ribbon small-ribbon">TWOJE PRODUKTY</div>
+                    <div className="section-ribbon blue-ribbon small-ribbon">{t('cart.products_title')}</div>
 
                     <div className="list-stack">
                         {pozycje.length === 0 ? (
-                            <p>Koszyk jest pusty.</p>
+                            <p>{t('cart.empty')}</p>
                         ) : (
                             pozycje.map((item) => (
                                 <article className="cart-item" key={item.id_pozycja_koszyka}>
-                                    <div className="cart-thumb">&lt;zdj. potrawa&gt;</div>
+                                    <div className="cart-thumb">{t('cart.item.image_alt')}</div>
 
                                     <div className="cart-copy">
                                         <strong>{item.nazwa}</strong>
-                                        <span>Cena jednostkowa: {item.cena.toFixed(2)} zł</span>
+                                        <span>{t('cart.item.unit_price', { price: item.cena.toFixed(2) })}</span>
                                         <span>
-                                            Ilość: {item.ilosc} • cena całkowita{' '}
-                                            {item.cena_calkowita.toFixed(2)} zł
+                                            {t('cart.item.total_info', { amount: item.ilosc, total: item.cena_calkowita.toFixed(2) })}
                                         </span>
 
                                         <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
@@ -206,31 +207,31 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
 
                 <section className="cart-summary-wrap">
                     <div className="section-ribbon green-ribbon small-ribbon">
-                        PODSUMOWANIE ZAMÓWIENIA
+                        {t('cart.summary_title')}
                     </div>
 
                     <div className="summary-card">
                         <div className="summary-row">
-                            <span>Suma częściowa</span>
-                            <strong>{suma.toFixed(2)} zł</strong>
+                            <span>{t('cart.summary.subtotal')}</span>
+                            <strong>{suma.toFixed(2)} {t('cart.summary.currency')}</strong>
                         </div>
 
                         <div className="summary-row">
-                            <span>Koszt dostawy</span>
-                            <strong>{kosztDostawyPoRabacie.toFixed(2)} zł</strong>
+                            <span>{t('cart.summary.delivery')}</span>
+                            <strong>{kosztDostawyPoRabacie.toFixed(2)} {t('cart.summary.currency')}</strong>
                         </div>
 
                         <div className="summary-row discount-action-row">
-                            <span>Wybrany rabat</span>
-                            <strong>{selectedKupon ? selectedKupon.nazwa : 'Brak wybranego rabatu'}</strong>
+                            <span>{t('cart.summary.selected_discount')}</span>
+                            <strong>{selectedKupon ? selectedKupon.nazwa : t('cart.summary.no_discount')}</strong>
                         </div>
 
                         {selectedKupon && (
                             <div className="summary-row">
-                                <span>Wartość rabatu</span>
+                                <span>{t('cart.summary.discount_value')}</span>
                                 <strong>
-                                    {selectedKupon.wartosc_znizki || 'Brak'}
-                                    {rabatKwotowy > 0 && ` (-${rabatKwotowy.toFixed(2)} zł)`}
+                                    {selectedKupon.wartosc_znizki || t('cart.summary.none')}
+                                    {rabatKwotowy > 0 && ` (-${rabatKwotowy.toFixed(2)} ${t('cart.summary.currency')})`}
                                 </strong>
                             </div>
                         )}
@@ -242,12 +243,12 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                                 setIsPopupOpen(true);
                             }}
                         >
-                            Wybierz rabat
+                            {t('cart.summary.choose_discount_btn')}
                         </button>
 
                         <div className="summary-row total-row">
-                            <span>Suma do zapłaty</span>
-                            <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
+                            <span>{t('cart.summary.total')}</span>
+                            <strong>{sumaDoZaplaty.toFixed(2)} {t('cart.summary.currency')}</strong>
                         </div>
                     </div>
 
@@ -263,7 +264,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                             onNavigate('payment');
                         }}
                     >
-                        ZŁÓŻ ZAMÓWIENIE
+                        {t('cart.summary.order_btn')}
                     </button>
                 </section>
             </div>
@@ -272,12 +273,12 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                 <div className="modal-overlay" onClick={() => setIsPopupOpen(false)}>
                     <div className="modal-card" onClick={(event) => event.stopPropagation()}>
                         <div className="section-ribbon blue-ribbon small-ribbon modal-ribbon">
-                            WYBIERZ RABAT
+                            {t('cart.modal.title')}
                         </div>
 
                         <div className="reward-choice-list">
                             {kupony.length === 0 && (
-                                <p className="modal-note">Nie masz aktywnych kuponów do wykorzystania.</p>
+                                <p className="modal-note">{t('cart.modal.no_coupons')}</p>
                             )}
 
                             {kupony.map((kupon) => {
@@ -300,33 +301,33 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
 
                                         <div className="reward-choice-copy">
                                             <strong>{kupon.nazwa}</strong>
-                                            <span>{kupon.opis || 'Brak opisu'}</span>
-                                            <span>{kupon.wartosc_znizki || 'Brak wartości rabatu'}</span>
+                                            <span>{kupon.opis || t('cart.modal.no_description')}</span>
+                                            <span>{kupon.wartosc_znizki || t('cart.modal.no_discount_value')}</span>
                                         </div>
                                     </button>
                                 );
                             })}
                         </div>
 
-                        <p className="modal-note">Na jedno zamówienie możesz użyć tylko jednego rabatu.</p>
+                        <p className="modal-note">{t('cart.modal.note')}</p>
 
                         <div className="modal-actions">
                             <button className="secondary-button" onClick={() => setIsPopupOpen(false)}>
-                                Zamknij
+                                {t('cart.modal.close')}
                             </button>
 
                             <button
                                 className="mint-button"
                                 onClick={() => {
                                     if (!selectedKupon) {
-                                        alert('Nie wybrano rabatu.');
+                                        alert(t('cart.alerts.no_discount_selected'));
                                         return;
                                     }
 
                                     setIsPopupOpen(false);
                                 }}
                             >
-                                Użyj wybranego rabatu
+                                {t('cart.modal.use_discount')}
                             </button>
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 
 interface AuthScreenProps {
@@ -7,6 +8,7 @@ interface AuthScreenProps {
 }
 
 export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
+  const { t } = useTranslation();
   const isLogin = mode === 'login';
 
   const [imie, setImie] = useState('');
@@ -20,15 +22,15 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
     setErrorMsg('');
     
     if (!email || !haslo) {
-      setErrorMsg('Email i hasło są wymagane!');
+      setErrorMsg(t('auth.errors.missing_email_password'));
       return;
     }
     if (!isLogin && (!imie || !nazwisko)) {
-      setErrorMsg('Wypełnij imię i nazwisko!');
+      setErrorMsg(t('auth.errors.missing_name'));
       return;
     }
     if (!email.includes('@')) {
-      setErrorMsg('Podaj poprawny adres email!');
+      setErrorMsg(t('auth.errors.invalid_email'));
       return;
     }
 
@@ -48,9 +50,9 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
 
       if (!response.ok) {
         if (Array.isArray(data.detail)) {
-          setErrorMsg(`Błąd wprowadzonych danych: ${data.detail[0].msg}`);
+          setErrorMsg(`${t('auth.errors.data_error')}: ${data.detail[0].msg}`);
         } else {
-          setErrorMsg(data.detail || 'Wystąpił błąd z serwerem');
+          setErrorMsg(data.detail || t('auth.errors.server_error'));
         }
         return;
       }
@@ -64,7 +66,7 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
         onNavigate('login');
       }
     } catch (error) {
-      setErrorMsg('Błąd połączenia z serwerem');
+      setErrorMsg(t('auth.errors.connection_error'));
     }
   };
 
@@ -72,7 +74,9 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
     <div className="auth-page">
       <div className="auth-card">
         <h1 className="auth-logo">FoodFlow</h1>
-        <div className="banner-ribbon">{isLogin ? 'ZALOGUJ SIĘ' : 'ZAREJESTRUJ SIĘ'}</div>
+        <div className="banner-ribbon">
+          {isLogin ? t('auth.login_mode') : t('auth.register_mode')}
+        </div>
 
         {/* Klasa zamiast stylu inline */}
         {errorMsg && <div className="auth-error-msg">{errorMsg}</div>}
@@ -81,7 +85,7 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
           {!isLogin && (
             <input 
               className="soft-input" 
-              placeholder="Imię" 
+              placeholder={t('auth.name_placeholder')} 
               value={imie} 
               onChange={(e) => setImie(e.target.value)} 
             />
@@ -89,20 +93,20 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
           {!isLogin && (
             <input 
               className="soft-input" 
-              placeholder="Nazwisko" 
+              placeholder={t('auth.surname_placeholder')} 
               value={nazwisko} 
               onChange={(e) => setNazwisko(e.target.value)} 
             />
           )}
           <input 
             className="soft-input" 
-            placeholder="Email" 
+            placeholder={t('auth.email_placeholder')} 
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
           />
           <input 
             className="soft-input" 
-            placeholder="Hasło" 
+            placeholder={t('auth.password_placeholder')} 
             type="password" 
             value={haslo} 
             onChange={(e) => setHaslo(e.target.value)} 
@@ -116,28 +120,28 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
                 checked={isOwner} 
                 onChange={(e) => setIsOwner(e.target.checked)} 
               />
-              <span>Zarejestruj jako właściciel restauracji</span>
+              <span>{t('auth.owner_checkbox')}</span>
             </label>
           )}
         </div>
 
         <button className="mint-button wide-button auth-submit-btn" onClick={handleSubmit}>
-          {isLogin ? 'ZALOGUJ SIĘ' : 'ZAREJESTRUJ SIĘ'}
+          {isLogin ? t('auth.login_mode') : t('auth.register_mode')}
         </button>
 
-          {isLogin && (
-              <button
-                  className="secondary-button wide-button"
-                  style={{ marginTop: '12px' }}
-                  onClick={() => {
-                      window.location.href = 'http://127.0.0.1:8000/auth/google/login';
-                  }}
-              >
-                  Zaloguj przez Google
-              </button>
-          )}
+        {isLogin && (
+          <button
+            className="secondary-button wide-button"
+            style={{ marginTop: '12px' }}
+            onClick={() => {
+                window.location.href = 'http://127.0.0.1:8000/auth/google/login';
+            }}
+          >
+            {t('auth.google_login')}
+          </button>
+        )}
 
-        <div className="auth-separator">lub</div>
+        <div className="auth-separator">{t('auth.or')}</div>
 
         <button
           className="secondary-button wide-button"
@@ -147,7 +151,7 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
             onNavigate(isLogin ? 'register' : 'login');
           }}
         >
-          {isLogin ? 'NIE MASZ KONTA? ZAREJESTRUJ SIĘ' : 'MASZ JUŻ KONTO? ZALOGUJ SIĘ'}
+          {isLogin ? t('auth.switch_to_register') : t('auth.switch_to_login')}
         </button>
       </div>
     </div>
