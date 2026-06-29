@@ -278,6 +278,7 @@ def kup_kupon(dane: schemas.ZakupKuponu, db: Session = Depends(get_db)):
     db.add(posiadany_kupon)
     db.commit()
     db.refresh(user)
+    sprawdz_osiagniecia_uzytkownika(user.id_uzytkownik, db)
 
     return {
         "msg": "Kupiono nagrodę",
@@ -332,6 +333,7 @@ def aktualizuj_profil(user_id: int, dane: schemas.UzytkownikUpdate, db: Session 
     user.adres = dane.adres
     
     db.commit()
+    sprawdz_osiagniecia_uzytkownika(user_id, db)
     return {"msg": "Profil zaktualizowany pomyślnie!"}
 
 @app.post("/uzytkownik/{user_id}/avatar")
@@ -350,6 +352,7 @@ def upload_avatar(user_id: int, file: UploadFile = File(...), db: Session = Depe
     avatar_url = f"/static/avatars/{filename}"
     user.zdjecie_profilowe = avatar_url
     db.commit()
+    sprawdz_osiagniecia_uzytkownika(user_id, db)
 
     return {"msg": "Zdjęcie profilowe zaktualizowane!", "avatar_url": avatar_url}
 
@@ -565,3 +568,127 @@ def create_payment_intent(dane: PaymentIntentRequest):
         return {"client_secret": intent.client_secret}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/uzytkownik/{user_id}/osiagniecia")
+def pobierz_osiagniecia(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(
+        models.Uzytkownik.id_uzytkownik == user_id
+    ).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Użytkownik nie istnieje")
+
+    wszystkie = db.query(models.Osiagniecie).all()
+    wynik = []
+
+    for osiagniecie in wszystkie:
+        zdobyte = db.query(models.ZdobyteOsiagniecie).filter(
+            models.ZdobyteOsiagniecie.id_uzytkownik == user_id,
+            models.ZdobyteOsiagniecie.id_osiagniecia == osiagniecie.id_osiagniecia
+        ).first()
+
+        wynik.append({
+            "id_osiagniecia": osiagniecie.id_osiagniecia,
+            "nazwa": osiagniecie.nazwa,
+            "opis": osiagniecie.opis,
+            "warunek": osiagniecie.warunek,
+            "punkty": osiagniecie.punkty,
+            "ikona": osiagniecie.ikona,
+            "zdobyte": zdobyte is not None,
+            "odebrane": zdobyte.odebrane if zdobyte else False
+        })
+
+    return wynik
+
+def sprawdz_osiagniecia_uzytkownika(user_id: int, db: Session):
+    user = db.query(models.Uzytkownik).filter(
+        models.Uzytkownik.id_uzytkownik == user_id
+    ).first()
+
+    if not user:
+        return
+
+    osiagniecia = db.query(models.Osiagniecie).all()
+
+    for osiagniecie in osiagniecia:
+        juz_istnieje = db.query(models.ZdobyteOsiagniecie).filter(
+            models.ZdobyteOsiagniecie.id_uzytkownik == user_id,
+            models.ZdobyteOsiagniecie.id_osiagniecia == osiagniecie.id_osiagniecia
+        ).first()
+
+        if juz_istnieje:
+            continue
+
+        warunek_spelniony = False
+
+        if osiagniecie.warunek == "pierwszy_kupon":
+            liczba = db.query(models.PosiadanyKupon).filter(
+                models.PosiadanyKupon.id_uzytkownik == user_id
+            ).count()
+            warunek_spelniony = liczba >= 1
+
+        elif osiagniecie.warunek == "profil_uzupelniony":
+            warunek_spelniony = bool(user.imie and user.nazwisko and user.email and user.adres)
+
+        elif osiagniecie.warunek == "avatar_dodany":
+            warunek_spelniony = bool(user.zdjecie_profilowe)
+
+        elif osiagniecie.warunek == "pierwsze_zamowienie":
+            liczba = db.query(models.Zamowienie).filter(
+                models.Zamowienie.id_uzytkownik == user_id
+            ).count()
+            warunek_spelniony = liczba >= 1
+
+        elif osiagniecie.warunek == "trzy_zamowienia":
+            liczba = db.query(models.Zamowienie).filter(
+                models.Zamowienie.id_uzytkownik == user_id
+            ).count()
+            warunek_spelniony = liczba >= 3
+
+        if warunek_spelniony:
+            zdobyte = models.ZdobyteOsiagniecie(
+                id_uzytkownik=user_id,
+                id_osiagniecia=osiagniecie.id_osiagniecia,
+                odebrane=False
+            )
+            db.add(zdobyte)
+
+    db.commit()
+
+@app.post("/uzytkownik/{user_id}/osiagniecia/{id_osiagniecia}/odbierz")
+def odbierz_punkty_za_osiagniecie(
+        user_id: int,
+        id_osiagniecia: int,
+        db: Session = Depends(get_db)
+):
+    sprawdz_osiagniecia_uzytkownika(user_id, db)
+
+    zdobyte = db.query(models.ZdobyteOsiagniecie).filter(
+        models.ZdobyteOsiagniecie.id_uzytkownik == user_id,
+        models.ZdobyteOsiagniecie.id_osiagniecia == id_osiagniecia
+    ).first()
+
+    if not zdobyte:
+        raise HTTPException(status_code=400, detail="Osiągnięcie nie zostało jeszcze zdobyte")
+
+    if zdobyte.odebrane:
+        raise HTTPException(status_code=400, detail="Punkty za to osiągnięcie zostały już odebrane")
+
+    osiagniecie = db.query(models.Osiagniecie).filter(
+        models.Osiagniecie.id_osiagniecia == id_osiagniecia
+    ).first()
+
+    user = db.query(models.Uzytkownik).filter(
+        models.Uzytkownik.id_uzytkownik == user_id
+    ).first()
+
+    user.punkty += osiagniecie.punkty
+    zdobyte.odebrane = True
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "msg": "Odebrano punkty za osiągnięcie",
+        "punkty": user.punkty
+    }

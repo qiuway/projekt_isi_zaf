@@ -132,3 +132,23 @@ class PosiadanyKupon(Base):
 
     kupon = relationship("KuponSklep")
 
+class Osiagniecie(Base):
+    __tablename__ = "osiagniecia"
+
+    id_osiagniecia = Column(Integer, primary_key=True, index=True)
+    nazwa = Column(String(100), nullable=False)
+    opis = Column(Text)
+    warunek = Column(String(100), nullable=False)
+    punkty = Column(Integer, nullable=False)
+    ikona = Column(String(20))
+
+
+class ZdobyteOsiagniecie(Base):
+    __tablename__ = "zdobyte_osiagniecia"
+
+    id_zdobyte_osiagniecie = Column(Integer, primary_key=True, index=True)
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=False)
+    id_osiagniecia = Column(Integer, ForeignKey("osiagniecia.id_osiagniecia"), nullable=False)
+    odebrane = Column(Boolean, default=False)
+
+    osiagniecie = relationship("Osiagniecie")

@@ -109,3 +109,16 @@ class ProduktCreate(BaseModel):
     cena: float
     id_kategoria: int
     dostepny: bool = True
+
+class OsiagniecieOut(BaseModel):
+    id_osiagniecia: int
+    nazwa: str
+    opis: str | None = None
+    warunek: str
+    punkty: int
+    ikona: str | None = None
+    zdobyte: bool
+    odebrane: bool
+
+    class Config:
+        from_attributes = True

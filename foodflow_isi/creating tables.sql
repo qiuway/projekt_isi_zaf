@@ -17,19 +17,30 @@ CREATE TABLE uzytkownik (
 );
 
 CREATE TABLE osiagniecia (
-    id_osiagniecia INT PRIMARY KEY,
-    nazwa VARCHAR(40),
-    opis TEXT
+    id_osiagniecia SERIAL PRIMARY KEY,
+    nazwa VARCHAR(100) NOT NULL,
+    opis TEXT,
+    warunek VARCHAR(100) NOT NULL,
+    punkty INTEGER NOT NULL,
+    ikona VARCHAR(20)
 );
 
 CREATE TABLE zdobyte_osiagniecia (
-    id_uzytkownik INT,
-    id_osiagniecia INT,
-    data_zdobycia DATE,
-    PRIMARY KEY(id_uzytkownik, id_osiagniecia),
-    Foreign Key (id_uzytkownik) REFERENCES uzytkownik(id_uzytkownik),
-    Foreign Key (id_osiagniecia) REFERENCES osiagniecia(id_osiagniecia)
+    id_zdobyte_osiagniecie SERIAL PRIMARY KEY,
+    id_uzytkownik INTEGER NOT NULL,
+    id_osiagniecia INTEGER NOT NULL,
+    odebrane BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_uzytkownik) REFERENCES uzytkownik(id_uzytkownik),
+    FOREIGN KEY (id_osiagniecia) REFERENCES osiagniecia(id_osiagniecia)
 );
+
+INSERT INTO osiagniecia (nazwa, opis, warunek, punkty, ikona)
+VALUES
+    ('Pierwsze zamówienie', 'Złóż swoje pierwsze zamówienie.', 'pierwsze_zamowienie', 100, '🍔'),
+    ('Łowca rabatów', 'Kup pierwszy kupon w sklepie za punkty.', 'pierwszy_kupon', 75, '🏷️'),
+    ('Uzupełniony profil', 'Uzupełnij dane profilu użytkownika.', 'profil_uzupelniony', 50, '👤'),
+    ('Zdjęcie profilowe', 'Dodaj zdjęcie profilowe.', 'avatar_dodany', 50, '📷'),
+    ('Stały klient', 'Złóż co najmniej 3 zamówienia.', 'trzy_zamowienia', 150, '⭐');
 
 CREATE TABLE kupony_sklep (
     id_kupon SERIAL PRIMARY KEY,
