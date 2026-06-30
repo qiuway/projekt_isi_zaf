@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface PointsShopScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -29,9 +30,9 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
             return;
         }
 
-        fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/punkty`)
-            .then((res) => res.json())
-            .then((data) => {
+        apiClient.get(`/uzytkownik/${userId}/punkty`)
+            .then((response) => {
+                const data = response.data;
                 const aktualnePunkty = String(data.punkty ?? 0);
                 setPunkty(aktualnePunkty);
                 localStorage.setItem('punkty', aktualnePunkty);
@@ -40,9 +41,8 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
     };
 
     const fetchKupony = () => {
-        fetch('http://127.0.0.1:8000/kupony/')
-            .then((res) => res.json())
-            .then((data) => setKupony(data))
+        apiClient.get('/kupony/')
+            .then((response) => setKupony(response.data))
             .catch((err) => console.error(err));
     };
 
@@ -58,29 +58,23 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/kupony/kup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id_uzytkownik: Number(userId),
-                    id_kupon: idKuponu
-                })
+            const response = await apiClient.post('/kupony/kup', {
+                id_uzytkownik: Number(userId),
+                id_kupon: idKuponu
             });
 
-            const data = await response.json();
+            const data = response.data;
 
-            if (!response.ok) {
-                alert(data.detail || t('points_shop.alerts.buy_failed'));
-                return;
-            }
-
-            alert(data.msg); 
+            alert(data.msg);
             const nowePunkty = String(data.punkty ?? 0);
             setPunkty(nowePunkty);
             localStorage.setItem('punkty', nowePunkty);
             window.dispatchEvent(new Event('punktyChanged'));
-        } catch (error) {
-            alert(t('points_shop.alerts.server_error'));
+        } catch (error: any) {
+            alert(
+                error.response?.data?.detail ||
+                t('points_shop.alerts.server_error')
+            );
         }
     };
 

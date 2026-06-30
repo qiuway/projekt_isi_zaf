@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface ProfileEditScreenProps {
     onNavigate: (screen: string) => void;
@@ -21,9 +22,10 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
     const fetchUserData = () => {
         if (!userId) return;
 
-        fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
-            .then((res) => res.json())
-            .then((data) => {
+        apiClient.get(`/uzytkownik/${userId}`)
+            .then((response) => {
+                const data = response.data;
+
                 setImie(data.imie || '');
                 setNazwisko(data.nazwisko || '');
                 setEmail(data.email || '');
@@ -53,21 +55,17 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
         };
 
         try {
-            const res = await fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+            await apiClient.put(`/uzytkownik/${userId}`, payload);
 
-            if (res.ok) {
-                alert(t('profile_edit.alerts.save_success'));
-                onNavigate('profile');
-            } else {
-                alert(t('profile_edit.alerts.save_error'));
-            }
-        } catch (error) {
+            alert(t('profile_edit.alerts.save_success'));
+            onNavigate('profile');
+        } catch (error: any) {
             console.error(error);
-            alert(t('profile_edit.alerts.server_error'));
+
+            alert(
+                error.response?.data?.detail ||
+                t('profile_edit.alerts.server_error')
+            );
         }
     };
 
@@ -83,21 +81,20 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
         formData.append('file', fileToUpload);
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/avatar`, {
-                method: 'POST',
-                body: formData,
+            await apiClient.post(`/uzytkownik/${userId}/avatar`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                fetchUserData();
-            } else {
-                alert(data.detail || t('profile_edit.alerts.upload_error'));
-            }
-        } catch (error) {
+            fetchUserData();
+        } catch (error: any) {
             console.error('Błąd sieciowy:', error);
-            alert(t('profile_edit.alerts.server_error'));
+
+            alert(
+                error.response?.data?.detail ||
+                t('profile_edit.alerts.upload_error')
+            );
         }
     };
 

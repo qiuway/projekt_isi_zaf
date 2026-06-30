@@ -1,32 +1,33 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:8000',
+    baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000',
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
 
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
 
-    return config;
-});
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('userId');
-            localStorage.removeItem('token');
-            localStorage.removeItem('punkty');
-
-            alert('Sesja wygasła. Zaloguj się ponownie.');
+            console.error('401 Unauthorized');
         }
+
+        console.error(error);
 
         return Promise.reject(error);
     }

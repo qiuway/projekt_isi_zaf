@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface AchievementsScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -30,10 +31,9 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
             return;
         }
 
-        fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/osiagniecia`)
-            .then((res) => res.json())
-            .then((data) => {
-                setOsiagniecia(data);
+        apiClient.get(`/uzytkownik/${userId}/osiagniecia`)
+            .then((response) => {
+                setOsiagniecia(response.data);
             })
             .catch((err) => console.error(err))
             .finally(() => setLoading(false));
@@ -52,19 +52,11 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
         }
 
         try {
-            const response = await fetch(
-                `http://127.0.0.1:8000/uzytkownik/${userId}/osiagniecia/${idOsiagniecia}/odbierz`,
-                {
-                    method: 'POST',
-                }
+            const response = await apiClient.post(
+                `/uzytkownik/${userId}/osiagniecia/${idOsiagniecia}/odbierz`
             );
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                alert(data.detail || 'Nie można odebrać punktów.');
-                return;
-            }
+            const data = response.data;
 
             alert(data.msg);
 
@@ -72,8 +64,11 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
             window.dispatchEvent(new Event('punktyChanged'));
 
             fetchOsiagniecia();
-        } catch (error) {
-            alert('Błąd połączenia z serwerem.');
+        } catch (error: any) {
+            alert(
+                error.response?.data?.detail ||
+                'Błąd połączenia z serwerem.'
+            );
         }
     };
 

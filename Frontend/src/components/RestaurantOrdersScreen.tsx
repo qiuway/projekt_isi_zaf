@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface RestaurantOrdersScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -21,20 +21,18 @@ type Order = {
 };
 
 export function RestaurantOrdersScreen({ onNavigate, restId, restName }: RestaurantOrdersScreenProps) {
-    const { t } = useTranslation();
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [processingOrderId, setProcessingOrderId] = useState<number | null>(null);
 
     const fetchOrders = useCallback(() => {
         setIsLoading(true);
-        fetch(`http://127.0.0.1:8000/restauracja/${restId}/zamowienia`)
-            .then(res => res.json())
-            .then(data => {
-                setOrders(data);
+        apiClient.get(`/restauracja/${restId}/zamowienia`)
+            .then((response) => {
+                setOrders(response.data);
                 setIsLoading(false);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
                 setIsLoading(false);
             });
@@ -48,16 +46,16 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
         if (processingOrderId) return; // blokada przed wielokrotnym kliknięciem
         setProcessingOrderId(orderId);
         try {
-            const res = await fetch(`http://127.0.0.1:8000/zamowienia/${orderId}/${endpoint}`, { method: 'PUT' });
-            if (res.ok) {
-                alert(successMsg);
-                fetchOrders();
-            } else {
-                const data = await res.json();
-                alert(data.detail || 'Błąd.');
-            }
-        } catch (error) {
-            alert('Błąd sieci.');
+            await apiClient.put(`/zamowienia/${orderId}/${endpoint}`);
+
+            alert(successMsg);
+            fetchOrders();
+
+        } catch (error: any) {
+            alert(
+                error.response?.data?.detail ||
+                'Błąd sieci.'
+            );
         } finally {
             setProcessingOrderId(null);
         }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface OrderHistoryScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -20,13 +21,12 @@ export function OrderHistoryScreen({ onNavigate }: OrderHistoryScreenProps) {
             return;
         }
 
-        fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/zamowienia`)
-            .then(res => res.json())
-            .then(data => {
-                setOrders(data);
+        apiClient.get(`/uzytkownik/${userId}/zamowienia`)
+            .then((response) => {
+                setOrders(response.data);
                 setIsLoading(false);
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
                 setIsLoading(false);
             });
