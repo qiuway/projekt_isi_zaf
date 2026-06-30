@@ -320,44 +320,70 @@ def upload_avatar(user_id: int, file: UploadFile = File(...), db: Session = Depe
 
     return {"msg": "Zdjęcie profilowe zaktualizowane!", "avatar_url": avatar_url}
 
-@app.get("/restauracje/zarzadzaj/{user_id}")
-def pobierz_moje_restauracje(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
-        
-    if user.id_typ_konta == 3:
+@app.get("/restauracje/zarzadzaj")
+def pobierz_moje_restauracje(
+    zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
+    db: Session = Depends(get_db)
+):
+    # Sprawdzamy typ konta na podstawie bezpiecznego tokena
+    if zalogowany_user.id_typ_konta == 3:  # Admin widzi wszystkie
         return db.query(models.Restauracja).all()
-    elif user.id_typ_konta == 2:
-        return db.query(models.Restauracja).filter(models.Restauracja.id_uzytkownik == user_id).all()
+    elif zalogowany_user.id_typ_konta == 2:  # Właściciel widzi tylko swoje
+        return db.query(models.Restauracja).filter(models.Restauracja.id_uzytkownik == zalogowany_user.id_uzytkownik).all()
     else:
-        return []
+        raise HTTPException(status_code=403, detail="Brak uprawnień do zarządzania restauracjami")
 
-@app.post("/restauracje/zarzadzaj/{user_id}")
-def dodaj_restauracje(user_id: int, rest: schemas.RestauracjaCreateUpdate, db: Session = Depends(get_db)):
-    nowa = models.Restauracja(**rest.model_dump(), id_uzytkownik=user_id)
+@app.post("/restauracje/zarzadzaj")
+def dodaj_restauracje(
+    rest: schemas.RestauracjaCreateUpdate,
+    zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
+    db: Session = Depends(get_db)
+):
+    if zalogowany_user.id_typ_konta not in [2, 3]:
+        raise HTTPException(status_code=403, detail="Tylko właściciel może dodawać restauracje")
+
+    nowa = models.Restauracja(**rest.model_dump(), id_uzytkownik=zalogowany_user.id_uzytkownik)
     db.add(nowa)
     db.commit()
     return {"msg": "Dodano restaurację"}
 
+
 @app.put("/restauracje/zarzadzaj/{rest_id}")
-def edytuj_restauracje(rest_id: int, rest: schemas.RestauracjaCreateUpdate, db: Session = Depends(get_db)):
+def edytuj_restauracje(
+        rest_id: int,
+        rest: schemas.RestauracjaCreateUpdate,
+        zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
+        db: Session = Depends(get_db)
+):
     db_rest = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
     if not db_rest:
-        raise HTTPException(status_code=404)
-    
+        raise HTTPException(status_code=404, detail="Restauracja nie istnieje")
+
+    if db_rest.id_uzytkownik != zalogowany_user.id_uzytkownik and zalogowany_user.id_typ_konta != 3:
+        raise HTTPException(status_code=403, detail="Nie masz uprawnień do edycji tej restauracji")
+
     for key, value in rest.model_dump().items():
         setattr(db_rest, key, value)
-        
+
     db.commit()
     return {"msg": "Zaktualizowano restaurację"}
 
+
 @app.delete("/restauracje/zarzadzaj/{rest_id}")
-def usun_restauracje(rest_id: int, db: Session = Depends(get_db)):
+def usun_restauracje(
+        rest_id: int,
+        zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
+        db: Session = Depends(get_db)
+):
     db_rest = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
-    if db_rest:
-        db.delete(db_rest)
-        db.commit()
+    if not db_rest:
+        raise HTTPException(status_code=404, detail="Restauracja nie istnieje")
+
+    if db_rest.id_uzytkownik != zalogowany_user.id_uzytkownik and zalogowany_user.id_typ_konta != 3:
+        raise HTTPException(status_code=403, detail="Nie masz uprawnień do usunięcia tej restauracji")
+
+    db.delete(db_rest)
+    db.commit()
     return {"msg": "Usunięto restaurację"}
 
 
