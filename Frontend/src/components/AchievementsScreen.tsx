@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface AchievementsScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -21,6 +22,7 @@ type Osiagniecie = {
 export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
     const [osiagniecia, setOsiagniecia] = useState<Osiagniecie[]>([]);
     const [loading, setLoading] = useState(true);
+    const notify = useNotify();
 
     const fetchOsiagniecia = () => {
         const userId = localStorage.getItem('userId');
@@ -47,7 +49,7 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
         const userId = localStorage.getItem('userId');
 
         if (!userId) {
-            alert('Musisz być zalogowany.');
+            notify('Musisz być zalogowany.', 'warning');
             return;
         }
 
@@ -58,16 +60,17 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
 
             const data = response.data;
 
-            alert(data.msg);
+            notify(data.msg, 'success');
 
             localStorage.setItem('punkty', String(data.punkty ?? 0));
             window.dispatchEvent(new Event('punktyChanged'));
 
             fetchOsiagniecia();
         } catch (error: any) {
-            alert(
+            notify(
                 error.response?.data?.detail ||
-                'Błąd połączenia z serwerem.'
+                'Błąd połączenia z serwerem.',
+                'error'
             );
         }
     };

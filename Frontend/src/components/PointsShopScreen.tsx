@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface PointsShopScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -19,6 +20,7 @@ type Kupon = {
 
 export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
     const { t } = useTranslation();
+    const notify = useNotify();
     const [punkty, setPunkty] = useState(localStorage.getItem('punkty') || '0');
     const [kupony, setKupony] = useState<Kupon[]>([]);
 
@@ -53,7 +55,7 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
 
     const kupKupon = async (idKuponu: number) => {
         if (!userId) {
-            alert(t('points_shop.alerts.not_logged_in'));
+            notify(t('points_shop.alerts.not_logged_in'), 'warning');
             return;
         }
 
@@ -65,15 +67,16 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
 
             const data = response.data;
 
-            alert(data.msg);
+            notify(data.msg, 'success');
             const nowePunkty = String(data.punkty ?? 0);
             setPunkty(nowePunkty);
             localStorage.setItem('punkty', nowePunkty);
             window.dispatchEvent(new Event('punktyChanged'));
         } catch (error: any) {
-            alert(
+            notify(
                 error.response?.data?.detail ||
-                t('points_shop.alerts.server_error')
+                t('points_shop.alerts.server_error'),
+                'error'
             );
         }
     };

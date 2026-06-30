@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface RestaurantOrdersScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -24,6 +25,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [processingOrderId, setProcessingOrderId] = useState<number | null>(null);
+    const notify = useNotify();
 
     const fetchOrders = useCallback(() => {
         setIsLoading(true);
@@ -48,13 +50,14 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
         try {
             await apiClient.put(`/zamowienia/${orderId}/${endpoint}`);
 
-            alert(successMsg);
+            notify(successMsg, 'success');
             fetchOrders();
 
         } catch (error: any) {
-            alert(
+            notify(
                 error.response?.data?.detail ||
-                'Błąd sieci.'
+                'Błąd sieci.',
+                'error'
             );
         } finally {
             setProcessingOrderId(null);

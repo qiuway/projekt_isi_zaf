@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface ProfileScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -10,6 +11,7 @@ interface ProfileScreenProps {
 
 export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   const { t } = useTranslation();
+  const notify = useNotify();
   const [userData, setUserData] = useState<any>(null);
   const [managedRestaurants, setManagedRestaurants] = useState<any[]>([]);
   const userId = localStorage.getItem('userId');
@@ -104,11 +106,14 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
               await apiClient.put(`/restauracje/zarzadzaj/${currentRestId}`, payload);
           }
 
-          alert(modalMode === 'add' ? t('profile.alerts.rest_added') : t('profile.alerts.rest_saved'));
+          notify(
+              modalMode === 'add' ? t('profile.alerts.rest_added') : t('profile.alerts.rest_saved'),
+              'success'
+          );
           setIsModalOpen(false);
           fetchProfileAndRestaurants();
       } catch (error: any) {
-          alert(error.response?.data?.detail || t('profile.alerts.rest_save_error'));
+          notify(error.response?.data?.detail || t('profile.alerts.rest_save_error'), 'error');
       }
   };
 
@@ -118,7 +123,7 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
           await apiClient.delete(`/restauracje/zarzadzaj/${restId}`);
           fetchProfileAndRestaurants();
       } catch (error: any) {
-          alert(error.response?.data?.detail || 'Nie udało się usunąć restauracji.');
+          notify(error.response?.data?.detail || 'Nie udało się usunąć restauracji.', 'error');
       }
   };
 
@@ -153,7 +158,10 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   };
 
   const handleSaveProduct = async () => {
-    if(!prodNazwa || !prodCena || !prodKategoria) return alert(t('profile.alerts.prod_required'));
+      if (!prodNazwa || !prodCena || !prodKategoria) {
+          notify(t('profile.alerts.prod_required'), 'warning');
+          return;
+      }
     
     const payload = {
         nazwa: prodNazwa,
@@ -172,7 +180,7 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
           fetchMenuProducts(currentRestId!);
           resetProductForm();
       } catch (error: any) {
-          alert(error.response?.data?.detail || t('profile.alerts.prod_save_error'));
+          notify(error.response?.data?.detail || t('profile.alerts.prod_save_error'), 'error');
       }
   };
 
@@ -182,7 +190,7 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
           await apiClient.delete(`/produkty/${prodId}`);
           fetchMenuProducts(currentRestId!);
       } catch (error: any) {
-          alert(error.response?.data?.detail || 'Nie udało się usunąć produktu.');
+          notify(error.response?.data?.detail || 'Nie udało się usunąć produktu.', 'error');
       }
   };
 

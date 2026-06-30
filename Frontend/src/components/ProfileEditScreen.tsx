@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface ProfileEditScreenProps {
     onNavigate: (screen: string) => void;
@@ -9,6 +10,7 @@ interface ProfileEditScreenProps {
 
 export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
     const { t } = useTranslation();
+    const notify = useNotify();
     const [imie, setImie] = useState('');
     const [nazwisko, setNazwisko] = useState('');
     const [email, setEmail] = useState('');
@@ -42,7 +44,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
 
     const handleSaveTextData = async () => {
         if (!userId) {
-            alert(t('profile_edit.alerts.no_user'));
+            notify(t('profile_edit.alerts.no_user'), 'warning');
             return;
         }
 
@@ -57,14 +59,15 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
         try {
             await apiClient.put(`/uzytkownik/${userId}`, payload);
 
-            alert(t('profile_edit.alerts.save_success'));
+            notify(t('profile_edit.alerts.save_success'), 'success');
             onNavigate('profile');
         } catch (error: any) {
             console.error(error);
 
-            alert(
+            notify(
                 error.response?.data?.detail ||
-                t('profile_edit.alerts.server_error')
+                t('profile_edit.alerts.server_error'),
+                'error'
             );
         }
     };
@@ -91,9 +94,10 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
         } catch (error: any) {
             console.error('Błąd sieciowy:', error);
 
-            alert(
+            notify(
                 error.response?.data?.detail ||
-                t('profile_edit.alerts.upload_error')
+                t('profile_edit.alerts.upload_error'),
+                'error'
             );
         }
     };

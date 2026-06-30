@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface CartScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -30,6 +31,7 @@ type KuponUzytkownika = {
 
 export function CartScreen({ onNavigate }: CartScreenProps) {
     const { t } = useTranslation();
+    const notify = useNotify();
     const [pozycje, setPozycje] = useState<PozycjaKoszyka[]>([]);
     const [suma, setSuma] = useState(0);
 
@@ -77,7 +79,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
         const userId = localStorage.getItem('userId');
 
         if (!userId) {
-            alert(t('cart.alerts.not_logged_in'));
+            notify(t('cart.alerts.not_logged_in'), 'warning');
             return;
         }
 
@@ -91,7 +93,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
             fetchKoszyk();
             window.dispatchEvent(new Event('koszykChanged'));
         } catch (error) {
-            alert(t('cart.alerts.server_error'));
+            notify(t('cart.alerts.server_error'), 'error');
         }
     };
 
@@ -314,7 +316,7 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                                 className="mint-button"
                                 onClick={() => {
                                     if (!selectedKupon) {
-                                        alert(t('cart.alerts.no_discount_selected'));
+                                        notify(t('cart.alerts.no_discount_selected'), 'warning');
                                         return;
                                     }
 
