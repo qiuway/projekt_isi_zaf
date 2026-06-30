@@ -38,7 +38,7 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
     const endpoint = isLogin ? '/logowanie' : '/rejestracja';
     const payload = isLogin 
       ? { email, haslo } 
-      : { imie, nazwisko, email, haslo, is_owner: isOwner }; // <-- DODANO is_owner
+      : { imie, nazwisko, email, haslo, is_owner: isOwner };
 
     try {
       const response = await apiClient.post(endpoint, payload);
