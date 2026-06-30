@@ -253,7 +253,7 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                     )}
 
                     {selectedMethod === 'offline' && (
-                        <div style={{ marginTop: '20px', padding: '15px', background: '#f0f8ff', borderRadius: '8px', border: '1px solid #b0d4f1' }}>
+                        <div className="offline-payment-box" style={{ marginTop: '20px', padding: '15px', borderRadius: '8px' }}>
                             <strong>Numer konta do przelewu:</strong>
                             <p style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: '10px 0 0 0' }}>{BANK_ACCOUNT_NUMBER}</p>
                             <p style={{ fontSize: '0.9rem', color: '#555' }}>Kwota: {sumaDoZaplaty.toFixed(2)} zł</p>
@@ -262,7 +262,7 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                     )}
 
                     {selectedMethod === 'on_delivery' && (
-                        <div style={{ marginTop: '20px', padding: '15px', background: '#f0fff0', borderRadius: '8px', border: '1px solid #b0d4b0' }}>
+                        <div className="delivery-payment-box" style={{ marginTop: '20px', padding: '15px', borderRadius: '8px' }}>
                             <strong>Płatność przy odbiorze</strong>
                             <p style={{ margin: '10px 0 0 0' }}>Zapłać gotówką lub kartą przy dostawie.</p>
                         </div>

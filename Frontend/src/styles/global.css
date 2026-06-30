@@ -1457,7 +1457,6 @@ body.dark-mode .mint-button {
   gap: 10px;
 }
 
-/* --- POPRAWKI UKŁADU TOPBAR (GÓRNY PASEK) --- */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -1487,13 +1486,11 @@ body.dark-mode .mint-button {
   justify-content: flex-end;
 }
 
-/* Nadpisanie marginesów wewnątrz prawej sekcji, żeby elementy się nie odpychały */
 .topbar-right .pill, 
 .topbar-right .mint-button {
   margin: 0 !important;
 }
 
-/* --- STYLE DLA FORMULARZA PŁATNOŚCI STRIPE --- */
 .stripe-card-container {
   margin-top: 20px;
   padding: 15px;
@@ -1520,7 +1517,6 @@ body.dark-mode .mint-button {
   font-weight: bold;
 }
 
-/* --- HISTORIA ZAMÓWIEŃ --- */
 .order-history-grid {
   display: flex;
   flex-direction: column;
@@ -1587,7 +1583,6 @@ body.dark-mode .mint-button {
   border-bottom: none;
 }
 
-/* --- PANEL ZARZĄDZANIA RESTAURACJAMI W PROFILU --- */
 
 .restaurant-list-item {
     display: flex;
@@ -1614,7 +1609,6 @@ body.dark-mode .mint-button {
     white-space: nowrap;
 }
 
-/* Dla ciemnego trybu */
 body.dark-mode .restaurant-list-item {
     background: #2b2b33;
 }
@@ -1625,4 +1619,200 @@ body.dark-mode .restaurant-list-item strong {
 
 body.dark-mode .restaurant-list-item div {
     color: #f5f0ea;
+}
+
+body.dark-mode .order-card {
+    background: #2f2f3a;
+    border: 1px solid #5b5b70;
+    color: #f5f0e8;
+}
+
+body.dark-mode .order-card strong,
+body.dark-mode .order-card span,
+body.dark-mode .order-card h4,
+body.dark-mode .order-card div {
+    color: #f5f0e8;
+}
+
+body.dark-mode .order-items-list {
+    border-top: 1px solid #5b5b70;
+}
+
+body.dark-mode .order-status-badge {
+    color: #1f1f28;
+}
+
+body.dark-mode .stripe-card-container {
+    background: #2f2f3a;
+    border: 1px solid #5b5b70;
+    color: #f5f0e8;
+}
+
+body.dark-mode .stripe-card-title {
+    color: #f5f0e8;
+}
+
+body.dark-mode .stripe-input-wrapper {
+    background: #ffffff;
+    color: #2e241e;
+}
+
+body.dark-mode .offline-payment-box {
+    background: #263447;
+    border: 1px solid #6fa8dc;
+    color: #f5f0e8;
+}
+
+body.dark-mode .offline-payment-box strong,
+body.dark-mode .offline-payment-box p {
+    color: #f5f0e8;
+}
+
+body.dark-mode .delivery-payment-box {
+    background: #263b2b;
+    border: 1px solid #7fcf8a;
+    color: #f5f0e8;
+}
+
+body.dark-mode .delivery-payment-box strong,
+body.dark-mode .delivery-payment-box p {
+    color: #f5f0e8;
+}
+
+body.dark-mode .order-status-badge {
+    color: #2e241e !important;
+    font-weight: 700;
+}
+
+body.dark-mode .status-oplacone {
+    background: #dff7e7 !important;
+    color: #1f4d2f !important;
+}
+
+body.dark-mode .status-nieoplacone {
+    background: #ffe3e3 !important;
+    color: #7a1f1f !important;
+}
+
+body.dark-mode .status-w-trakcie {
+    background: #fff1d6 !important;
+    color: #6b3d00 !important;
+}
+
+body.dark-mode .settings-content .restaurant-menu-item {
+    background: #2f2f3a !important;
+    color: #f5f0e8 !important;
+    border: 1px solid #5b5b70 !important;
+}
+
+body.dark-mode .settings-content .restaurant-menu-item strong {
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .settings-content .restaurant-menu-item span {
+    color: #d6d6dc !important;
+}
+
+body.dark-mode .modal-content {
+    background: #2f2f3a !important;
+    color: #f5f0e8 !important;
+    border: 1px solid #5b5b70 !important;
+}
+
+body.dark-mode .modal-header {
+    border-bottom-color: #5b5b70 !important;
+}
+
+body.dark-mode .modal-content h3,
+body.dark-mode .modal-content h4,
+body.dark-mode .modal-content label,
+body.dark-mode .modal-content p,
+body.dark-mode .modal-content strong,
+body.dark-mode .modal-content span {
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .modal-content input,
+body.dark-mode .modal-content textarea,
+body.dark-mode .modal-content select {
+    background: #3a3a44 !important;
+    color: #ffffff !important;
+    border-color: #666677 !important;
+}
+
+body.dark-mode .modal-content input::placeholder,
+body.dark-mode .modal-content textarea::placeholder {
+    color: #beb6ae !important;
+}
+
+body.dark-mode .restaurant-list-item {
+    background: #2f2f3a !important;
+    border: 1px solid #5b5b70 !important;
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .restaurant-list-item strong {
+    color: #ffffff !important;
+}
+
+body.dark-mode .restaurant-list-item div {
+    color: #e8e2d8 !important;
+}
+
+body.dark-mode .restaurant-list-item button {
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .restaurant-list-item .secondary-button {
+    background: #3a3a44 !important;
+    border: 1px solid #666677 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .restaurant-list-item .secondary-button:nth-child(1) {
+    background: #e8fff8 !important;
+    color: #1f4d43 !important;
+}
+
+body.dark-mode .restaurant-list-item .secondary-button:nth-child(2) {
+    background: #fff4a8 !important;
+    color: #5b4a00 !important;
+}
+
+body.dark-mode .restaurant-list-item .secondary-button:nth-child(4) {
+    background: #ffd6d6 !important;
+    color: #7a1f1f !important;
+}
+
+body.dark-mode .order-items-list {
+    background: #24242c !important;
+    border: 1px solid #5b5b70 !important;
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .order-items-list h4,
+body.dark-mode .order-items-list div,
+body.dark-mode .order-items-list strong {
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .order-item-row {
+    border-bottom-color: #5b5b70 !important;
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .menu-product-item {
+    background: #24242c !important;
+    border: 1px solid #5b5b70 !important;
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .menu-product-item strong,
+body.dark-mode .menu-product-item div,
+body.dark-mode .menu-product-item span {
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .menu-product-item .secondary-button {
+    color: #ffffff !important;
 }

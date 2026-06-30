@@ -333,7 +333,7 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
                     <p style={{ textAlign: 'center', color: '#888' }}>{t('profile.menu_modal.empty')}</p>
                 ) : (
                     menuProducts.map(prod => (
-                        <div key={prod.id_produkt} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f9f9f9', padding: '10px', marginBottom: '8px', borderRadius: '5px', border: '1px solid #e0e0e0' }}>
+                        <div className="menu-product-item" key={prod.id_produkt} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f9f9f9', padding: '10px', marginBottom: '8px', borderRadius: '5px', border: '1px solid #e0e0e0' }}>
                             <div>
                                 <strong>{prod.nazwa}</strong> - {prod.cena} zł
                                 <div style={{ fontSize: '0.8rem', color: prod.dostepny ? 'green' : 'red' }}>
