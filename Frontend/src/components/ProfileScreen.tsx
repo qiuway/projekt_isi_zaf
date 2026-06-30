@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface ProfileScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -34,26 +35,33 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   const [prodKategoria, setProdKategoria] = useState('');
   const [prodDostepny, setProdDostepny] = useState(true);
 
-  const fetchProfileAndRestaurants = () => {
-    if (!userId) return;
-    fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setUserData(data);
-        if (data.id_typ_konta === 2 || data.id_typ_konta === 3) {
-          fetch(`http://127.0.0.1:8000/restauracje/zarzadzaj/${userId}`)
-            .then(r => r.json())
-            .then(rests => setManagedRestaurants(rests));
-            
-          fetch(`http://127.0.0.1:8000/kategorie`)
-            .then(r => r.json())
-            .then(kat => {
-                setKategorie(kat);
-                if (kat.length > 0) setProdKategoria(String(kat[0].id_kategoria));
-            });
-        }
-      });
-  };
+    const fetchProfileAndRestaurants = () => {
+        if (!userId) return;
+
+        apiClient.get(`/uzytkownik/${userId}`)
+            .then((response) => {
+                const data = response.data;
+
+                setUserData(data);
+
+                if (data.id_typ_konta === 2 || data.id_typ_konta === 3) {
+                    apiClient.get(`/restauracje/zarzadzaj/${userId}`)
+                        .then((response) => setManagedRestaurants(response.data));
+
+                    apiClient.get('/kategorie')
+                        .then((response) => {
+                            const kat = response.data;
+
+                            setKategorie(kat);
+
+                            if (kat.length > 0) {
+                                setProdKategoria(String(kat[0].id_kategoria));
+                            }
+                        });
+                }
+            })
+            .catch(console.error);
+    };
 
   useEffect(() => {
     fetchProfileAndRestaurants();
@@ -89,21 +97,29 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
         numer_telefonu: formTel ? parseInt(formTel) : null, 
         czynne: formCzynne 
     };
-    const url = modalMode === 'add' ? `http://127.0.0.1:8000/restauracje/zarzadzaj/${userId}` : `http://127.0.0.1:8000/restauracje/zarzadzaj/${currentRestId}`;
-    const method = modalMode === 'add' ? 'POST' : 'PUT';
-    
-    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if (res.ok) {
-      alert(modalMode === 'add' ? t('profile.alerts.rest_added') : t('profile.alerts.rest_saved'));
-      setIsModalOpen(false); 
-      fetchProfileAndRestaurants();
-    }
+      try {
+          if (modalMode === 'add') {
+              await apiClient.post(`/restauracje/zarzadzaj/${userId}`, payload);
+          } else {
+              await apiClient.put(`/restauracje/zarzadzaj/${currentRestId}`, payload);
+          }
+
+          alert(modalMode === 'add' ? t('profile.alerts.rest_added') : t('profile.alerts.rest_saved'));
+          setIsModalOpen(false);
+          fetchProfileAndRestaurants();
+      } catch (error: any) {
+          alert(error.response?.data?.detail || t('profile.alerts.rest_save_error'));
+      }
   };
 
   const handleDeleteRestaurant = async (restId: number) => {
     if(!window.confirm(t('profile.alerts.rest_delete_confirm'))) return;
-    const res = await fetch(`http://127.0.0.1:8000/restauracje/zarzadzaj/${restId}`, { method: 'DELETE' });
-    if (res.ok) fetchProfileAndRestaurants();
+      try {
+          await apiClient.delete(`/restauracje/zarzadzaj/${restId}`);
+          fetchProfileAndRestaurants();
+      } catch (error: any) {
+          alert(error.response?.data?.detail || 'Nie udało się usunąć restauracji.');
+      }
   };
 
   const fetchMenuProducts = (restId: number) => {
@@ -146,30 +162,28 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
         dostepny: prodDostepny
     };
 
-    const url = prodMode === 'add' 
-        ? `http://127.0.0.1:8000/restauracja/${currentRestId}/produkty`
-        : `http://127.0.0.1:8000/produkty/${currentProdId}`;
-    
-    const method = prodMode === 'add' ? 'POST' : 'PUT';
+      try {
+          if (prodMode === 'add') {
+              await apiClient.post(`/restauracja/${currentRestId}/produkty`, payload);
+          } else {
+              await apiClient.put(`/produkty/${currentProdId}`, payload);
+          }
 
-    const res = await fetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-        fetchMenuProducts(currentRestId!);
-        resetProductForm();
-    } else {
-        alert(t('profile.alerts.prod_save_error'));
-    }
+          fetchMenuProducts(currentRestId!);
+          resetProductForm();
+      } catch (error: any) {
+          alert(error.response?.data?.detail || t('profile.alerts.prod_save_error'));
+      }
   };
 
   const handleDeleteProduct = async (prodId: number) => {
     if(!window.confirm(t('profile.alerts.prod_delete_confirm'))) return;
-    const res = await fetch(`http://127.0.0.1:8000/produkty/${prodId}`, { method: 'DELETE' });
-    if (res.ok) fetchMenuProducts(currentRestId!);
+      try {
+          await apiClient.delete(`/produkty/${prodId}`);
+          fetchMenuProducts(currentRestId!);
+      } catch (error: any) {
+          alert(error.response?.data?.detail || 'Nie udało się usunąć produktu.');
+      }
   };
 
   const canManage = userData && (userData.id_typ_konta === 2 || userData.id_typ_konta === 3);
