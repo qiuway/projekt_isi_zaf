@@ -95,7 +95,8 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                 ilosc: item.ilosc
             })),
             czy_skladka: false,
-            typ_platnosci: typ_platnosci
+            typ_platnosci: typ_platnosci,
+            id_posiadany_kupon: selectedKupon?.id_posiadany_kupon ?? null
         };
 
         try {
@@ -112,6 +113,7 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
             );
 
             window.dispatchEvent(new Event('koszykChanged'));
+            localStorage.removeItem('selectedKupon');
             return true;
         } catch (error: any) {
             console.error(error);

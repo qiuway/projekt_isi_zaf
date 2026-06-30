@@ -26,6 +26,7 @@ class TworzenieZamowienia(BaseModel):
     czy_skladka: bool
     uczestnicy_skladki: Optional[List[UczestnikSkladki]] = None
     typ_platnosci: str
+    id_posiadany_kupon: int | None = None
 
 class DodajDoKoszyka(BaseModel):
     id_uzytkownik: int

@@ -708,6 +708,21 @@ def zloz_zamowienie(dane: schemas.TworzenieZamowienia, db: Session = Depends(get
         )
         db.add(osoba)
 
+    if dane.id_posiadany_kupon:
+        posiadany_kupon = db.query(models.PosiadanyKupon).filter(
+            models.PosiadanyKupon.id_posiadany_kupon == dane.id_posiadany_kupon,
+            models.PosiadanyKupon.id_uzytkownik == dane.id_uzytkownik,
+            models.PosiadanyKupon.wykorzystany == False
+        ).first()
+
+        if not posiadany_kupon:
+            raise HTTPException(
+                status_code=400,
+                detail="Wybrany rabat nie istnieje albo został już użyty"
+            )
+
+        posiadany_kupon.wykorzystany = True
+
     db.commit()
 
     return {
