@@ -45,7 +45,9 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
           alert(data.msg);
       
       if (isLogin) {
-        localStorage.setItem('userId', data.user_id);
+        localStorage.setItem('token', data.access_token);
+        
+        localStorage.setItem('userId', data.user_id); 
         onNavigate('home');
       } else {
         onNavigate('login');

@@ -21,8 +21,13 @@ function App() {
     const params = new URLSearchParams(window.location.search);
 
     if (params.get('googleLogin') === 'success') {
+      const token = params.get('token');
       const userId = params.get('userId');
       const punkty = params.get('punkty');
+
+      if (token) {
+        localStorage.setItem('token', token);
+      }
 
       if (userId) {
         localStorage.setItem('userId', userId);

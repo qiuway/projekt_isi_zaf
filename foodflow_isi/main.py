@@ -19,6 +19,41 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 import stripe
 from pydantic import BaseModel
 
+import jwt
+from datetime import datetime, timedelta
+from fastapi.security import OAuth2PasswordBearer
+
+JWT_SECRET = os.getenv("JWT_SECRET", "super-tajny-klucz-zmien-mnie")
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_MINUTES = 1440  # token wazny 24h
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="logowanie")
+
+
+def stworz_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+
+def pobierz_aktualnego_uzytkownika(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id: int = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Nieprawidłowy token")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token wygasł")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Błąd autoryzacji tokena")
+
+    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="Nie znaleziono użytkownika")
+    return user
+
 load_dotenv()
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
@@ -78,8 +113,12 @@ def logowanie(user: schemas.UzytkownikLogin, db: Session = Depends(get_db)):
     if not db_user or db_user.haslo != user.haslo:
         raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
 
+    access_token = stworz_token(data={"sub": db_user.id_uzytkownik})
+
     return {
         "msg": f"Witaj {db_user.imie}, zalogowano pomyślnie!",
+        "access_token": access_token,
+        "token_type": "bearer",
         "user_id": db_user.id_uzytkownik,
         "imie": db_user.imie,
         "punkty": db_user.punkty
@@ -151,9 +190,12 @@ def google_callback(code: str, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(user)
 
-    return RedirectResponse(
-        f"{FRONTEND_URL}?googleLogin=success&userId={user.id_uzytkownik}&punkty={user.punkty}"
-)
+        access_token = stworz_token(data={"sub": user.id_uzytkownik})
+
+        return RedirectResponse(
+            f"{FRONTEND_URL}?googleLogin=success&token={access_token}&userId={user.id_uzytkownik}&punkty={user.punkty}"
+        )
+
 
 @app.get("/uzytkownik/{user_id}/punkty")
 def pobierz_punkty(user_id: int, db: Session = Depends(get_db)):
