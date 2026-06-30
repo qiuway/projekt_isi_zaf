@@ -90,6 +90,7 @@ export function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                         {produkty.map((prod) => (
                             <div
+                                className="restaurant-menu-item"
                                 key={prod.id_produkt}
                                 style={{
                                     display: 'flex',

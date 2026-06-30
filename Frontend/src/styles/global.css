@@ -332,10 +332,11 @@ button {
 .brown-box { background: #b38a6c; }
 
 .two-column-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: start;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 42px;
+    row-gap: 20px;
+    align-items: start;
 }
 
 .column-panel {
@@ -1110,7 +1111,7 @@ button {
 }
 
 .home-layout {
-  gap: 0;
+  gap: 42px;
 }
 
 .home-ribbon {
@@ -1815,4 +1816,38 @@ body.dark-mode .menu-product-item span {
 
 body.dark-mode .menu-product-item .secondary-button {
     color: #ffffff !important;
+}
+
+.home-restaurant-panel {
+    width: 100%;
+    max-width: 100%;
+}
+
+.home-restaurant-panel .restaurant-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.home-restaurant-tile {
+    width: 100%;
+    max-width: 100%;
+}
+
+body.dark-mode .restaurant-menu-item {
+    background: #2f2f3a !important;
+    border: 1px solid #5b5b70 !important;
+    color: #f5f0e8 !important;
+}
+
+body.dark-mode .restaurant-menu-item strong {
+    color: #ffffff !important;
+}
+
+body.dark-mode .restaurant-menu-item span {
+    color: #d6d6dc !important;
+}
+
+body.dark-mode .restaurant-menu-item .mint-button {
+    color: #24463d !important;
 }
