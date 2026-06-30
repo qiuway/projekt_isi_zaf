@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface CartScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -45,9 +46,9 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
             return;
         }
 
-        fetch(`http://127.0.0.1:8000/koszyk/${userId}`)
-            .then((res) => res.json())
-            .then((data) => {
+        apiClient.get(`/koszyk/${userId}`)
+            .then((response) => {
+                const data = response.data;
                 setPozycje(data.pozycje || []);
                 setSuma(data.suma || 0);
             })
@@ -62,9 +63,8 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
             return;
         }
 
-        fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/kupony`)
-            .then((res) => res.json())
-            .then((data) => setKupony(data))
+        apiClient.get(`/uzytkownik/${userId}/kupony`)
+            .then((response) => setKupony(response.data))
             .catch((err) => console.error(err));
     };
 
@@ -82,16 +82,10 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
         }
 
         try {
-            await fetch('http://127.0.0.1:8000/koszyk/aktualizuj', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id_uzytkownik: Number(userId),
-                    id_produkt: idProduktu,
-                    ilosc: nowaIlosc,
-                }),
+            await apiClient.put('/koszyk/aktualizuj', {
+                id_uzytkownik: Number(userId),
+                id_produkt: idProduktu,
+                ilosc: nowaIlosc,
             });
 
             fetchKoszyk();

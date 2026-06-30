@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
+import { apiClient } from '../api/apiClient';
 
 interface AuthScreenProps {
   mode: 'login' | 'register';
@@ -34,30 +35,14 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
       return;
     }
 
-    const url = isLogin ? 'http://127.0.0.1:8000/logowanie' : 'http://127.0.0.1:8000/rejestracja';
-    const payload = isLogin 
-      ? { email, haslo } 
-      : { imie, nazwisko, email, haslo, is_owner: isOwner };
+      const endpoint = isLogin ? '/logowanie' : '/rejestracja';
+      const payload = isLogin ? { email, haslo } : { imie, nazwisko, email, haslo };
 
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      try {
+          const response = await apiClient.post(endpoint, payload);
+          const data = response.data;
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (Array.isArray(data.detail)) {
-          setErrorMsg(`${t('auth.errors.data_error')}: ${data.detail[0].msg}`);
-        } else {
-          setErrorMsg(data.detail || t('auth.errors.server_error'));
-        }
-        return;
-      }
-
-      alert(data.msg); 
+          alert(data.msg);
       
       if (isLogin) {
         localStorage.setItem('userId', data.user_id);
@@ -65,9 +50,15 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
       } else {
         onNavigate('login');
       }
-    } catch (error) {
-      setErrorMsg(t('auth.errors.connection_error'));
-    }
+      } catch (error: any) {
+          const detail = error.response?.data?.detail;
+
+          if (Array.isArray(detail)) {
+              setErrorMsg(`Błąd wprowadzonych danych: ${detail[0].msg}`);
+          } else {
+              setErrorMsg(detail || 'Błąd połączenia z serwerem');
+          }
+      }
   };
 
   return (

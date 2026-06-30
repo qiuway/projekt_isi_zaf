@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 interface HomeScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -22,9 +23,8 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
   const [sortBy, setSortBy] = useState('name_asc');
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/restauracje/')
-      .then((response) => response.json())
-      .then((data) => setRestaurants(data))
+      apiClient.get('/restauracje/')
+          .then((response) => setRestaurants(response.data))
       .catch((error) => console.error(t('home.errors.fetch_error'), error));
   }, [t]);
 

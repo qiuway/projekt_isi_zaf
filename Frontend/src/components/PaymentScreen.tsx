@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
+import { apiClient } from '../api/apiClient';
 
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -51,10 +52,12 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
         }
 
         Promise.all([
-            fetch(`http://127.0.0.1:8000/koszyk/${userId}`).then((r) => r.json()),
-            fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`).then((r) => r.json()),
+            apiClient.get(`/koszyk/${userId}`),
+            apiClient.get(`/uzytkownik/${userId}`),
         ])
-            .then(([koszyk, user]) => {
+            .then(([koszykResponse, userResponse]) => {
+                const koszyk = koszykResponse.data;
+                const user = userResponse.data;
                 setSuma(koszyk.suma || 0);
                 setCartItems(koszyk.pozycje || []);
                 setAdres(user.adres || t('payment.summary.no_address'));
@@ -96,33 +99,28 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
         };
 
         try {
-            const res = await fetch('http://127.0.0.1:8000/zamowienia/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            
-            if (res.ok) {
-                await Promise.all(cartItems.map((item: any) => 
-                    fetch('http://127.0.0.1:8000/koszyk/aktualizuj', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            id_uzytkownik: Number(userId),
-                            id_produkt: item.id_produkt,
-                            ilosc: 0
-                        })
+            await apiClient.post('/zamowienia/', payload);
+
+            await Promise.all(
+                cartItems.map((item: any) =>
+                    apiClient.put('/koszyk/aktualizuj', {
+                        id_uzytkownik: Number(userId),
+                        id_produkt: item.id_produkt,
+                        ilosc: 0,
                     })
-                ));
-                window.dispatchEvent(new Event('koszykChanged')); 
-                return true;
-            } else {
-                const errorData = await res.json();
-                alert(`Serwer odrzucił zamówienie: ${errorData.detail}`);
-                return false;
-            }
-        } catch (e) {
-            console.error(e);
+                )
+            );
+
+            window.dispatchEvent(new Event('koszykChanged'));
+            return true;
+        } catch (error: any) {
+            console.error(error);
+
+            alert(
+                error.response?.data?.detail ||
+                'Błąd podczas zapisywania zamówienia.'
+            );
+
             return false;
         }
     };
@@ -165,14 +163,11 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
             setPaymentError(null);
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/create-payment-intent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: sumaDoZaplaty })
+                const response = await apiClient.post('/create-payment-intent', {
+                    amount: sumaDoZaplaty
                 });
-                const data = await response.json();
-                
-                if (!response.ok) throw new Error(data.detail);
+
+                const data = response.data;
 
                 const cardElement = elements.getElement(CardElement);
                 const paymentResult = await stripe.confirmCardPayment(data.client_secret, {
@@ -207,7 +202,11 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                     }
                 }
             } catch (error: any) {
-                setPaymentError(error.message || t('payment.alerts.server_error'));
+                setPaymentError(
+                    error.response?.data?.detail ||
+                    error.message ||
+                    t('payment.alerts.server_error')
+                );
             }
 
             setIsProcessing(false);

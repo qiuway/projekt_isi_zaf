@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
+import { apiClient } from '../api/apiClient';
 
 interface TopBarProps {
   title?: string;
@@ -46,25 +47,25 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
         return;
       }
 
-      fetch(`http://127.0.0.1:8000/uzytkownik/${userId}/punkty`)
-        .then((res) => res.json())
-        .then((data) => {
+        apiClient.get(`/uzytkownik/${userId}/punkty`)
+            .then((response) => {
+                const data = response.data;
           const aktualnePunkty = String(data.punkty ?? 0);
           setPunkty(aktualnePunkty);
           localStorage.setItem('punkty', aktualnePunkty);
         })
         .catch((err) => console.error(err));
 
-      fetch(`http://127.0.0.1:8000/koszyk/${userId}`)
-        .then((res) => res.json())
-        .then((data) => {
+        apiClient.get(`/koszyk/${userId}`)
+            .then((response) => {
+                const data = response.data;
           setKoszykSuma(data.suma || 0);
         })
         .catch((err) => console.error(err));
 
-      fetch(`http://127.0.0.1:8000/uzytkownik/${userId}`)
-        .then((res) => res.json())
-        .then((data) => {
+        apiClient.get(`/uzytkownik/${userId}`)
+            .then((response) => {
+                const data = response.data;
           setAdres(data.adres || null);
         })
         .catch((err) => console.error(err));
