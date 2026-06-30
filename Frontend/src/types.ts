@@ -6,10 +6,12 @@ export type Screen =
   | 'cart'
   | 'profile'
   | 'profileEdit'
+  | 'restaurantOrders'
   | 'settings'
   | 'help'
   | 'achievements'
   | 'pointsShop'
+  | 'orderHistory'
   | 'payment';
 
 export interface Dish {

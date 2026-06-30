@@ -200,6 +200,15 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
           <div style={{ marginTop: '10px', fontWeight: 'bold', color: '#6d4b3a', fontSize: '0.9rem' }}>
             {t('profile.account_type', { type: getAccountTypeLabel(userData?.id_typ_konta) })}
           </div>
+          
+          <button 
+            className="secondary-button" 
+            style={{ marginTop: '20px', width: '100%', fontSize: '0.85rem' }} 
+            onClick={() => onNavigate('orderHistory' as Screen)}
+          >
+            {t('profile.order_history', 'Historia zamówień')}
+          </button>
+          
         </div>
 
         <div className="profile-info">
@@ -233,11 +242,35 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
                 </div>
               </div>
               <div className="restaurant-list-actions">
-                <button className="secondary-button" style={{ background: '#e0f7fa', borderColor: '#b2ebf2' }} onClick={() => openMenuModal(rest.id_restauracja)}>
+                <button 
+                  className="secondary-button" 
+                  style={{ background: '#e0f7fa', borderColor: '#b2ebf2' }} 
+                  onClick={() => openMenuModal(rest.id_restauracja)}
+                >
                   {t('profile.management.btn_menu')}
                 </button>
-                <button className="secondary-button" onClick={() => openModalForEdit(rest)}>{t('profile.management.btn_edit')}</button>
-                <button className="secondary-button" style={{ background: '#ffcccc', color: '#cc0000', borderColor: '#ff9999' }} onClick={() => handleDeleteRestaurant(rest.id_restauracja)}>
+                <button 
+                  className="secondary-button" 
+                  style={{ background: '#ffeb3b', borderColor: '#fbc02d' }} 
+                  onClick={() => {
+                    localStorage.setItem('restaurantOrdersRestId', String(rest.id_restauracja));
+                    localStorage.setItem('restaurantOrdersRestName', rest.nazwa);
+                    onNavigate('restaurantOrders');
+                  }}
+                >
+                  Zamówienia
+                </button>
+                <button 
+                  className="secondary-button" 
+                  onClick={() => openModalForEdit(rest)}
+                >
+                  {t('profile.management.btn_edit')}
+                </button>
+                <button 
+                  className="secondary-button" 
+                  style={{ background: '#ffcccc', color: '#cc0000', borderColor: '#ff9999' }} 
+                  onClick={() => handleDeleteRestaurant(rest.id_restauracja)}
+                >
                   {t('profile.management.btn_delete')}
                 </button>
               </div>

@@ -10,40 +10,42 @@ import { ProfileScreen } from './components/ProfileScreen';
 import { RestaurantScreen } from './components/RestaurantScreen';
 import { SettingsScreen } from './components/SettingsScreen';
 import { ProfileEditScreen } from './components/ProfileEditScreen';
+import { OrderHistoryScreen } from './components/OrderHistoryScreen';
+import { RestaurantOrdersScreen } from './components/RestaurantOrdersScreen';
 import type { Screen } from './types';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('register');
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
 
-        if (params.get('googleLogin') === 'success') {
-            const userId = params.get('userId');
-            const punkty = params.get('punkty');
+    if (params.get('googleLogin') === 'success') {
+      const userId = params.get('userId');
+      const punkty = params.get('punkty');
 
-            if (userId) {
-                localStorage.setItem('userId', userId);
-            }
+      if (userId) {
+        localStorage.setItem('userId', userId);
+      }
 
-            if (punkty) {
-                localStorage.setItem('punkty', punkty);
-            }
+      if (punkty) {
+        localStorage.setItem('punkty', punkty);
+      }
 
-            window.history.replaceState({}, document.title, window.location.pathname);
-            setCurrentScreen('home');
-        }
-    }, []);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setCurrentScreen('home');
+    }
+  }, []);
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
 
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
-        }
-    }, []);
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, []);
 
   const screen = useMemo(() => {
     switch (currentScreen) {
@@ -60,8 +62,8 @@ function App() {
       case 'profile':
         return <ProfileScreen onNavigate={setCurrentScreen} />;
       case 'profileEdit':
-          // @ts-ignore
-          return <ProfileEditScreen onNavigate={setCurrentScreen} />;
+        // @ts-ignore
+        return <ProfileEditScreen onNavigate={setCurrentScreen} />;
       case 'settings':
         return <SettingsScreen onNavigate={setCurrentScreen} />;
       case 'help':
@@ -72,6 +74,23 @@ function App() {
         return <PointsShopScreen onNavigate={setCurrentScreen} />;
       case 'payment':
         return <PaymentScreen onNavigate={setCurrentScreen} />;
+      case 'orderHistory':
+        return <OrderHistoryScreen onNavigate={setCurrentScreen} />;
+      case 'restaurantOrders': {
+        const restId = localStorage.getItem('restaurantOrdersRestId');
+        const restName = localStorage.getItem('restaurantOrdersRestName');
+        if (!restId) {
+          setCurrentScreen('profile');
+          return null;
+        }
+        return (
+          <RestaurantOrdersScreen
+            onNavigate={setCurrentScreen}
+            restId={Number(restId)}
+            restName={restName || 'Restauracja'}
+          />
+        );
+      }
       default:
         return <AuthScreen mode="register" onNavigate={setCurrentScreen} />;
     }

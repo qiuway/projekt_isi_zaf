@@ -1519,3 +1519,110 @@ body.dark-mode .mint-button {
   font-size: 0.9rem;
   font-weight: bold;
 }
+
+/* --- HISTORIA ZAMÓWIEŃ --- */
+.order-history-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.order-card {
+  background: #fff;
+  border: 1px solid #dccbbd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.order-meta span {
+  display: block;
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.order-status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-right: 8px;
+  margin-top: 5px;
+}
+
+.status-oplacone { background: #e8f5e9; color: #2e7d32; }
+.status-nieoplacone { background: #ffebee; color: #c62828; }
+.status-w-trakcie { background: #fff3e0; color: #ef6c00; }
+
+.order-items-list {
+  background: #fdfaf7;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #dccbbd;
+  padding: 8px 0;
+  font-size: 0.95rem;
+  color: #5d4537;
+}
+
+.order-item-row:last-child {
+  border-bottom: none;
+}
+
+/* --- PANEL ZARZĄDZANIA RESTAURACJAMI W PROFILU --- */
+
+.restaurant-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.restaurant-list-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.restaurant-list-actions .secondary-button {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* Dla ciemnego trybu */
+body.dark-mode .restaurant-list-item {
+    background: #2b2b33;
+}
+
+body.dark-mode .restaurant-list-item strong {
+    color: #f5f0ea;
+}
+
+body.dark-mode .restaurant-list-item div {
+    color: #f5f0ea;
+}

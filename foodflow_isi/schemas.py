@@ -25,6 +25,7 @@ class TworzenieZamowienia(BaseModel):
     pozycje: List[PozycjaKoszyka]
     czy_skladka: bool
     uczestnicy_skladki: Optional[List[UczestnikSkladki]] = None
+    typ_platnosci: str
 
 class DodajDoKoszyka(BaseModel):
     id_uzytkownik: int
@@ -81,8 +82,8 @@ class KuponOut(BaseModel):
     wartosc_znizki: Optional[str] = None
     ikona: Optional[str] = None
 
-class Config:
-    from_attributes = True
+    class Config:
+        from_attributes = True
 
 class ZakupKuponu(BaseModel):
     id_uzytkownik: int
