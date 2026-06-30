@@ -35,32 +35,33 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
       return;
     }
 
-      const endpoint = isLogin ? '/logowanie' : '/rejestracja';
-      const payload = isLogin ? { email, haslo } : { imie, nazwisko, email, haslo };
+    const endpoint = isLogin ? '/logowanie' : '/rejestracja';
+    const payload = isLogin 
+      ? { email, haslo } 
+      : { imie, nazwisko, email, haslo, is_owner: isOwner }; // <-- DODANO is_owner
 
-      try {
-          const response = await apiClient.post(endpoint, payload);
-          const data = response.data;
+    try {
+      const response = await apiClient.post(endpoint, payload);
+      const data = response.data;
 
-          alert(data.msg);
+      alert(data.msg);
       
       if (isLogin) {
         localStorage.setItem('token', data.access_token);
-        
         localStorage.setItem('userId', data.user_id); 
         onNavigate('home');
       } else {
         onNavigate('login');
       }
-      } catch (error: any) {
-          const detail = error.response?.data?.detail;
+    } catch (error: any) {
+      const detail = error.response?.data?.detail;
 
-          if (Array.isArray(detail)) {
-              setErrorMsg(`Błąd wprowadzonych danych: ${detail[0].msg}`);
-          } else {
-              setErrorMsg(detail || 'Błąd połączenia z serwerem');
-          }
+      if (Array.isArray(detail)) {
+        setErrorMsg(`Błąd wprowadzonych danych: ${detail[0].msg}`);
+      } else {
+        setErrorMsg(detail || 'Błąd połączenia z serwerem');
       }
+    }
   };
 
   return (
@@ -71,7 +72,6 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
           {isLogin ? t('auth.login_mode') : t('auth.register_mode')}
         </div>
 
-        {/* Klasa zamiast stylu inline */}
         {errorMsg && <div className="auth-error-msg">{errorMsg}</div>}
 
         <div className="form-stack">

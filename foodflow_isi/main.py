@@ -19,41 +19,6 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 import stripe
 from pydantic import BaseModel
 
-import jwt
-from datetime import datetime, timedelta
-from fastapi.security import OAuth2PasswordBearer
-
-JWT_SECRET = os.getenv("JWT_SECRET", "super-tajny-klucz-zmien-mnie")
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_MINUTES = 1440  # token wazny 24h
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="logowanie")
-
-
-def stworz_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return encoded_jwt
-
-
-def pobierz_aktualnego_uzytkownika(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user_id: int = payload.get("sub")
-        if user_id is None:
-            raise HTTPException(status_code=401, detail="Nieprawidłowy token")
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token wygasł")
-    except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="Błąd autoryzacji tokena")
-
-    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
-    if user is None:
-        raise HTTPException(status_code=401, detail="Nie znaleziono użytkownika")
-    return user
-
 load_dotenv()
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
@@ -113,12 +78,8 @@ def logowanie(user: schemas.UzytkownikLogin, db: Session = Depends(get_db)):
     if not db_user or db_user.haslo != user.haslo:
         raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
 
-    access_token = stworz_token(data={"sub": db_user.id_uzytkownik})
-
     return {
         "msg": f"Witaj {db_user.imie}, zalogowano pomyślnie!",
-        "access_token": access_token,
-        "token_type": "bearer",
         "user_id": db_user.id_uzytkownik,
         "imie": db_user.imie,
         "punkty": db_user.punkty
@@ -190,12 +151,9 @@ def google_callback(code: str, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(user)
 
-        access_token = stworz_token(data={"sub": user.id_uzytkownik})
-
-        return RedirectResponse(
-            f"{FRONTEND_URL}?googleLogin=success&token={access_token}&userId={user.id_uzytkownik}&punkty={user.punkty}"
-        )
-
+    return RedirectResponse(
+        f"{FRONTEND_URL}?googleLogin=success&userId={user.id_uzytkownik}&punkty={user.punkty}"
+)
 
 @app.get("/uzytkownik/{user_id}/punkty")
 def pobierz_punkty(user_id: int, db: Session = Depends(get_db)):
@@ -320,70 +278,44 @@ def upload_avatar(user_id: int, file: UploadFile = File(...), db: Session = Depe
 
     return {"msg": "Zdjęcie profilowe zaktualizowane!", "avatar_url": avatar_url}
 
-@app.get("/restauracje/zarzadzaj")
-def pobierz_moje_restauracje(
-    zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
-    db: Session = Depends(get_db)
-):
-    # Sprawdzamy typ konta na podstawie bezpiecznego tokena
-    if zalogowany_user.id_typ_konta == 3:  # Admin widzi wszystkie
+@app.get("/restauracje/zarzadzaj/{user_id}")
+def pobierz_moje_restauracje(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Nie znaleziono użytkownika")
+        
+    if user.id_typ_konta == 3:
         return db.query(models.Restauracja).all()
-    elif zalogowany_user.id_typ_konta == 2:  # Właściciel widzi tylko swoje
-        return db.query(models.Restauracja).filter(models.Restauracja.id_uzytkownik == zalogowany_user.id_uzytkownik).all()
+    elif user.id_typ_konta == 2:
+        return db.query(models.Restauracja).filter(models.Restauracja.id_uzytkownik == user_id).all()
     else:
-        raise HTTPException(status_code=403, detail="Brak uprawnień do zarządzania restauracjami")
+        return []
 
-@app.post("/restauracje/zarzadzaj")
-def dodaj_restauracje(
-    rest: schemas.RestauracjaCreateUpdate,
-    zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
-    db: Session = Depends(get_db)
-):
-    if zalogowany_user.id_typ_konta not in [2, 3]:
-        raise HTTPException(status_code=403, detail="Tylko właściciel może dodawać restauracje")
-
-    nowa = models.Restauracja(**rest.model_dump(), id_uzytkownik=zalogowany_user.id_uzytkownik)
+@app.post("/restauracje/zarzadzaj/{user_id}")
+def dodaj_restauracje(user_id: int, rest: schemas.RestauracjaCreateUpdate, db: Session = Depends(get_db)):
+    nowa = models.Restauracja(**rest.model_dump(), id_uzytkownik=user_id)
     db.add(nowa)
     db.commit()
     return {"msg": "Dodano restaurację"}
 
-
 @app.put("/restauracje/zarzadzaj/{rest_id}")
-def edytuj_restauracje(
-        rest_id: int,
-        rest: schemas.RestauracjaCreateUpdate,
-        zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
-        db: Session = Depends(get_db)
-):
+def edytuj_restauracje(rest_id: int, rest: schemas.RestauracjaCreateUpdate, db: Session = Depends(get_db)):
     db_rest = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
     if not db_rest:
-        raise HTTPException(status_code=404, detail="Restauracja nie istnieje")
-
-    if db_rest.id_uzytkownik != zalogowany_user.id_uzytkownik and zalogowany_user.id_typ_konta != 3:
-        raise HTTPException(status_code=403, detail="Nie masz uprawnień do edycji tej restauracji")
-
+        raise HTTPException(status_code=404)
+    
     for key, value in rest.model_dump().items():
         setattr(db_rest, key, value)
-
+        
     db.commit()
     return {"msg": "Zaktualizowano restaurację"}
 
-
 @app.delete("/restauracje/zarzadzaj/{rest_id}")
-def usun_restauracje(
-        rest_id: int,
-        zalogowany_user: models.Uzytkownik = Depends(pobierz_aktualnego_uzytkownika),
-        db: Session = Depends(get_db)
-):
+def usun_restauracje(rest_id: int, db: Session = Depends(get_db)):
     db_rest = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
-    if not db_rest:
-        raise HTTPException(status_code=404, detail="Restauracja nie istnieje")
-
-    if db_rest.id_uzytkownik != zalogowany_user.id_uzytkownik and zalogowany_user.id_typ_konta != 3:
-        raise HTTPException(status_code=403, detail="Nie masz uprawnień do usunięcia tej restauracji")
-
-    db.delete(db_rest)
-    db.commit()
+    if db_rest:
+        db.delete(db_rest)
+        db.commit()
     return {"msg": "Usunięto restaurację"}
 
 
@@ -685,7 +617,6 @@ def odbierz_punkty_za_osiagniecie(
 
 @app.post("/zamowienia/")
 def zloz_zamowienie(dane: schemas.TworzenieZamowienia, db: Session = Depends(get_db)):
-
     laczna_kwota = 0.0
     pozycje_do_zapisu = []
 
@@ -865,68 +796,9 @@ def zaakceptuj_platnosc(zam_id: int, db: Session = Depends(get_db)):
     platnosc.status_platnosci = "ZAAKCEPTOWANA"
     db.commit()
     return {"msg": "Płatność zatwierdzona"}
-    zamowienie = db.query(models.Zamowienie).filter(models.Zamowienie.id_zamowienia == zam_id).first()
-    if not zamowienie:
-        raise HTTPException(status_code=404, detail="Zamówienie nie istnieje")
-    platnosc = db.query(models.Platnosc).filter(models.Platnosc.id_zamowienia == zam_id).first()
-    if not platnosc:
-        raise HTTPException(status_code=404, detail="Płatność nie istnieje")
-    if platnosc.status_platnosci != "OCZEKUJĄCA":
-        raise HTTPException(status_code=400, detail="Płatność nie oczekuje na akceptację")
-    platnosc.status_platnosci = "ZAAKCEPTOWANA"
-    db.commit()
-    return {"msg": "Płatność zatwierdzona"}
-    restauracja = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
-    if not restauracja:
-        raise HTTPException(status_code=404, detail="Restauracja nie istnieje")
-    
-    zamowienia = db.query(models.Zamowienie).filter(models.Zamowienie.id_restauracja == rest_id).all()
-    wynik = []
-    
-    for zam in zamowienia:
-        uzytkownik = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == zam.id_uzytkownik).first()
-        
-        pozycje = db.query(models.PozycjaZamowienia).filter(models.PozycjaZamowienia.id_zamowienia == zam.id_zamowienia).all()
-        pozycje_out = []
-        for p in pozycje:
-            produkt = db.query(models.Produkt).filter(models.Produkt.id_produkt == p.id_produkt).first()
-            pozycje_out.append({
-                "nazwa": produkt.nazwa if produkt else "Nieznany produkt",
-                "ilosc": p.ilosc,
-                "cena": float(p.cena)
-            })
-        
-        platnosc = db.query(models.Platnosc).filter(models.Platnosc.id_zamowienia == zam.id_zamowienia).first()
-        status_platnosci = platnosc.status_platnosci if platnosc else "NIEZNANY"
-        
-        wynik.append({
-            "id_zamowienia": zam.id_zamowienia,
-            "klient": f"{uzytkownik.imie} {uzytkownik.nazwisko}" if uzytkownik else "Nieznany klient",
-            "adres_dostawy": uzytkownik.adres if uzytkownik else "Brak adresu",
-            "data_zamowienia": zam.data_zamowienia,
-            "kwota": float(zam.kwota),
-            "status_zamowienia": zam.status_zamowienia,
-            "status_platnosci": status_platnosci,
-            "pozycje": pozycje_out
-        })
-    
-    return wynik
-
-    zamowienie = db.query(models.Zamowienie).filter(models.Zamowienie.id_zamowienia == zam_id).first()
-    if not zamowienie:
-        raise HTTPException(status_code=404, detail="Zamówienie nie istnieje")
-    
-    # Można dodać sprawdzenie, czy zalogowany użytkownik jest właścicielem tej restauracji (ale pomijamy dla uproszczenia)
-    
-    zamowienie.status_zamowienia = "ODRZUCONE"
-    db.commit()
-    return {"msg": "Zamówienie zostało odrzucone"}
-
-    # ========== ZAMÓWIENIA - HISTORIA I ZARZĄDZANIE ==========
 
 @app.get("/uzytkownik/{user_id}/zamowienia")
 def pobierz_zamowienia_uzytkownika(user_id: int, db: Session = Depends(get_db)):
-    """Pobiera zamówienia złożone przez użytkownika (historia)"""
     user = db.query(models.Uzytkownik).filter(models.Uzytkownik.id_uzytkownik == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Użytkownik nie istnieje")
@@ -959,7 +831,6 @@ def pobierz_zamowienia_uzytkownika(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/restauracja/{rest_id}/zamowienia")
 def pobierz_zamowienia_restauracji(rest_id: int, db: Session = Depends(get_db)):
-    """Pobiera zamówienia dla danej restauracji (dla właściciela)"""
     restauracja = db.query(models.Restauracja).filter(models.Restauracja.id_restauracja == rest_id).first()
     if not restauracja:
         raise HTTPException(status_code=404, detail="Restauracja nie istnieje")
