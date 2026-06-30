@@ -3,11 +3,16 @@ import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe('pk_test_51TnE2bCBya6caqe3f4wb0lX3ecPVXX8HadBXhPRoKIgNyZ6rnd1aUbTaIYdYkoIkpHm0WxMi0gz9g3omS3Hejpo100wLemHYoq');
+const STRIPE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+
+console.log('STRIPE KEY:', STRIPE_KEY);
+
+const stripePromise = STRIPE_KEY ? loadStripe(STRIPE_KEY) : null;
 
 interface PaymentScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -31,6 +36,7 @@ export function PaymentScreen(props: PaymentScreenProps) {
 
 function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
     const { t } = useTranslation();
+    const notify = useNotify();
     const stripe = useStripe();
     const elements = useElements();
 
@@ -41,6 +47,8 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [paymentError, setPaymentError] = useState<string | null>(null);
     const [cartItems, setCartItems] = useState<any[]>([]);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successPaymentType, setSuccessPaymentType] = useState<'offline' | 'on_delivery' | 'card' | null>(null);
 
     useEffect(() => {
         const userId = localStorage.getItem('userId');
@@ -118,7 +126,7 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
         } catch (error: any) {
             console.error(error);
 
-            alert(
+            notify(
                 error.response?.data?.detail ||
                 'Błąd podczas zapisywania zamówienia.'
             );
@@ -129,7 +137,7 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
     
     const handleConfirmPayment = async () => {
         if (!selectedMethod) {
-            alert(t('payment.alerts.select_method'));
+            notify(t('payment.alerts.select_method'));
             return;
         }
 
@@ -137,12 +145,14 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
             setIsProcessing(true);
             const sukces = await zlozZamowienieWbazie('offline');
             setIsProcessing(false);
+
             if (sukces) {
-                alert(`Zamówienie zarejestrowane. Prosimy o dokonanie przelewu na numer konta:\n${BANK_ACCOUNT_NUMBER}\nKwota: ${sumaDoZaplaty.toFixed(2)} zł\nPo zaksięgowaniu płatności zamówienie zostanie zrealizowane.`);
-                onNavigate('home');
+                setSuccessPaymentType('offline');
+                setShowSuccessModal(true);
             } else {
-                alert('Błąd podczas zapisywania zamówienia.');
+                notify('Błąd podczas zapisywania zamówienia.', 'error');
             }
+
             return;
         }
 
@@ -150,12 +160,14 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
             setIsProcessing(true);
             const sukces = await zlozZamowienieWbazie('on_delivery');
             setIsProcessing(false);
+
             if (sukces) {
-                alert(`Zamówienie zarejestrowane. Płatność zostanie pobrana przy odbiorze. Kwota: ${sumaDoZaplaty.toFixed(2)} zł`);
-                onNavigate('home');
+                setSuccessPaymentType('on_delivery');
+                setShowSuccessModal(true);
             } else {
-                alert('Błąd podczas zapisywania zamówienia.');
+                notify('Błąd podczas zapisywania zamówienia.', 'error');
             }
+
             return;
         }
 
@@ -197,10 +209,10 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                 } else if (paymentResult.paymentIntent?.status === 'succeeded') {
                     const sukces = await zlozZamowienieWbazie('card');
                     if (sukces) {
-                        alert(t('payment.alerts.payment_success'));
-                        onNavigate('home');
+                        setSuccessPaymentType('card');
+                        setShowSuccessModal(true);
                     } else {
-                        alert('Płatność przeszła, ale wystąpił błąd przy zapisie zamówienia.');
+                        notify('Płatność przeszła, ale wystąpił błąd przy zapisie zamówienia.', 'error');
                     }
                 }
             } catch (error: any) {
@@ -305,6 +317,82 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                     </div>
                 </div>
             </section>
+            {showSuccessModal && (
+                <div className="payment-success-overlay">
+                    <div className="payment-success-modal">
+
+                        <div className="payment-success-icon">
+                            ✅
+                        </div>
+
+                        <h2>Zamówienie złożone!</h2>
+
+                        {successPaymentType === 'offline' && (
+                            <div className="payment-success-text">
+                                <p>Zamówienie zrealizowane.</p>
+
+                                <p>Prosimy o dokonanie przelewu na numer konta:</p>
+
+                                <div className="payment-bank-number">
+                                    {BANK_ACCOUNT_NUMBER}
+                                </div>
+
+                                <p>
+                                    Kwota: <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
+                                </p>
+
+                                <p>
+                                    Po zaksięgowaniu płatności zamówienie zostanie zrealizowane.
+                                </p>
+                            </div>
+                        )}
+
+                        {successPaymentType === 'on_delivery' && (
+                            <div className="payment-success-text">
+                                <p>Zamówienie zrealizowane.</p>
+
+                                <p>
+                                    Płatność zostanie pobrana przy odbiorze.
+                                </p>
+
+                                <p>
+                                    Kwota do zapłaty: <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
+                                </p>
+
+                                <p>
+                                    Przygotuj gotówkę lub kartę dla dostawcy.
+                                </p>
+                            </div>
+                        )}
+
+                        {successPaymentType === 'card' && (
+                            <div className="payment-success-text">
+                                <p>Zamówienie zrealizowane.</p>
+
+                                <p>
+                                    Płatność kartą została zakończona pomyślnie.
+                                </p>
+
+                                <p>
+                                    Kwota: <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
+                                </p>
+                            </div>
+                        )}
+
+                        <button
+                            className="mint-button"
+                            onClick={() => {
+                                setShowSuccessModal(false);
+                                setSuccessPaymentType(null);
+                                onNavigate('home');
+                            }}
+                        >
+                            OK
+                        </button>
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

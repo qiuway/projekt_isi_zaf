@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface RestaurantScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -10,6 +11,7 @@ interface RestaurantScreenProps {
 
 export function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
     const { t } = useTranslation();
+    const notify = useNotify();
     const restId = localStorage.getItem('currentRestId');
     const [restauracja, setRestauracja] = useState<any>(null);
     const [produkty, setProdukty] = useState<any[]>([]);
@@ -18,7 +20,7 @@ export function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
         const userId = localStorage.getItem('userId');
 
         if (!userId) {
-            alert(t('restaurant.alerts.cart_auth_error'));
+            notify(t('restaurant.alerts.cart_auth_error'));
             return;
         }
 
@@ -29,10 +31,10 @@ export function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
                 ilosc: 1,
             });
 
-            alert(t('restaurant.alerts.add_success'));
+            notify(t('restaurant.alerts.add_success'));
             window.dispatchEvent(new Event('koszykChanged'));
         } catch (error: any) {
-            alert(
+            notify(
                 error.response?.data?.detail ||
                 t('restaurant.alerts.server_error')
             );

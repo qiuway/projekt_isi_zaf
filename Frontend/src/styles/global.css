@@ -1851,3 +1851,151 @@ body.dark-mode .restaurant-menu-item span {
 body.dark-mode .restaurant-menu-item .mint-button {
     color: #24463d !important;
 }
+
+.notification-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: grid;
+    gap: 12px;
+    z-index: 9999;
+    width: min(360px, calc(100vw - 32px));
+}
+
+.notification-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+    font-weight: 700;
+    animation: notificationSlide 0.22s ease-out;
+}
+
+.notification-success {
+    background: #dff7e7;
+    color: #1f4d2f;
+    border: 2px solid #8de5c7;
+}
+
+.notification-error {
+    background: #ffe3e3;
+    color: #7a1f1f;
+    border: 2px solid #ff9f9f;
+}
+
+.notification-warning {
+    background: #fff1d6;
+    color: #6b3d00;
+    border: 2px solid #ebc96a;
+}
+
+.notification-info {
+    background: #e5f0ff;
+    color: #23415f;
+    border: 2px solid #96b9de;
+}
+
+.notification-close {
+    background: transparent;
+    color: inherit;
+    font-size: 1.3rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+@keyframes notificationSlide {
+    from {
+        opacity: 0;
+        transform: translateX(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+body.dark-mode .notification-success {
+    background: #203a2b;
+    color: #dff7e7;
+}
+
+body.dark-mode .notification-error {
+    background: #402323;
+    color: #ffe3e3;
+}
+
+body.dark-mode .notification-warning {
+    background: #3b301f;
+    color: #fff1d6;
+}
+
+body.dark-mode .notification-info {
+    background: #263447;
+    color: #e5f0ff;
+}
+
+.payment-success-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    z-index:9999;
+}
+
+.payment-success-modal{
+
+    width:430px;
+    max-width:90%;
+
+    padding:35px;
+
+    border-radius:24px;
+
+    background:#f8ecd9;
+
+    text-align:center;
+
+    box-shadow:0 25px 70px rgba(0,0,0,.35);
+
+    animation:popupShow .25s;
+}
+
+.payment-success-icon{
+
+    font-size:70px;
+
+    margin-bottom:15px;
+}
+
+.payment-success-modal h2{
+
+    color:#5d4537;
+
+    margin-bottom:10px;
+}
+
+.payment-success-modal p{
+
+    margin-bottom:30px;
+
+    font-size:17px;
+}
+
+body.dark-mode .payment-success-modal{
+
+    background:#2f2f3a;
+}
+
+body.dark-mode .payment-success-modal h2,
+body.dark-mode .payment-success-modal p{
+
+    color:white;
+}
+

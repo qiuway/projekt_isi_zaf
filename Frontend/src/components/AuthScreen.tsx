@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { apiClient } from '../api/apiClient';
+import { useNotify } from './NotificationProvider';
 
 interface AuthScreenProps {
   mode: 'login' | 'register';
@@ -10,6 +11,7 @@ interface AuthScreenProps {
 
 export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
   const { t } = useTranslation();
+  const notify = useNotify();
   const isLogin = mode === 'login';
 
   const [imie, setImie] = useState('');
@@ -44,7 +46,7 @@ export function AuthScreen({ mode, onNavigate }: AuthScreenProps) {
       const response = await apiClient.post(endpoint, payload);
       const data = response.data;
 
-      alert(data.msg);
+      notify(data.msg);
       
       if (isLogin) {
         localStorage.setItem('token', data.access_token);

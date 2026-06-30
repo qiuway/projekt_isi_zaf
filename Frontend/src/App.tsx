@@ -12,6 +12,7 @@ import { SettingsScreen } from './components/SettingsScreen';
 import { ProfileEditScreen } from './components/ProfileEditScreen';
 import { OrderHistoryScreen } from './components/OrderHistoryScreen';
 import { RestaurantOrdersScreen } from './components/RestaurantOrdersScreen';
+import { NotificationProvider } from './components/NotificationProvider';
 import type { Screen } from './types';
 
 function App() {
@@ -101,7 +102,11 @@ function App() {
     }
   }, [currentScreen]);
 
-  return <div>{screen}</div>;
+    return (
+        <NotificationProvider>
+            <div>{screen}</div>
+        </NotificationProvider>
+    );
 }
 
 export default App;
