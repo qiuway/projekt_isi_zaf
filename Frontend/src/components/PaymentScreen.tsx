@@ -329,7 +329,6 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
 
                         {successPaymentType === 'offline' && (
                             <div className="payment-success-text">
-                                <p>Zamówienie zrealizowane.</p>
 
                                 <p>Prosimy o dokonanie przelewu na numer konta:</p>
 
@@ -349,7 +348,6 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
 
                         {successPaymentType === 'on_delivery' && (
                             <div className="payment-success-text">
-                                <p>Zamówienie zrealizowane.</p>
 
                                 <p>
                                     Płatność zostanie pobrana przy odbiorze.
@@ -367,7 +365,6 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
 
                         {successPaymentType === 'card' && (
                             <div className="payment-success-text">
-                                <p>Zamówienie zrealizowane.</p>
 
                                 <p>
                                     Płatność kartą została zakończona pomyślnie.
