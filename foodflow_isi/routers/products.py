@@ -45,8 +45,22 @@ def edytuj_produkt(prod_id: int, prod: schemas.ProduktCreate, db: Session = Depe
 
 @router.delete("/produkty/{prod_id}")
 def usun_produkt(prod_id: int, db: Session = Depends(get_db)):
-    db_prod = db.query(models.Produkt).filter(models.Produkt.id_produkt == prod_id).first()
-    if db_prod:
-        db.delete(db_prod)
-        db.commit()
-    return {"msg": "Usunięto produkt!"}
+    db_prod = db.query(models.Produkt).filter(
+        models.Produkt.id_produkt == prod_id
+    ).first()
+
+    if not db_prod:
+        raise HTTPException(status_code=404, detail="Produkt nie istnieje")
+
+    db.query(models.PozycjaWKoszyku).filter(
+        models.PozycjaWKoszyku.id_produkt == prod_id
+    ).delete()
+
+    db.query(models.PozycjaZamowienia).filter(
+        models.PozycjaZamowienia.id_produkt == prod_id
+    ).delete()
+
+    db.delete(db_prod)
+    db.commit()
+
+    return {"msg": "Produkt został usunięty"}

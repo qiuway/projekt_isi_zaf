@@ -3,6 +3,7 @@ import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
 import { useNotify } from './NotificationProvider';
+import { ConfirmationProvider } from './ConfirmationProvider';
 
 interface RestaurantOrdersScreenProps {
     onNavigate: (screen: Screen) => void;
@@ -26,6 +27,10 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
     const [isLoading, setIsLoading] = useState(true);
     const [processingOrderId, setProcessingOrderId] = useState<number | null>(null);
     const notify = useNotify();
+    const [confirmAction, setConfirmAction] = useState<null | {
+        message: string;
+        action: () => void;
+    }>(null);
 
     const fetchOrders = useCallback(() => {
         setIsLoading(true);
@@ -65,33 +70,38 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
     };
 
     const handlePrzyjmij = (orderId: number) => {
-        if (window.confirm('Czy na pewno chcesz przyjąć to zamówienie?')) {
-            handleAction(orderId, 'przyjmij', 'Zamówienie przyjęte.');
-        }
+        setConfirmAction({
+            message: 'Czy na pewno chcesz przyjąć to zamówienie?',
+            action: () => handleAction(orderId, 'przyjmij', 'Zamówienie przyjęte.')
+        });
     };
 
     const handleOdrzuc = (orderId: number) => {
-        if (window.confirm('Czy na pewno chcesz odrzucić to zamówienie?')) {
-            handleAction(orderId, 'odrzuc', 'Zamówienie odrzucone.');
-        }
+        setConfirmAction({
+            message: 'Czy na pewno chcesz odrzucić to zamówienie?',
+            action: () => handleAction(orderId, 'odrzuc', 'Zamówienie odrzucone.')
+        });
     };
 
     const handleWDostawie = (orderId: number) => {
-        if (window.confirm('Czy na pewno chcesz wysłać zamówienie w dostawę?')) {
-            handleAction(orderId, 'w_dostawie', 'Zamówienie wysłane w dostawę.');
-        }
+        setConfirmAction({
+            message: 'Czy na pewno chcesz wysłać zamówienie w dostawę?',
+            action: () => handleAction(orderId, 'w_dostawie', 'Zamówienie wysłane w dostawę.')
+        });
     };
 
     const handleDostarczono = (orderId: number) => {
-        if (window.confirm('Czy na pewno chcesz oznaczyć zamówienie jako dostarczone?')) {
-            handleAction(orderId, 'dostarczono', 'Zamówienie dostarczone.');
-        }
+        setConfirmAction({
+            message: 'Czy na pewno chcesz oznaczyć zamówienie jako dostarczone?',
+            action: () => handleAction(orderId, 'dostarczono', 'Zamówienie dostarczone.')
+        });
     };
 
     const handleAcceptPayment = (orderId: number) => {
-        if (window.confirm('Czy na pewno chcesz zatwierdzić tę płatność?')) {
-            handleAction(orderId, 'zaakceptuj-platnosc', 'Płatność zatwierdzona!');
-        }
+        setConfirmAction({
+            message: 'Czy na pewno chcesz zatwierdzić tę płatność?',
+            action: () => handleAction(orderId, 'zaakceptuj-platnosc', 'Płatność zatwierdzona!')
+        });
     };
 
     return (
@@ -234,6 +244,17 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                     </button>
                 </div>
             </section>
+
+            {confirmAction && (
+                <ConfirmationProvider
+                    message={confirmAction.message}
+                    onCancel={() => setConfirmAction(null)}
+                    onConfirm={() => {
+                        confirmAction.action();
+                        setConfirmAction(null);
+                    }}
+                />
+            )}
         </div>
     );
 }

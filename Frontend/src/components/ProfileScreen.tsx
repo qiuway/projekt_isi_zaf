@@ -4,6 +4,7 @@ import type { Screen } from '../types';
 import { TopBar } from './TopBar';
 import { apiClient } from '../api/apiClient';
 import { useNotify } from './NotificationProvider';
+import { ConfirmationProvider } from './ConfirmationProvider';
 
 interface ProfileScreenProps {
   onNavigate: (screen: Screen) => void;
@@ -12,6 +13,10 @@ interface ProfileScreenProps {
 export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   const { t } = useTranslation();
   const notify = useNotify();
+  const [confirmAction, setConfirmAction] = useState<null | {
+      message: string;
+      action: () => void;
+  }>(null);
   const [userData, setUserData] = useState<any>(null);
   const [managedRestaurants, setManagedRestaurants] = useState<any[]>([]);
   const userId = localStorage.getItem('userId');
@@ -70,8 +75,12 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
   }, [userId]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userId');
-    onNavigate('login');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('token');
+      localStorage.removeItem('punkty');
+
+      notify('Wylogowano pomyślnie.', 'success');
+      onNavigate('login');
   };
 
   const openModalForAdd = () => {
@@ -91,8 +100,17 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
     setIsModalOpen(true);
   };
 
-  const handleSaveRestaurant = async () => {
-    const payload = { 
+    const handleSaveRestaurant = async () => {
+        if (!formNazwa.trim()) {
+            notify('Nazwa restauracji jest wymagana.', 'warning');
+            return;
+        }
+
+        if (!formOpis.trim() || !formAdres.trim() || !formTel.trim()) {
+            notify('Uzupełnij opis, adres i numer telefonu restauracji.', 'warning');
+            return;
+        }
+        const payload = {
         nazwa: formNazwa, 
         opis: formOpis || null, 
         adres: formAdres || null, 
@@ -117,21 +135,21 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
       }
   };
 
-  const handleDeleteRestaurant = async (restId: number) => {
-    if(!window.confirm(t('profile.alerts.rest_delete_confirm'))) return;
-      try {
-          await apiClient.delete(`/restauracje/zarzadzaj/${restId}`);
-          fetchProfileAndRestaurants();
-      } catch (error: any) {
-          notify(error.response?.data?.detail || 'Nie udało się usunąć restauracji.', 'error');
-      }
-  };
+    const handleDeleteRestaurant = async (restId: number) => {
+        try {
+            await apiClient.delete(`/restauracje/zarzadzaj/${restId}`);
+            notify('Restauracja została usunięta.', 'success');
+            fetchProfileAndRestaurants();
+        } catch (error: any) {
+            notify(error.response?.data?.detail || 'Nie udało się usunąć restauracji.', 'error');
+        }
+    };
 
-  const fetchMenuProducts = (restId: number) => {
-    fetch(`http://127.0.0.1:8000/restauracja/${restId}/produkty`)
-        .then(r => r.json())
-        .then(data => setMenuProducts(data));
-  };
+    const fetchMenuProducts = (restId: number) => {
+        apiClient.get(`/restauracja/${restId}/produkty`)
+            .then((response) => setMenuProducts(response.data))
+            .catch(() => notify('Nie udało się pobrać menu restauracji.', 'error'));
+    };
 
   const openMenuModal = (restId: number) => {
     setCurrentRestId(restId);
@@ -177,6 +195,11 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
               await apiClient.put(`/produkty/${currentProdId}`, payload);
           }
 
+          notify(
+              prodMode === 'add' ? 'Produkt został dodany do menu.' : 'Produkt został zaktualizowany.',
+              'success'
+          );
+
           fetchMenuProducts(currentRestId!);
           resetProductForm();
       } catch (error: any) {
@@ -184,15 +207,15 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
       }
   };
 
-  const handleDeleteProduct = async (prodId: number) => {
-    if(!window.confirm(t('profile.alerts.prod_delete_confirm'))) return;
-      try {
-          await apiClient.delete(`/produkty/${prodId}`);
-          fetchMenuProducts(currentRestId!);
-      } catch (error: any) {
-          notify(error.response?.data?.detail || 'Nie udało się usunąć produktu.', 'error');
-      }
-  };
+    const handleDeleteProduct = async (prodId: number) => {
+        try {
+            await apiClient.delete(`/produkty/${prodId}`);
+            notify('Produkt został usunięty z menu.', 'success');
+            fetchMenuProducts(currentRestId!);
+        } catch (error: any) {
+            notify(error.response?.data?.detail || 'Nie udało się usunąć produktu.', 'error');
+        }
+    };
 
   const canManage = userData && (userData.id_typ_konta === 2 || userData.id_typ_konta === 3);
 
@@ -290,8 +313,13 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
                 </button>
                 <button 
                   className="secondary-button" 
-                  style={{ background: '#ffcccc', color: '#cc0000', borderColor: '#ff9999' }} 
-                  onClick={() => handleDeleteRestaurant(rest.id_restauracja)}
+                  style={{ background: '#ffcccc', color: '#cc0000', borderColor: '#ff9999' }}
+                  onClick={() =>
+                      setConfirmAction({
+                          message: 'Czy na pewno chcesz usunąć tę restaurację?',
+                          action: () => handleDeleteRestaurant(rest.id_restauracja)
+                      })
+                  }
                 >
                   {t('profile.management.btn_delete')}
                 </button>
@@ -350,7 +378,14 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
                             </div>
                             <div style={{ display: 'flex', gap: '5px' }}>
                                 <button className="secondary-button" style={{ padding: '5px 10px', fontSize: '0.85rem' }} onClick={() => startEditProduct(prod)}>{t('profile.management.btn_edit')}</button>
-                                <button className="secondary-button" style={{ padding: '5px 10px', fontSize: '0.85rem', background: '#ffcccc', color: '#cc0000', borderColor: '#ff9999' }} onClick={() => handleDeleteProduct(prod.id_produkt)}>{t('profile.management.btn_delete')}</button>
+                                <button className="secondary-button" style={{ padding: '5px 10px', fontSize: '0.85rem', background: '#ffcccc', color: '#cc0000', borderColor: '#ff9999' }}
+                                        onClick={() =>
+                                            setConfirmAction({
+                                                message: 'Czy na pewno chcesz usunąć ten produkt z menu?',
+                                                action: () => handleDeleteProduct(prod.id_produkt)
+                                            })
+                                        }
+                                >{t('profile.management.btn_delete')}</button>
                             </div>
                         </div>
                     ))
@@ -388,6 +423,17 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
           </div>
         </div>
       )}
+
+        {confirmAction && (
+            <ConfirmationProvider
+                message={confirmAction.message}
+                onCancel={() => setConfirmAction(null)}
+                onConfirm={() => {
+                    confirmAction.action();
+                    setConfirmAction(null);
+                }}
+            />
+        )}
     </div>
   );
 }

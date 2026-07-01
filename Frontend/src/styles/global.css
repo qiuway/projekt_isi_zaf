@@ -1999,3 +1999,50 @@ body.dark-mode .payment-success-modal p{
     color:white;
 }
 
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.confirm-box {
+    width: min(420px, 90%);
+    background: #f6ebda;
+    border: 2px solid rgba(184, 138, 118, 0.55);
+    border-radius: 22px;
+    padding: 26px;
+    text-align: center;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+}
+
+.confirm-box h3 {
+    margin-top: 0;
+    color: #3d2b20;
+}
+
+.confirm-box p {
+    margin: 16px 0 24px;
+    font-weight: 700;
+    color: #4b382f;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+body.dark-mode .confirm-box {
+    background: #2f2f3a;
+    border-color: #5b5b70;
+}
+
+body.dark-mode .confirm-box h3,
+body.dark-mode .confirm-box p {
+    color: #f5f0e8;
+}
+
