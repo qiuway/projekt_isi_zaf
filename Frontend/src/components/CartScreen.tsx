@@ -32,6 +32,7 @@ type KuponUzytkownika = {
 export function CartScreen({ onNavigate }: CartScreenProps) {
     const { t } = useTranslation();
     const notify = useNotify();
+    const [adres, setAdres] = useState<string | null>(null);
     const [pozycje, setPozycje] = useState<PozycjaKoszyka[]>([]);
     const [suma, setSuma] = useState(0);
 
@@ -70,9 +71,25 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
             .catch((err) => console.error(err));
     };
 
+    const fetchAdres = () => {
+        const userId = localStorage.getItem('userId');
+
+        if (!userId) {
+            setAdres(null);
+            return;
+        }
+
+        apiClient.get(`/uzytkownik/${userId}`)
+            .then((response) => {
+                setAdres(response.data.adres || null);
+            })
+            .catch((err) => console.error(err));
+    };
+
     useEffect(() => {
         fetchKoszyk();
         fetchKupony();
+        fetchAdres();
     }, []);
 
     const zmienIlosc = async (idProduktu: number, nowaIlosc: number) => {
@@ -251,6 +268,12 @@ export function CartScreen({ onNavigate }: CartScreenProps) {
                     <button
                         className="mint-button order-button"
                         onClick={() => {
+                            if (!adres || adres.trim() === '') {
+                                notify('Aby złożyć zamówienie, najpierw uzupełnij adres dostawy.', 'warning');
+                                onNavigate('profileEdit');
+                                return;
+                            }
+
                             if (selectedKupon) {
                                 localStorage.setItem('selectedKupon', JSON.stringify(selectedKupon));
                             } else {
