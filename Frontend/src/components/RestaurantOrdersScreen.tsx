@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
-import { apiClient } from '../api/apiClient';
+import { ordersApi } from '../api/apiClient';
 import { useNotify } from './NotificationProvider';
 import { ConfirmationProvider } from './ConfirmationProvider';
 
@@ -23,6 +24,7 @@ type Order = {
 };
 
 export function RestaurantOrdersScreen({ onNavigate, restId, restName }: RestaurantOrdersScreenProps) {
+    const { t, i18n } = useTranslation();
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [processingOrderId, setProcessingOrderId] = useState<number | null>(null);
@@ -34,7 +36,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
 
     const fetchOrders = useCallback(() => {
         setIsLoading(true);
-        apiClient.get(`/restauracja/${restId}/zamowienia`)
+        ordersApi.getRestaurantOrders(restId)
             .then((response) => {
                 setOrders(response.data);
                 setIsLoading(false);
@@ -50,10 +52,14 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
     }, [fetchOrders]);
 
     const handleAction = async (orderId: number, endpoint: string, successMsg: string) => {
-        if (processingOrderId) return; // blokada przed wielokrotnym kliknięciem
+        if (processingOrderId) return;
         setProcessingOrderId(orderId);
         try {
-            await apiClient.put(`/zamowienia/${orderId}/${endpoint}`);
+            if (endpoint === 'przyjmij') await ordersApi.acceptOrder(orderId);
+            else if (endpoint === 'odrzuc') await ordersApi.rejectOrder(orderId);
+            else if (endpoint === 'w_dostawie') await ordersApi.setInDelivery(orderId);
+            else if (endpoint === 'dostarczono') await ordersApi.setDelivered(orderId);
+            else if (endpoint === 'zaakceptuj-platnosc') await ordersApi.acceptPayment(orderId);
 
             notify(successMsg, 'success');
             fetchOrders();
@@ -61,7 +67,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
         } catch (error: any) {
             notify(
                 error.response?.data?.detail ||
-                'Błąd sieci.',
+                t('restaurant_orders.loading'),
                 'error'
             );
         } finally {
@@ -71,36 +77,36 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
 
     const handlePrzyjmij = (orderId: number) => {
         setConfirmAction({
-            message: 'Czy na pewno chcesz przyjąć to zamówienie?',
-            action: () => handleAction(orderId, 'przyjmij', 'Zamówienie przyjęte.')
+            message: t('restaurant_orders.confirm_accept_order'),
+            action: () => handleAction(orderId, 'przyjmij', t('restaurant_orders.msg_accepted'))
         });
     };
 
     const handleOdrzuc = (orderId: number) => {
         setConfirmAction({
-            message: 'Czy na pewno chcesz odrzucić to zamówienie?',
-            action: () => handleAction(orderId, 'odrzuc', 'Zamówienie odrzucone.')
+            message: t('restaurant_orders.confirm_reject'),
+            action: () => handleAction(orderId, 'odrzuc', t('restaurant_orders.msg_rejected'))
         });
     };
 
     const handleWDostawie = (orderId: number) => {
         setConfirmAction({
-            message: 'Czy na pewno chcesz wysłać zamówienie w dostawę?',
-            action: () => handleAction(orderId, 'w_dostawie', 'Zamówienie wysłane w dostawę.')
+            message: t('restaurant_orders.confirm_send_delivery'),
+            action: () => handleAction(orderId, 'w_dostawie', t('restaurant_orders.msg_in_delivery'))
         });
     };
 
     const handleDostarczono = (orderId: number) => {
         setConfirmAction({
-            message: 'Czy na pewno chcesz oznaczyć zamówienie jako dostarczone?',
-            action: () => handleAction(orderId, 'dostarczono', 'Zamówienie dostarczone.')
+            message: t('restaurant_orders.confirm_delivered'),
+            action: () => handleAction(orderId, 'dostarczono', t('restaurant_orders.msg_delivered'))
         });
     };
 
     const handleAcceptPayment = (orderId: number) => {
         setConfirmAction({
-            message: 'Czy na pewno chcesz zatwierdzić tę płatność?',
-            action: () => handleAction(orderId, 'zaakceptuj-platnosc', 'Płatność zatwierdzona!')
+            message: t('restaurant_orders.confirm_accept_payment'),
+            action: () => handleAction(orderId, 'zaakceptuj-platnosc', t('restaurant_orders.msg_payment_accepted'))
         });
     };
 
@@ -110,21 +116,24 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
 
             <div className="single-ribbon-wrap">
                 <div className="section-ribbon blue-ribbon large-ribbon">
-                    Zamówienia: {restName}
+                    {t('restaurant_orders.title', { name: restName })}
                 </div>
             </div>
 
             <section className="settings-content" style={{ marginTop: '20px' }}>
                 {isLoading ? (
-                    <p style={{ textAlign: 'center' }}>Ładowanie zamówień...</p>
+                    <p style={{ textAlign: 'center' }}>{t('restaurant_orders.loading')}</p>
                 ) : orders.length === 0 ? (
-                    <p style={{ textAlign: 'center', color: '#888' }}>Brak zamówień dla tej restauracji.</p>
+                    <p style={{ textAlign: 'center', color: '#888' }}>{t('restaurant_orders.empty')}</p>
                 ) : (
                     <div className="order-history-grid">
                         {orders.map(order => {
-                            const dataFormat = new Date(order.data_zamowienia).toLocaleString('pl-PL', {
-                                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                            });
+                            const dataFormat = new Date(order.data_zamowienia).toLocaleString(
+                                i18n.language === 'en' ? 'en-US' : 'pl-PL',
+                                {
+                                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                                }
+                            );
 
                             const isZlozone = order.status_zamowienia === 'ZŁOŻONE';
                             const isRealizacja = order.status_zamowienia === 'W_REALIZACJI';
@@ -138,28 +147,28 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                                 <article className="order-card" key={order.id_zamowienia}>
                                     <div className="order-header">
                                         <div className="order-meta">
-                                            <strong style={{ fontSize: '1.2rem', color: '#5d4537' }}>
+                                            <strong className="order-title">
                                                 {order.klient}
                                             </strong>
-                                            <span>📅 Data: {dataFormat}</span>
-                                            <span>🧾 Nr zamówienia: #{order.id_zamowienia}</span>
-                                            <span>📍 Adres dostawy: {order.adres_dostawy}</span>
+                                            <span>{t('restaurant_orders.date', { date: dataFormat })}</span>
+                                            <span>{t('restaurant_orders.order_number', { id: order.id_zamowienia })}</span>
+                                            <span>{t('restaurant_orders.delivery_address', { address: order.adres_dostawy })}</span>
                                             <span>
-                                                💳 Płatność: 
+                                                {t('restaurant_orders.payment')}{' '}
                                                 <span style={{ fontWeight: 'bold', marginLeft: '5px' }}>
-                                                    {order.status_platnosci}
+                                                    {t(`restaurant_orders.payment_statuses.${order.status_platnosci}`, order.status_platnosci)}
                                                 </span>
                                             </span>
                                             <span>
-                                                📦 Status: 
+                                                {t('restaurant_orders.status')}{' '}
                                                 <span style={{ fontWeight: 'bold', marginLeft: '5px' }}>
-                                                    {order.status_zamowienia}
+                                                    {t(`restaurant_orders.statuses.${order.status_zamowienia}`, order.status_zamowienia)}
                                                 </span>
                                             </span>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
                                             <strong style={{ display: 'block', fontSize: '1.3rem', color: '#60d3b4', marginBottom: '10px' }}>
-                                                {order.kwota.toFixed(2)} zł
+                                                {order.kwota.toFixed(2)} {t('restaurant.currency', 'zł')}
                                             </strong>
 
                                             {!isOdrzucone && !isDostarczone && (
@@ -171,7 +180,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                                                             onClick={() => handleAcceptPayment(order.id_zamowienia)}
                                                             disabled={processingOrderId === order.id_zamowienia}
                                                         >
-                                                            Zatwierdź płatność
+                                                            {t('restaurant_orders.btn_accept_payment')}
                                                         </button>
                                                     )}
                                                     {isPlatnoscZaakceptowana && isZlozone && (
@@ -181,7 +190,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                                                             onClick={() => handlePrzyjmij(order.id_zamowienia)}
                                                             disabled={processingOrderId === order.id_zamowienia}
                                                         >
-                                                            Przyjmij zamówienie
+                                                            {t('restaurant_orders.btn_accept_order')}
                                                         </button>
                                                     )}
                                                     {isRealizacja && (
@@ -191,7 +200,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                                                             onClick={() => handleWDostawie(order.id_zamowienia)}
                                                             disabled={processingOrderId === order.id_zamowienia}
                                                         >
-                                                            Wyślij w dostawę
+                                                            {t('restaurant_orders.btn_send_delivery')}
                                                         </button>
                                                     )}
                                                     {isWDostawie && (
@@ -201,7 +210,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                                                             onClick={() => handleDostarczono(order.id_zamowienia)}
                                                             disabled={processingOrderId === order.id_zamowienia}
                                                         >
-                                                            Dostarczono
+                                                            {t('restaurant_orders.btn_delivered')}
                                                         </button>
                                                     )}
                                                     {(isZlozone || isRealizacja || isWDostawie) && (
@@ -211,25 +220,25 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                                                             onClick={() => handleOdrzuc(order.id_zamowienia)}
                                                             disabled={processingOrderId === order.id_zamowienia}
                                                         >
-                                                            Odrzuć zamówienie
+                                                            {t('restaurant_orders.btn_reject')}
                                                         </button>
                                                     )}
                                                 </div>
                                             )}
                                             {isOdrzucone && (
-                                                <span style={{ color: '#cc0000', fontWeight: 'bold' }}>Zamówienie odrzucone</span>
+                                                <span style={{ color: '#cc0000', fontWeight: 'bold' }}>{t('restaurant_orders.status_rejected')}</span>
                                             )}
                                             {isDostarczone && (
-                                                <span style={{ color: '#4caf50', fontWeight: 'bold' }}>Zamówienie dostarczone</span>
+                                                <span style={{ color: '#4caf50', fontWeight: 'bold' }}>{t('restaurant_orders.status_delivered')}</span>
                                             )}
                                         </div>
                                     </div>
                                     <div className="order-items-list">
-                                        <h4 style={{ margin: '0 0 10px 0', color: '#5d4537' }}>Produkty:</h4>
+                                        <h4 className="order-items-heading">{t('restaurant_orders.items_title')}</h4>
                                         {order.pozycje.map((poz, idx) => (
                                             <div className="order-item-row" key={idx}>
                                                 <div><strong>{poz.ilosc}x</strong> {poz.nazwa}</div>
-                                                <div>{(poz.ilosc * poz.cena).toFixed(2)} zł</div>
+                                                <div>{(poz.ilosc * poz.cena).toFixed(2)} {t('restaurant.currency', 'zł')}</div>
                                             </div>
                                         ))}
                                     </div>
@@ -240,7 +249,7 @@ export function RestaurantOrdersScreen({ onNavigate, restId, restName }: Restaur
                 )}
                 <div style={{ marginTop: '20px' }}>
                     <button className="secondary-button" onClick={() => onNavigate('profile')}>
-                        Powrót do profilu
+                        {t('restaurant_orders.back_to_profile')}
                     </button>
                 </div>
             </section>

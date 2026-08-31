@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
-import { apiClient } from '../api/apiClient';
+import { userApi, cartApi } from '../api/apiClient';
 
 interface TopBarProps {
   title?: string;
@@ -22,6 +22,7 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
   const [punkty, setPunkty] = useState(localStorage.getItem('punkty') || '0');
   const [koszykSuma, setKoszykSuma] = useState<number>(0);
   const [adres, setAdres] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<number>(Number(localStorage.getItem('role') || '1'));
 
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -44,29 +45,34 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
         setPunkty('0');
         setKoszykSuma(0);
         setAdres(null);
+        setUserRole(1);
         return;
       }
 
-        apiClient.get(`/uzytkownik/${userId}/punkty`)
-            .then((response) => {
-                const data = response.data;
+      userApi.getPoints(userId)
+        .then((response) => {
+          const data = response.data;
           const aktualnePunkty = String(data.punkty ?? 0);
           setPunkty(aktualnePunkty);
           localStorage.setItem('punkty', aktualnePunkty);
         })
         .catch((err) => console.error(err));
 
-        apiClient.get(`/koszyk/${userId}`)
-            .then((response) => {
-                const data = response.data;
+      cartApi.getCart(userId)
+        .then((response) => {
+          const data = response.data;
           setKoszykSuma(data.suma || 0);
         })
         .catch((err) => console.error(err));
 
-        apiClient.get(`/uzytkownik/${userId}`)
-            .then((response) => {
-                const data = response.data;
+      userApi.getProfile(userId)
+        .then((response) => {
+          const data = response.data;
           setAdres(data.adres || null);
+          if (data.id_typ_konta) {
+            setUserRole(data.id_typ_konta);
+            localStorage.setItem('role', String(data.id_typ_konta));
+          }
         })
         .catch((err) => console.error(err));
     };
@@ -87,6 +93,11 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
     onNavigate(screen);
   };
 
+  const dynamicMenuItems = [
+    ...menuItems,
+    ...(userRole === 3 ? [{ labelKey: 'topbar.menu.adminPanel', screen: 'adminPanel' as Screen }] : [])
+  ];
+
   return (
     <header className="topbar">
       
@@ -100,7 +111,7 @@ export function TopBar({ title = 'FoodFlow', onNavigate }: TopBarProps) {
 
             {isOpen && (
               <div className="dropdown-menu">
-                {menuItems.map((item) => (
+                {dynamicMenuItems.map((item) => (
                   <button key={item.screen} className="dropdown-item" onClick={() => handleNavigate(item.screen)}>
                     {t(item.labelKey)}
                   </button>

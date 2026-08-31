@@ -8,7 +8,7 @@ CREATE TABLE uzytkownik (
     imie VARCHAR(30),
     nazwisko VARCHAR(30),
     email VARCHAR(50) UNIQUE,
-    haslo VARCHAR(32),
+    haslo VARCHAR(255),
     numer_telefonu INT,
     adres VARCHAR(70),
     punkty INT,

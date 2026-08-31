@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
-import { apiClient } from '../api/apiClient';
+import { userApi, couponsApi } from '../api/apiClient';
 import { useNotify } from './NotificationProvider';
 
 interface PointsShopScreenProps {
@@ -32,7 +32,7 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
             return;
         }
 
-        apiClient.get(`/uzytkownik/${userId}/punkty`)
+        userApi.getPoints(userId)
             .then((response) => {
                 const data = response.data;
                 const aktualnePunkty = String(data.punkty ?? 0);
@@ -43,7 +43,7 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
     };
 
     const fetchKupony = () => {
-        apiClient.get('/kupony/')
+        couponsApi.getAll()
             .then((response) => setKupony(response.data))
             .catch((err) => console.error(err));
     };
@@ -60,14 +60,10 @@ export function PointsShopScreen({ onNavigate }: PointsShopScreenProps) {
         }
 
         try {
-            const response = await apiClient.post('/kupony/kup', {
-                id_uzytkownik: Number(userId),
-                id_kupon: idKuponu
-            });
-
+            const response = await couponsApi.buyCoupon(userId, idKuponu);
             const data = response.data;
 
-            notify(data.msg, 'success');
+            notify(t('points_shop.alerts.buy_success'), 'success');
             const nowePunkty = String(data.punkty ?? 0);
             setPunkty(nowePunkty);
             localStorage.setItem('punkty', nowePunkty);

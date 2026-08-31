@@ -1,25 +1,25 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-import os
-import stripe
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, Field
 
-router = APIRouter()
+import models
+from auth_jwt import get_current_user_optional
+from services import payment_service
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+router = APIRouter(tags=["payments"])
+
 
 class PaymentIntentRequest(BaseModel):
-    amount: float
+    amount: float = Field(..., ge=0.50, le=100000.00)
+
 
 @router.post("/create-payment-intent")
-def create_payment_intent(dane: PaymentIntentRequest):
-    try:
-        kwota_w_groszach = int(dane.amount * 100)
+def create_payment_intent(
+    dane: PaymentIntentRequest,
+    current_user: models.Uzytkownik | None = Depends(get_current_user_optional)
+):
+    return payment_service.create_payment_intent(dane.amount, current_user)
 
-        intent = stripe.PaymentIntent.create(
-            amount=kwota_w_groszach,
-            currency="pln",
-            automatic_payment_methods={"enabled": True},
-        )
-        return {"client_secret": intent.client_secret}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/payments/verify/{payment_intent_id}")
+def verify_payment(payment_intent_id: str):
+    return payment_service.verify_payment(payment_intent_id)

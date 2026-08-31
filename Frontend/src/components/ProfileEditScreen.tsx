@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TopBar } from './TopBar';
-import { apiClient } from '../api/apiClient';
+import { userApi, getAvatarUrl } from '../api/apiClient';
 import { useNotify } from './NotificationProvider';
 
 interface ProfileEditScreenProps {
@@ -24,7 +24,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
     const fetchUserData = () => {
         if (!userId) return;
 
-        apiClient.get(`/uzytkownik/${userId}`)
+        userApi.getProfile(userId)
             .then((response) => {
                 const data = response.data;
 
@@ -57,7 +57,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
         };
 
         try {
-            await apiClient.put(`/uzytkownik/${userId}`, payload);
+            await userApi.updateProfile(userId, payload);
 
             notify(t('profile_edit.alerts.save_success'), 'success');
             onNavigate('profile');
@@ -80,16 +80,9 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
         }
 
         const fileToUpload = files[0];
-        const formData = new FormData();
-        formData.append('file', fileToUpload);
 
         try {
-            await apiClient.post(`/uzytkownik/${userId}/avatar`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
+            await userApi.uploadAvatar(userId, fileToUpload);
             fetchUserData();
         } catch (error: any) {
             console.error('Błąd sieciowy:', error);
@@ -129,14 +122,17 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
                             marginBottom: '15px',
                         }}
                     >
-                        {zdjecie ? (
+                        {getAvatarUrl(zdjecie) ? (
                             <img
-                                src={`http://127.0.0.1:8000${zdjecie}?t=${Date.now()}`}
+                                src={`${getAvatarUrl(zdjecie)}?t=${Date.now()}`}
                                 alt={t('profile_edit.avatar_alt')}
                                 style={{
                                     width: '100%',
                                     height: '100%',
                                     objectFit: 'cover',
+                                }}
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
                                 }}
                             />
                         ) : (

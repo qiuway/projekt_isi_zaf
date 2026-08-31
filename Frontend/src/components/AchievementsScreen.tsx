@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
-import { apiClient } from '../api/apiClient';
+import { achievementsApi } from '../api/apiClient';
 import { useNotify } from './NotificationProvider';
 
 interface AchievementsScreenProps {
@@ -20,6 +21,7 @@ type Osiagniecie = {
 };
 
 export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
+    const { t } = useTranslation();
     const [osiagniecia, setOsiagniecia] = useState<Osiagniecie[]>([]);
     const [loading, setLoading] = useState(true);
     const notify = useNotify();
@@ -33,7 +35,7 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
             return;
         }
 
-        apiClient.get(`/uzytkownik/${userId}/osiagniecia`)
+        achievementsApi.getUserAchievements(userId)
             .then((response) => {
                 setOsiagniecia(response.data);
             })
@@ -49,15 +51,12 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
         const userId = localStorage.getItem('userId');
 
         if (!userId) {
-            notify('Musisz być zalogowany.', 'warning');
+            notify(t('achievements.alerts.not_logged_in'), 'warning');
             return;
         }
 
         try {
-            const response = await apiClient.post(
-                `/uzytkownik/${userId}/osiagniecia/${idOsiagniecia}/odbierz`
-            );
-
+            const response = await achievementsApi.claimAchievement(userId, idOsiagniecia);
             const data = response.data;
 
             notify(data.msg, 'success');
@@ -69,7 +68,7 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
         } catch (error: any) {
             notify(
                 error.response?.data?.detail ||
-                'Błąd połączenia z serwerem.',
+                t('achievements.alerts.server_error'),
                 'error'
             );
         }
@@ -80,21 +79,20 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
             <TopBar onNavigate={onNavigate} />
 
             <div className="single-ribbon-wrap">
-                <div className="section-ribbon blue-ribbon large-ribbon">OSIĄGNIĘCIA</div>
+                <div className="section-ribbon blue-ribbon large-ribbon">
+                    {t('achievements.title')}
+                </div>
             </div>
 
             <section className="help-card">
                 <article className="help-item">
-                    <h3>Twoje osiągnięcia</h3>
-                    <p>
-                        Kliknij zdobyte osiągnięcie, aby odebrać punkty. Punkty zostaną
-                        automatycznie dopisane do Twojego konta.
-                    </p>
+                    <h3>{t('achievements.subtitle')}</h3>
+                    <p>{t('achievements.instructions')}</p>
                 </article>
             </section>
 
             {loading ? (
-                <p style={{ textAlign: 'center' }}>Ładowanie osiągnięć...</p>
+                <p style={{ textAlign: 'center' }}>{t('achievements.loading')}</p>
             ) : (
                 <div className="points-shop-grid">
                     {osiagniecia.map((osiagniecie) => (
@@ -110,29 +108,29 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
 
                             <div className="reward-content">
                                 <div className="achievement-line">
-                                    <span>Nazwa</span>
+                                    <span>{t('achievements.labels.name')}</span>
                                     <strong>{osiagniecie.nazwa}</strong>
                                 </div>
 
                                 <div className="achievement-line">
-                                    <span>Opis</span>
-                                    <strong>{osiagniecie.opis || 'Brak opisu'}</strong>
+                                    <span>{t('achievements.labels.description')}</span>
+                                    <strong>{osiagniecie.opis || t('achievements.labels.no_description')}</strong>
                                 </div>
 
                                 <div className="achievement-line two-up">
                                     <div>
-                                        <span>Punkty</span>
-                                        <strong>{osiagniecie.punkty} pkt</strong>
+                                        <span>{t('achievements.labels.points')}</span>
+                                        <strong>{osiagniecie.punkty} {t('achievements.pts')}</strong>
                                     </div>
 
                                     <div>
-                                        <span>Status</span>
+                                        <span>{t('achievements.labels.status')}</span>
                                         <strong>
                                             {osiagniecie.odebrane
-                                                ? 'Odebrane'
+                                                ? t('achievements.labels.status_claimed')
                                                 : osiagniecie.zdobyte
-                                                    ? 'Do odebrania'
-                                                    : 'Niezdobyte'}
+                                                    ? t('achievements.labels.status_to_claim')
+                                                    : t('achievements.labels.status_locked')}
                                         </strong>
                                     </div>
                                 </div>
@@ -144,10 +142,10 @@ export function AchievementsScreen({ onNavigate }: AchievementsScreenProps) {
                                 onClick={() => odbierzPunkty(osiagniecie.id_osiagniecia)}
                             >
                                 {osiagniecie.odebrane
-                                    ? 'Punkty odebrane'
+                                    ? t('achievements.buttons.claimed')
                                     : osiagniecie.zdobyte
-                                        ? 'Odbierz punkty'
-                                        : 'Niezdobyte'}
+                                        ? t('achievements.buttons.claim')
+                                        : t('achievements.buttons.locked')}
                             </button>
                         </article>
                     ))}

@@ -8,8 +8,12 @@ fake_stripe = types.SimpleNamespace()
 
 class FakePaymentIntent:
     @staticmethod
-    def create(amount, currency, automatic_payment_methods):
-        return types.SimpleNamespace(client_secret="pi_test_secret")
+    def create(amount, currency, automatic_payment_methods, metadata=None, **kwargs):
+        return types.SimpleNamespace(client_secret="pi_test_secret", id="pi_test_123")
+
+    @staticmethod
+    def retrieve(payment_intent_id, **kwargs):
+        return types.SimpleNamespace(id=payment_intent_id, status="succeeded", amount=2500, currency="pln")
 
 fake_stripe.PaymentIntent = FakePaymentIntent
 fake_stripe.api_key = "sk_test_fake"
@@ -111,3 +115,10 @@ def seeded_catalog(db_session):
         "restaurant": restaurant,
         "product": product,
     }
+
+
+@pytest.fixture()
+def auth_headers(seeded_catalog):
+    from auth_jwt import create_access_token
+    token = create_access_token({"user_id": seeded_catalog["user"].id_uzytkownik})
+    return {"Authorization": f"Bearer {token}"}

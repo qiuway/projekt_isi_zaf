@@ -12,11 +12,64 @@ import { SettingsScreen } from './components/SettingsScreen';
 import { ProfileEditScreen } from './components/ProfileEditScreen';
 import { OrderHistoryScreen } from './components/OrderHistoryScreen';
 import { RestaurantOrdersScreen } from './components/RestaurantOrdersScreen';
+import { AdminPanelScreen } from './components/AdminPanelScreen';
 import { NotificationProvider } from './components/NotificationProvider';
+import { isTokenExpired, clearAuthSession, logoutUser } from './api/apiClient';
 import type { Screen } from './types';
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('register');
+  const [currentScreen, setCurrentScreen] = useState<Screen>(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('googleLogin') === 'success') {
+      return 'home';
+    }
+
+    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+
+    if (userId && token && token !== 'undefined' && token !== 'null') {
+      if (isTokenExpired(token)) {
+        clearAuthSession();
+        return 'login';
+      }
+      const savedScreen = localStorage.getItem('currentScreen') as Screen | null;
+      if (savedScreen && savedScreen !== 'login' && savedScreen !== 'register') {
+        return savedScreen;
+      }
+      return 'home';
+    }
+
+    const savedScreen = localStorage.getItem('currentScreen') as Screen | null;
+    return savedScreen === 'register' ? 'register' : 'login';
+  });
+
+  const handleNavigate = (screen: Screen) => {
+    setCurrentScreen(screen);
+    localStorage.setItem('currentScreen', screen);
+  };
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setCurrentScreen('login');
+      localStorage.setItem('currentScreen', 'login');
+    };
+
+    window.addEventListener('sessionExpired', handleSessionExpired);
+    return () => window.removeEventListener('sessionExpired', handleSessionExpired);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const token = localStorage.getItem('token');
+      if (token && token !== 'undefined' && token !== 'null') {
+        if (isTokenExpired(token)) {
+          logoutUser();
+        }
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -39,7 +92,7 @@ function App() {
       }
 
       window.history.replaceState({}, document.title, window.location.pathname);
-      setCurrentScreen('home');
+      handleNavigate('home');
     }
   }, []);
 
@@ -56,49 +109,51 @@ function App() {
   const screen = useMemo(() => {
     switch (currentScreen) {
       case 'login':
-        return <AuthScreen mode="login" onNavigate={setCurrentScreen} />;
+        return <AuthScreen mode="login" onNavigate={handleNavigate} />;
       case 'register':
-        return <AuthScreen mode="register" onNavigate={setCurrentScreen} />;
+        return <AuthScreen mode="register" onNavigate={handleNavigate} />;
       case 'home':
-        return <HomeScreen onNavigate={setCurrentScreen} />;
+        return <HomeScreen onNavigate={handleNavigate} />;
       case 'restaurant':
-        return <RestaurantScreen onNavigate={setCurrentScreen} />;
+        return <RestaurantScreen onNavigate={handleNavigate} />;
       case 'cart':
-        return <CartScreen onNavigate={setCurrentScreen} />;
+        return <CartScreen onNavigate={handleNavigate} />;
       case 'profile':
-        return <ProfileScreen onNavigate={setCurrentScreen} />;
+        return <ProfileScreen onNavigate={handleNavigate} />;
       case 'profileEdit':
         // @ts-ignore
-        return <ProfileEditScreen onNavigate={setCurrentScreen} />;
+        return <ProfileEditScreen onNavigate={handleNavigate} />;
       case 'settings':
-        return <SettingsScreen onNavigate={setCurrentScreen} />;
+        return <SettingsScreen onNavigate={handleNavigate} />;
       case 'help':
-        return <HelpScreen onNavigate={setCurrentScreen} />;
+        return <HelpScreen onNavigate={handleNavigate} />;
       case 'achievements':
-        return <AchievementsScreen onNavigate={setCurrentScreen} />;
+        return <AchievementsScreen onNavigate={handleNavigate} />;
       case 'pointsShop':
-        return <PointsShopScreen onNavigate={setCurrentScreen} />;
+        return <PointsShopScreen onNavigate={handleNavigate} />;
       case 'payment':
-        return <PaymentScreen onNavigate={setCurrentScreen} />;
+        return <PaymentScreen onNavigate={handleNavigate} />;
       case 'orderHistory':
-        return <OrderHistoryScreen onNavigate={setCurrentScreen} />;
+        return <OrderHistoryScreen onNavigate={handleNavigate} />;
       case 'restaurantOrders': {
         const restId = localStorage.getItem('restaurantOrdersRestId');
         const restName = localStorage.getItem('restaurantOrdersRestName');
         if (!restId) {
-          setCurrentScreen('profile');
+          handleNavigate('profile');
           return null;
         }
         return (
           <RestaurantOrdersScreen
-            onNavigate={setCurrentScreen}
+            onNavigate={handleNavigate}
             restId={Number(restId)}
             restName={restName || 'Restauracja'}
           />
         );
       }
+      case 'adminPanel':
+        return <AdminPanelScreen onNavigate={handleNavigate} />;
       default:
-        return <AuthScreen mode="register" onNavigate={setCurrentScreen} />;
+        return <AuthScreen mode="login" onNavigate={handleNavigate} />;
     }
   }, [currentScreen]);
 

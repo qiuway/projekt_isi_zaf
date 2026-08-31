@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, Numeric, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from database import Base
 
 class Uzytkownik(Base):
@@ -10,7 +10,7 @@ class Uzytkownik(Base):
     imie = Column(String(30))
     nazwisko = Column(String(30))
     email = Column(String(50), unique=True)
-    haslo = Column(String(32))
+    haslo = Column(String(255))
     numer_telefonu = Column(Integer, nullable=True)
     adres = Column(String(70), nullable=True)
     id_typ_konta = Column(Integer, nullable=True)
@@ -43,6 +43,7 @@ class Produkt(Base):
     nazwa = Column(String(30))
     cena = Column(Numeric(10, 2))
     dostepny = Column(Boolean, default=True)
+    zdjecie = Column(String(255), nullable=True)
 
     kategoria = relationship("Kategoria")
     restauracja = relationship("Restauracja", back_populates="produkty")
@@ -58,10 +59,14 @@ class Zamowienie(Base):
     id_zamowienia = Column(Integer, primary_key=True, index=True)
     id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"))
     id_restauracja = Column(Integer, ForeignKey("restauracja.id_restauracja"))
-    kod_zaproszenia = Column(String(15), unique=True, nullable=True)
+    kod_zaproszenia = Column(String(15), nullable=True, index=True)
     kwota = Column(Numeric(10, 2))
     status_zamowienia = Column(String(20), default="ZŁOŻONE")
-    data_zamowienia = Column(DateTime, default=datetime.utcnow)
+    data_zamowienia = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    uzytkownik = relationship("Uzytkownik")
+    restauracja = relationship("Restauracja")
+    pozycje = relationship("PozycjaZamowienia")
 
 
 class PozycjaZamowienia(Base):
@@ -77,9 +82,13 @@ class Koszyk(Base):
     __tablename__ = "koszyk"
 
     id_koszyk = Column(Integer, primary_key=True, index=True)
-    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=False, unique=True)
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=False, index=True)
+    kod_grupy = Column(String(15), unique=True, nullable=True, index=True)
+    is_group = Column(Boolean, default=False)
 
     pozycje = relationship("PozycjaWKoszyku", back_populates="koszyk", cascade="all, delete-orphan")
+    uczestnicy = relationship("UczestnikKoszyka", back_populates="koszyk", cascade="all, delete-orphan")
+    uzytkownik = relationship("Uzytkownik")
 
 
 class PozycjaWKoszyku(Base):
@@ -88,10 +97,25 @@ class PozycjaWKoszyku(Base):
     id_pozycja_koszyka = Column(Integer, primary_key=True, index=True)
     id_koszyk = Column(Integer, ForeignKey("koszyk.id_koszyk"), nullable=False)
     id_produkt = Column(Integer, ForeignKey("produkt.id_produkt"), nullable=False)
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=True)
     ilosc = Column(Integer, nullable=False, default=1)
 
     koszyk = relationship("Koszyk", back_populates="pozycje")
     produkt = relationship("Produkt")
+    uzytkownik = relationship("Uzytkownik")
+
+
+class UczestnikKoszyka(Base):
+    __tablename__ = "uczestnicy_koszyka"
+
+    id_uczestnik = Column(Integer, primary_key=True, index=True)
+    id_koszyk = Column(Integer, ForeignKey("koszyk.id_koszyk"), nullable=False)
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=False)
+    data_dolaczenia = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    koszyk = relationship("Koszyk", back_populates="uczestnicy")
+    uzytkownik = relationship("Uzytkownik")
+
 
 class Platnosc(Base):
     __tablename__ = "platnosc"
@@ -110,6 +134,10 @@ class OsobaPlacaca(Base):
     id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), primary_key=True)
     kwota = Column(Numeric(10, 2))
     czy_oplacone = Column(Boolean, default=False)
+
+    uzytkownik = relationship("Uzytkownik")
+    platnosc = relationship("Platnosc")
+
 
 class KuponSklep(Base):
     __tablename__ = "kupony_sklep"
@@ -152,3 +180,16 @@ class ZdobyteOsiagniecie(Base):
     odebrane = Column(Boolean, default=False)
 
     osiagniecie = relationship("Osiagniecie")
+
+
+class Opinia(Base):
+    __tablename__ = "opinie"
+
+    id_opinia = Column(Integer, primary_key=True, index=True)
+    id_uzytkownik = Column(Integer, ForeignKey("uzytkownik.id_uzytkownik"), nullable=False)
+    id_restauracja = Column(Integer, ForeignKey("restauracja.id_restauracja"), nullable=False)
+    ocena = Column(Integer, nullable=False)
+    komentarz = Column(Text, nullable=True)
+
+    uzytkownik = relationship("Uzytkownik")
+    restauracja = relationship("Restauracja")

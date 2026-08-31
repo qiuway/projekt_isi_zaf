@@ -12,7 +12,8 @@ export type Screen =
   | 'achievements'
   | 'pointsShop'
   | 'orderHistory'
-  | 'payment';
+  | 'payment'
+  | 'adminPanel';
 
 export interface Dish {
   id: number;

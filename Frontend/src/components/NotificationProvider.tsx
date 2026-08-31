@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
@@ -12,11 +13,15 @@ type NotifyFunction = (message: string, type?: NotificationType) => void;
 
 const NotificationContext = createContext<NotifyFunction | null>(null);
 
+let notificationCounter = 0;
+
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
+    const { t } = useTranslation();
     const [notifications, setNotifications] = useState<Notification[]>([]);
 
     const notify: NotifyFunction = (message, type = 'info') => {
-        const id = Date.now();
+        notificationCounter += 1;
+        const id = Number(`${Date.now()}${notificationCounter}`);
 
         setNotifications((prev) => [
             ...prev,
@@ -27,6 +32,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             setNotifications((prev) => prev.filter((n) => n.id !== id));
         }, 3500);
     };
+
+    useEffect(() => {
+        const handleSessionExpired = (e: Event) => {
+            const customEvent = e as CustomEvent<{ message?: string }>;
+            notify(customEvent.detail?.message || t('auth.errors.session_expired'), 'warning');
+        };
+
+        window.addEventListener('sessionExpired', handleSessionExpired);
+        return () => window.removeEventListener('sessionExpired', handleSessionExpired);
+    }, [t]);
 
     return (
         <NotificationContext.Provider value={notify}>

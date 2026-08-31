@@ -1,77 +1,40 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from typing import List
 
 import models
+import schemas
 from database import get_db
-from services.achievements_service import sprawdz_osiagniecia_uzytkownika
+from auth_jwt import get_current_user
+from services import achievements_service
 
-router = APIRouter()
+router = APIRouter(tags=["achievements"])
 
-@router.get("/uzytkownik/{user_id}/osiagniecia")
-def pobierz_osiagniecia(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.Uzytkownik).filter(
-        models.Uzytkownik.id_uzytkownik == user_id
-    ).first()
 
-    if not user:
-        raise HTTPException(status_code=404, detail="Użytkownik nie istnieje")
+@router.get("/uzytkownik/{user_id}/osiagniecia", response_model=List[schemas.OsiagniecieOut])
+def pobierz_osiagniecia(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.Uzytkownik = Depends(get_current_user)
+):
+    if current_user.id_typ_konta != 3 and current_user.id_uzytkownik != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Brak uprawnień do podglądu osiągnięć tego użytkownika."
+        )
+    return achievements_service.get_user_achievements(db, user_id)
 
-    wszystkie = db.query(models.Osiagniecie).all()
-    wynik = []
-
-    for osiagniecie in wszystkie:
-        zdobyte = db.query(models.ZdobyteOsiagniecie).filter(
-            models.ZdobyteOsiagniecie.id_uzytkownik == user_id,
-            models.ZdobyteOsiagniecie.id_osiagniecia == osiagniecie.id_osiagniecia
-        ).first()
-
-        wynik.append({
-            "id_osiagniecia": osiagniecie.id_osiagniecia,
-            "nazwa": osiagniecie.nazwa,
-            "opis": osiagniecie.opis,
-            "warunek": osiagniecie.warunek,
-            "punkty": osiagniecie.punkty,
-            "ikona": osiagniecie.ikona,
-            "zdobyte": zdobyte is not None,
-            "odebrane": zdobyte.odebrane if zdobyte else False
-        })
-
-    return wynik
 
 @router.post("/uzytkownik/{user_id}/osiagniecia/{id_osiagniecia}/odbierz")
 def odbierz_punkty_za_osiagniecie(
-        user_id: int,
-        id_osiagniecia: int,
-        db: Session = Depends(get_db)
+    user_id: int,
+    id_osiagniecia: int,
+    db: Session = Depends(get_db),
+    current_user: models.Uzytkownik = Depends(get_current_user)
 ):
-    sprawdz_osiagniecia_uzytkownika(user_id, db)
-
-    zdobyte = db.query(models.ZdobyteOsiagniecie).filter(
-        models.ZdobyteOsiagniecie.id_uzytkownik == user_id,
-        models.ZdobyteOsiagniecie.id_osiagniecia == id_osiagniecia
-    ).first()
-
-    if not zdobyte:
-        raise HTTPException(status_code=400, detail="Osiągnięcie nie zostało jeszcze zdobyte")
-
-    if zdobyte.odebrane:
-        raise HTTPException(status_code=400, detail="Punkty za to osiągnięcie zostały już odebrane")
-
-    osiagniecie = db.query(models.Osiagniecie).filter(
-        models.Osiagniecie.id_osiagniecia == id_osiagniecia
-    ).first()
-
-    user = db.query(models.Uzytkownik).filter(
-        models.Uzytkownik.id_uzytkownik == user_id
-    ).first()
-
-    user.punkty += osiagniecie.punkty
-    zdobyte.odebrane = True
-
-    db.commit()
-    db.refresh(user)
-
-    return {
-        "msg": "Odebrano punkty za osiągnięcie",
-        "punkty": user.punkty
-    }
+    if current_user.id_typ_konta != 3 and current_user.id_uzytkownik != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Brak uprawnień do odbierania punktów w imieniu innego użytkownika."
+        )
+    return achievements_service.claim_achievement_reward(db, user_id, id_osiagniecia)

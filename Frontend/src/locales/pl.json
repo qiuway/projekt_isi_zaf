@@ -11,13 +11,20 @@
     "or": "lub",
     "switch_to_register": "NIE MASZ KONTA? ZAREJESTRUJ SIĘ",
     "switch_to_login": "MASZ JUŻ KONTO? ZALOGUJ SIĘ",
+    "login_success": "Zalogowano pomyślnie!",
+    "register_success": "Zarejestrowano pomyślnie! Możesz się teraz zalogować.",
     "errors": {
       "missing_email_password": "Email i hasło są wymagane!",
+      "missing_email": "Wpisz adres email!",
+      "missing_password": "Pole hasła nie może być puste!",
       "missing_name": "Wypełnij imię i nazwisko!",
       "invalid_email": "Podaj poprawny adres email!",
+      "google_account_use_oauth": "To konto zostało utworzone przez Google. Zaloguj się za pomocą przycisku 'Zaloguj przez Google'.",
+      "invalid_credentials": "Błędny adres email lub hasło.",
       "data_error": "Błąd wprowadzonych danych",
       "server_error": "Wystąpił błąd z serwerem",
-      "connection_error": "Błąd połączenia z serwerem"
+      "connection_error": "Błąd połączenia z serwerem",
+      "session_expired": "Twoja sesja wygasła. Zaloguj się ponownie."
     }
   },
   "home": {
@@ -32,9 +39,11 @@
       "sort_za": "Od Z do A"
     },
     "sections": {
-      "recommended": "POLECANE I NOWOŚCI",
+      "recommended": "DOSTĘPNE RESTAURACJE",
       "promotions": "SPECJALNE PROMOCJE"
     },
+    "status_open": "Otwarte",
+    "status_closed": "Zamknięte",
     "no_restaurants": "Brak restauracji do wyświetlenia.",
     "errors": {
       "fetch_error": "Błąd pobierania danych:"
@@ -46,7 +55,8 @@
       "settings": "Ustawienia",
       "pointsShop": "Sklep za punkty",
       "achievements": "Osiągnięcia",
-      "help": "Pomoc"
+      "help": "Pomoc",
+      "adminPanel": "Panel Administratora"
     },
     "points": "Punkty: {{points}}",
     "home_button": "Strona główna",
@@ -59,6 +69,7 @@
     "title": "MÓJ PROFIL",
     "avatar_alt": "Awatar",
     "account_type": "Konto: {{type}}",
+    "order_history": "Historia zamówień",
     "roles": {
       "admin": "Admin",
       "owner": "Właściciel",
@@ -81,9 +92,11 @@
       "add_restaurant": "+ Dodaj restaurację",
       "status_open": "🟢 Otwarte",
       "status_closed": "🔴 Zamknięte",
-      "btn_menu": "📋 Menu",
+      "btn_orders": "Zamówienia",
+      "btn_menu": "Menu",
       "btn_edit": "Edytuj",
-      "btn_delete": "Usuń"
+      "btn_delete": "Usuń",
+      "btn_photo": "Zdjęcie"
     },
     "restaurant_modal": {
       "title_add": "Nowa restauracja",
@@ -117,12 +130,24 @@
       "btn_save": "Zapisz zmiany w daniu"
     },
     "alerts": {
+      "logged_out": "Wylogowano pomyślnie.",
+      "rest_name_required": "Nazwa restauracji jest wymagana.",
+      "rest_fields_required": "Uzupełnij opis, adres i numer telefonu restauracji.",
       "rest_added": "Dodano restaurację!",
       "rest_saved": "Zapisano zmiany!",
-      "rest_delete_confirm": "Usunąć restaurację?",
+      "rest_deleted": "Restauracja została usunięta.",
+      "rest_delete_error": "Nie udało się usunąć restauracji.",
+      "rest_delete_confirm": "Czy na pewno chcesz usunąć tę restaurację?",
+      "menu_fetch_error": "Nie udało się pobrać menu restauracji.",
       "prod_required": "Wypełnij wymagane pola!",
+      "prod_added": "Produkt został dodany do menu.",
+      "prod_updated": "Produkt został zaktualizowany.",
+      "prod_deleted": "Produkt został usunięty z menu.",
+      "prod_delete_error": "Nie udało się usunąć produktu.",
       "prod_save_error": "Błąd podczas zapisywania produktu.",
-      "prod_delete_confirm": "Usunąć ten produkt z menu?"
+      "prod_delete_confirm": "Czy na pewno chcesz usunąć ten produkt z menu?",
+      "photo_uploaded": "Zdjęcie potrawy zostało zaktualizowane!",
+      "photo_upload_error": "Nie udało się wgrać zdjęcia potrawy."
     }
   },
   "profile_edit": {
@@ -175,22 +200,103 @@
     },
     "alerts": {
       "not_logged_in": "Musisz być zalogowany.",
+      "buy_success": "Nagroda została pomyślnie zakupiona!",
       "buy_failed": "Nie udało się kupić nagrody.",
       "server_error": "Błąd połączenia z serwerem."
     }
   },
   "achievements": {
     "title": "OSIĄGNIĘCIA",
+    "subtitle": "Twoje osiągnięcia",
+    "instructions": "Kliknij zdobyte osiągnięcie, aby odebrać punkty. Punkty zostaną automatycznie dopisane do Twojego konta.",
+    "loading": "Ładowanie osiągnięć...",
     "labels": {
-      "name": "Nazwa osiągnięcia",
-      "description": "Opis osiągnięcia",
-      "earned_at": "Data zdobycia",
-      "points": "Ilość punktów"
+      "name": "Nazwa",
+      "description": "Opis",
+      "no_description": "Brak opisu",
+      "points": "Punkty",
+      "status": "Status",
+      "status_claimed": "Odebrane",
+      "status_to_claim": "Do odebrania",
+      "status_locked": "Niezdobyte"
+    },
+    "buttons": {
+      "claimed": "Punkty odebrane",
+      "claim": "Odbierz punkty",
+      "locked": "Niezdobyte"
+    },
+    "alerts": {
+      "not_logged_in": "Musisz być zalogowany.",
+      "server_error": "Błąd połączenia z serwerem."
     },
     "pts": "pkt"
   },
+  "order_history": {
+    "title": "HISTORIA ZAMÓWIEŃ",
+    "loading": "Ładowanie zamówień...",
+    "empty": "Nie masz jeszcze żadnych zamówień.",
+    "date": "Data: {{date}}",
+    "order_number": "Numer zamówienia: #{{id}}",
+    "payment": "Płatność: {{status}}",
+    "status": "Status: {{status}}",
+    "expand": "Rozwiń szczegóły ⌄",
+    "collapse": "Zwiń szczegóły ⌃",
+    "items_title": "Pozycje w zamówieniu:",
+    "currency": "zł",
+    "split_badge": "Składka",
+    "settlement_btn": "Rozliczenie składki"
+  },
+  "restaurant_orders": {
+    "title": "Zamówienia: {{name}}",
+    "loading": "Ładowanie zamówień...",
+    "empty": "Brak zamówień dla tej restauracji.",
+    "date": "Data: {{date}}",
+    "order_number": "Nr zamówienia: #{{id}}",
+    "delivery_address": "Adres dostawy: {{address}}",
+    "payment": "Płatność:",
+    "status": "Status:",
+    "items_title": "Produkty:",
+    "btn_accept_payment": "Zatwierdź płatność",
+    "btn_accept_order": "Przyjmij zamówienie",
+    "btn_send_delivery": "W drodze",
+    "btn_delivered": "Dostarczono",
+    "btn_reject": "Odrzuć zamówienie",
+    "status_rejected": "Zamówienie odrzucone",
+    "status_delivered": "Zamówienie dostarczone",
+    "back_to_profile": "Wróć do profilu",
+    "confirm_accept_payment": "Czy na pewno chcesz zatwierdzić tę płatność?",
+    "confirm_accept_order": "Czy na pewno chcesz przyjąć to zamówienie?",
+    "confirm_send_delivery": "Czy na pewno chcesz przekazać to zamówienie do dostawy?",
+    "confirm_delivered": "Czy na pewno chcesz oznaczyć to zamówienie jako dostarczone?",
+    "confirm_reject": "Czy na pewno chcesz odrzucić to zamówienie?",
+    "msg_accepted": "Zamówienie zostało przyjęte.",
+    "msg_rejected": "Zamówienie zostało odrzucone.",
+    "msg_in_delivery": "Zamówienie zostało przekazane do dostawy.",
+    "msg_delivered": "Zamówienie zostało dostarczone.",
+    "msg_payment_accepted": "Płatność została zatwierdzona!",
+    "statuses": {
+      "ZŁOŻONE": "Złożone",
+      "W_REALIZACJI": "W realizacji",
+      "W_DOSTAWIE": "W dostawie",
+      "DOSTARCZONE": "Dostarczone",
+      "ODRZUCONE": "Odrzucone"
+    },
+    "payment_statuses": {
+      "OPŁACONE": "Opłacone",
+      "OCZEKUJĄCA": "Oczekująca",
+      "PRZY_ODBIORZE": "Płatność przy odbiorze",
+      "ZAAKCEPTOWANA": "Zaakceptowana",
+      "ANULOWANA": "Anulowana",
+      "OCZEKIWANIE_NA_ZWROT": "Oczekiwanie na zwrot"
+    },
+    "alerts": {
+      "status_changed": "Status zamówienia został zmieniony.",
+      "server_error": "Błąd podczas zmiany statusu."
+    }
+  },
   "help": {
-    "title": "POMOC",
+    "title": "POMOC I FAQ",
+    "subtitle": "Najczęściej zadawane pytania",
     "items": {
       "order": {
         "title": "Jak zamówić jedzenie?",
@@ -212,10 +318,47 @@
   },
   "cart": {
     "title": "TWÓJ KOSZYK",
+    "tabs": {
+      "individual": "Mój koszyk",
+      "group": "Koszyk grupowy"
+    },
+    "group": {
+      "created_success": "Utworzono koszyk grupowy! Twój kod: {{code}}",
+      "create_error": "Nie udało się utworzyć koszyka grupowego.",
+      "joined_success": "Dołączono do koszyka grupowego: {{code}}",
+      "join_error": "Nie udało się dołączyć do koszyka grupowego.",
+      "left_success": "Opuszczono koszyk grupowy.",
+      "leave_error": "Błąd podczas opuszczania koszyka.",
+      "copied_code": "Skopiowano kod do schowka!",
+      "code_required": "Wpisz kod zaproszenia.",
+      "host_placed_order": "Gospodarz złożył zamówienie! Koszyk grupowy został zamknięty.",
+      "create_title": "Stwórz koszyk grupowy",
+      "create_desc": "Będziesz gospodarzem zamówienia. Otrzymasz unikalny kod do wysłania znajomym.",
+      "create_btn": "Utwórz pokój",
+      "join_title": "Dołącz z kodem zaproszenia",
+      "join_desc": "Wpisz kod otrzymany od znajomego (np. FF-7X9K2), aby wspólnie zamawiać.",
+      "join_btn": "Dołącz",
+      "room_code_label": "Kod grupy",
+      "copy_btn": "Kopiuj",
+      "members_label": "Uczestnicy",
+      "close_group_btn": "Zamknij grupę",
+      "leave_btn": "Opuść",
+      "dishes_title": "Wspólne dania w koszyku",
+      "empty_dishes": "Koszyk grupowy jest jeszcze pusty. Wejdź do restauracji i dodaj dania!",
+      "browse_menu": "Przeglądaj menu restauracji",
+      "added_by": "Dodał(a)",
+      "settlement_title": "Podsumowanie Składki",
+      "per_person_title": "Rozbicie na osoby",
+      "order_split_btn": "Złóż zamówienie",
+      "guest_waiting_title": "Oczekiwanie na gospodarza",
+      "only_host_can_order": "Tylko gospodarz zamówienia ({{host}}) może przejść do płatności i sfinalizować zamówienie.",
+      "loading": "Przetwarzanie...",
+      "or": "LUB"
+    },
     "products_title": "TWOJE PRODUKTY",
     "empty": "Koszyk jest pusty.",
     "item": {
-      "image_alt": "<zdj. potrawa>",
+      "image_alt": "Zdjęcie potrawy",
       "unit_price": "Cena jednostkowa: {{price}} zł",
       "total_info": "Ilość: {{amount}} • cena całkowita {{total}} zł"
     },
@@ -244,8 +387,30 @@
     "alerts": {
       "not_logged_in": "Musisz być zalogowany.",
       "server_error": "Błąd połączenia z serwerem.",
-      "no_discount_selected": "Nie wybrano rabatu."
+      "no_discount_selected": "Nie wybrano rabatu.",
+      "empty_cart": "Twój koszyk jest pusty! Dodaj dania przed złożeniem zamówienia.",
+      "missing_address": "Aby złożyć zamówienie, najpierw uzupełnij adres dostawy."
     }
+  },
+  "settlement": {
+    "title": "Rozliczenie składki",
+    "code_label": "Kod składki",
+    "host_label": "Gospodarz",
+    "host_tag": "Gospodarz",
+    "my_share_label": "Twoja część do oddania hostowi:",
+    "status_paid_by_host": "Opłacone (Gospodarz potwierdził wpłatę)",
+    "status_pending_transfer": "Oczekuje na przekazanie pieniędzy gospodarzowi",
+    "participants_breakdown": "Rozliczenie uczestników składki:",
+    "btn_mark_paid": "Oznacz jako opłacone",
+    "btn_mark_unpaid": "Oznacz jako nieopłacone",
+    "tag_paid": "Opłacone",
+    "tag_unpaid": "Oczekuje",
+    "close_btn": "Zamknij",
+    "fetch_error": "Nie udało się pobrać szczegółów rozliczenia.",
+    "status_updated": "Zaktualizowano status rozliczenia.",
+    "status_update_error": "Błąd podczas zmiany statusu rozliczenia.",
+    "loading": "Ładowanie rozliczenia...",
+    "view_split_summary_btn": "Zobacz rozliczenie składki"
   },
   "payment": {
     "title": "WYBÓR PŁATNOŚCI",
@@ -266,6 +431,27 @@
       "no_address": "Brak adresu",
       "currency": "zł"
     },
+    "offline_box": {
+      "account_number": "Numer konta do przelewu:",
+      "amount": "Kwota: {{amount}} zł",
+      "title": "Tytuł: zamówienie {{id}}"
+    },
+    "delivery_box": {
+      "title": "Płatność przy odbiorze",
+      "desc": "Zapłać gotówką lub kartą przy dostawie."
+    },
+    "stripe_warning": {
+      "title": "Brak klucza Stripe",
+      "desc": "Utwórz plik Frontend/.env i dodaj klucz publiczny:"
+    },
+    "success_modal": {
+      "title": "Zamówienie zostało złożone!",
+      "offline_msg": "Twoje zamówienie zostało przekazane do restauracji. Po wykonaniu przelewu restauracja zmieni status na 'W realizacji'.",
+      "on_delivery_msg": "Twoje zamówienie zostało przyjęte. Zapłać dostawcy przy odbiorze gotówką lub kartą.",
+      "card_msg": "Płatność kartą przebiegła pomyślnie! Twoje zamówienie jest już przygotowywane.",
+      "btn_orders": "Przejdź do historii zamówień",
+      "btn_home": "Wróć do strony głównej"
+    },
     "buttons": {
       "back_to_cart": "Wróć do koszyka",
       "processing": "Przetwarzanie...",
@@ -275,7 +461,12 @@
       "select_method": "Wybierz metodę płatności.",
       "order_placed": "Złożono zamówienie. Metoda: {{method}}",
       "payment_success": "Płatność zakończona SUKCESEM! Zamówienie zostało opłacone.",
-      "server_error": "Błąd połączenia z serwerem płatności."
+      "server_error": "Błąd połączenia z serwerem płatności.",
+      "empty_cart": "Twój koszyk jest pusty! Dodaj dania przed przejściem do płatności.",
+      "save_order_error": "Błąd podczas zapisywania zamówienia.",
+      "stripe_key_missing": "Klucz Stripe nie został skonfigurowany w Frontend/.env (VITE_STRIPE_PUBLISHABLE_KEY).",
+      "card_form_missing": "Nie znaleziono formularza karty.",
+      "payment_success_order_fail": "Płatność przeszła, ale wystąpił błąd przy zapisie zamówienia."
     },
     "stripe_errors": {
       "default": "Płatność odrzucona.",
@@ -288,6 +479,9 @@
   },
   "restaurant": {
     "loading": "Wczytywanie restauracji...",
+    "description_label": "Opis:",
+    "address_label": "Adres:",
+    "phone_label": "Telefon:",
     "status_open": "Aktualnie otwarte",
     "status_closed": "Aktualnie zamknięte",
     "menu_title": "Menu Restauracji",
@@ -297,11 +491,139 @@
     "unavailable": "Chwilowo niedostępne",
     "currency": "zł",
     "add_button": "+ Dodaj",
+    "confirm_replace_cart": "Twój koszyk zawiera już dania z innego lokalu. Czy chcesz wyczyścić dotychczasowy koszyk i dodać wybrane danie z tej restauracji?",
     "alerts": {
       "cart_auth_error": "Musisz być zalogowany, aby dodać produkt do koszyka.",
       "add_success": "Dodano produkt do koszyka.",
+      "add_group_success": "Dodano do koszyka grupowego!",
       "add_error": "Nie udało się dodać produktu do koszyka.",
       "server_error": "Błąd połączenia z serwerem."
     }
+  },
+  "admin": {
+    "title": "PANEL ADMINISTRATORA",
+    "stats": {
+      "title": "Podsumowanie platformy",
+      "users": "Użytkownicy",
+      "orders": "Zamówienia",
+      "revenue": "Łączny obrót",
+      "restaurants": "Restauracje",
+      "products": "Dania w menu"
+    },
+    "tabs": {
+      "users": "Zarządzanie Użytkownikami",
+      "restaurants": "Wszystkie Restauracje",
+      "coupons": "Sklep za punkty"
+    },
+    "coupons": {
+      "btn_add_coupon": "Dodaj nową nagrodę",
+      "modal_add_title": "Dodaj nową nagrodę do sklepu",
+      "modal_edit_title": "Edytuj nagrodę w sklepie",
+      "labels_name": "Nazwa nagrody / kuponu",
+      "labels_desc": "Opis",
+      "labels_cost": "Koszt w punktach",
+      "labels_discount": "Wartość zniżki (np. 15%, 10 zł)",
+      "labels_icon": "Ikona (emotka)",
+      "btn_save": "Zapisz nagrodę",
+      "btn_cancel": "Anuluj",
+      "btn_edit": "Edytuj",
+      "btn_delete": "Usuń",
+      "confirm_delete": "Czy na pewno chcesz usunąć nagrodę {{name}} ze sklepu punktowego?",
+      "fields_required": "Uzupełnij nazwę i koszt punktowy nagrody.",
+      "created_success": "Nagroda została dodana do sklepu!",
+      "updated_success": "Nagroda została zaktualizowana!",
+      "deleted_success": "Nagroda została usunięta ze sklepu.",
+      "save_error": "Błąd podczas zapisywania nagrody.",
+      "delete_error": "Błąd podczas usuwania nagrody.",
+      "cost_label": "Koszt: {{cost}} pkt",
+      "discount_label": "Wartość: {{value}}",
+      "no_coupons": "Brak nagród w sklepie za punkty."
+    },
+    "users": {
+      "search_placeholder": "Szukaj użytkownika (imię, nazwisko, email)...",
+      "filter_all_roles": "Wszystkie role",
+      "filter_clients": "Klienci",
+      "filter_owners": "Właściciele restauracji",
+      "filter_admins": "Administratorzy",
+      "role_client": "Klient",
+      "role_owner": "Właściciel",
+      "role_admin": "Admin",
+      "btn_change_role": "Zmień rolę",
+      "btn_delete_user": "Usuń konto",
+      "confirm_delete": "Czy na pewno chcesz bezpowrotnie usunąć użytkownika {{email}}?",
+      "role_updated": "Rola użytkownika została zaktualizowana.",
+      "user_deleted": "Użytkownik został usunięty.",
+      "no_users": "Brak użytkowników spełniających kryteria.",
+      "orders_count": "Zamówień: {{count}}",
+      "points_count": "Punkty: {{count}}"
+    },
+    "restaurants": {
+      "owner": "Właściciel: {{name}}",
+      "dishes": "Dania: {{count}}",
+      "orders": "Zamówienia: {{count}}",
+      "status_open": "Otwarte",
+      "status_closed": "Zamknięte",
+      "no_restaurants": "Brak restauracji w bazie.",
+      "search_placeholder": "Szukaj restauracji (nazwa, adres, opis)...",
+      "filter_all": "Wszystkie statusy",
+      "filter_open": "Tylko otwarte",
+      "filter_closed": "Tylko zamknięte",
+      "btn_add_restaurant": "Dodaj nową restaurację",
+      "btn_edit": "Edytuj",
+      "btn_delete": "Usuń",
+      "btn_toggle_status": "Zmień status",
+      "btn_manage_menu": "Zarządzaj menu",
+      "btn_view_restaurant": "Otwórz lokal",
+      "confirm_delete": "Czy na pewno chcesz usunąć restaurację {{name}} wraz z jej menu?",
+      "name_required": "Nazwa restauracji jest wymagana.",
+      "status_changed": "Status restauracji został zmieniony.",
+      "deleted_success": "Restauracja została usunięta.",
+      "saved_success": "Restauracja została pomyślnie zaktualizowana.",
+      "save_error": "Błąd podczas zapisu restauracji.",
+      "delete_error": "Błąd podczas usuwania restauracji.",
+      "modal_add_title": "Dodaj nową restaurację",
+      "modal_edit_title": "Edytuj restaurację",
+      "labels_name": "Nazwa restauracji",
+      "labels_desc": "Opis restauracji",
+      "labels_address": "Adres",
+      "labels_phone": "Numer telefonu",
+      "labels_status": "Status (otwarta dla zamówień)",
+      "labels_owner": "Przypisany właściciel (konto)",
+      "owner_none": "Brak (zarządzana przez administratora)"
+    }
+  },
+  "reviews": {
+    "title": "Opinie i oceny klientów",
+    "rating_summary": "Średnia ocen: {{rating}} / 5 ({{count}} opinii)",
+    "no_reviews": "Ta restauracja nie ma jeszcze żadnych opinii. Bądź pierwszy i dodaj swoją ocenę!",
+    "add_review_title": "Dodaj swoją opinię",
+    "your_rating": "Twoja ocena:",
+    "comment_placeholder": "Napisz kilka słów o smaku dań, czasie dostawy lub obsłudze...",
+    "btn_submit": "Opublikuj opinię",
+    "btn_delete": "Usuń opinię",
+    "confirm_delete": "Czy na pewno chcesz usunąć tę opinię?",
+    "auth_required": "Zaloguj się, aby móc ocenić restaurację.",
+    "success_added": "Dziękujemy! Twoja opinia została pomyślnie zapisana.",
+    "success_deleted": "Opinia została usunięta.",
+    "save_error": "Błąd podczas zapisywania opinii.",
+    "delete_error": "Błąd podczas usuwania opinii."
+  },
+  "confirmation": {
+    "title": "Potwierdzenie",
+    "btn_cancel": "Anuluj",
+    "btn_confirm": "Tak"
+  },
+  "categories": {
+    "Pizza": "Pizza",
+    "Burgery": "Burgery",
+    "Napoje": "Napoje",
+    "Desery": "Desery",
+    "Dania główne": "Dania główne",
+    "Zupy": "Zupy",
+    "Sałatki": "Sałatki",
+    "Przekąski": "Przekąski",
+    "Sushi": "Sushi",
+    "Kebab": "Kebab",
+    "Makarony": "Makarony"
   }
 }

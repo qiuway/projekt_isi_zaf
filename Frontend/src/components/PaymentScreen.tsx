@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Screen } from '../types';
 import { TopBar } from './TopBar';
-import { apiClient } from '../api/apiClient';
+import { cartApi, userApi, ordersApi, paymentsApi } from '../api/apiClient';
 import { useNotify } from './NotificationProvider';
+import { GroupSettlementModal } from './GroupSettlementModal';
 
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 const STRIPE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-
-console.log('STRIPE KEY:', STRIPE_KEY);
-
 const stripePromise = STRIPE_KEY ? loadStripe(STRIPE_KEY) : null;
 
 interface PaymentScreenProps {
@@ -50,9 +48,26 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successPaymentType, setSuccessPaymentType] = useState<'offline' | 'on_delivery' | 'card' | null>(null);
 
+    const [groupOrderData, setGroupOrderData] = useState<any | null>(null);
+    const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
+    const [showSettlementModal, setShowSettlementModal] = useState(false);
+
     useEffect(() => {
         const userId = localStorage.getItem('userId');
-        if (!userId) return;
+        if (!userId) {
+            onNavigate('login');
+            return;
+        }
+
+        const savedGroup = localStorage.getItem('groupCartOrder');
+        if (savedGroup) {
+            try {
+                const parsed = JSON.parse(savedGroup);
+                setGroupOrderData(parsed);
+            } catch (e) {
+                console.error(e);
+            }
+        }
 
         const zapisanyKupon = localStorage.getItem('selectedKupon');
         if (zapisanyKupon) {
@@ -60,18 +75,37 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
         }
 
         Promise.all([
-            apiClient.get(`/koszyk/${userId}`),
-            apiClient.get(`/uzytkownik/${userId}`),
+            cartApi.getCart(userId),
+            userApi.getProfile(userId),
         ])
             .then(([koszykResponse, userResponse]) => {
                 const koszyk = koszykResponse.data;
                 const user = userResponse.data;
+
+                if (savedGroup) {
+                    try {
+                        const parsed = JSON.parse(savedGroup);
+                        if (parsed.items && parsed.items.length > 0) {
+                            setCartItems(parsed.items);
+                            const total = parsed.items.reduce((acc: number, item: any) => acc + (Number(item.cena_calkowita) || (item.cena * item.ilosc)), 0);
+                            setSuma(total);
+                            setAdres(user.adres || t('payment.summary.no_address'));
+                            return;
+                        }
+                    } catch (e) {}
+                }
+
+                if (!koszyk.pozycje || koszyk.pozycje.length === 0) {
+                    notify(t('payment.alerts.empty_cart'), 'warning');
+                    onNavigate('home');
+                    return;
+                }
                 setSuma(koszyk.suma || 0);
                 setCartItems(koszyk.pozycje || []);
                 setAdres(user.adres || t('payment.summary.no_address'));
             })
             .catch(console.error);
-    }, [t]);
+    }, [t, onNavigate]);
 
     const kosztDostawy = suma > 0 ? 7.99 : 0;
     let rabat = 0;
@@ -95,40 +129,43 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
         
         if (!userId || cartItems.length === 0) return false;
 
-        const payload = {
+        const isGroup = !!groupOrderData;
+
+        const payload: any = {
             id_uzytkownik: Number(userId),
             id_restauracja: 1,
             pozycje: cartItems.map((item: any) => ({
                 id_produkt: item.id_produkt,
                 ilosc: item.ilosc
             })),
-            czy_skladka: false,
+            czy_skladka: isGroup,
             typ_platnosci: typ_platnosci,
             id_posiadany_kupon: selectedKupon?.id_posiadany_kupon ?? null
         };
 
-        try {
-            await apiClient.post('/zamowienia/', payload);
+        if (isGroup && groupOrderData.participants) {
+            payload.uczestnicy_skladki = groupOrderData.participants.map((p: any) => ({
+                id_uzytkownik: p.id_uzytkownik,
+                kwota_deklarowana: p.suma_do_zwrotu
+            }));
+        }
 
-            await Promise.all(
-                cartItems.map((item: any) =>
-                    apiClient.put('/koszyk/aktualizuj', {
-                        id_uzytkownik: Number(userId),
-                        id_produkt: item.id_produkt,
-                        ilosc: 0,
-                    })
-                )
-            );
+        try {
+            const res = await ordersApi.createOrder(payload);
+            setCreatedOrderId(res.data.id_zamowienia);
 
             window.dispatchEvent(new Event('koszykChanged'));
             localStorage.removeItem('selectedKupon');
+            localStorage.removeItem('groupCartOrder');
+            localStorage.removeItem('activeGroupCode');
             return true;
         } catch (error: any) {
             console.error(error);
 
             notify(
                 error.response?.data?.detail ||
-                'Błąd podczas zapisywania zamówienia.'
+                t('payment.alerts.save_order_error'),
+                'error'
             );
 
             return false;
@@ -136,6 +173,12 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
     };
     
     const handleConfirmPayment = async () => {
+        if (cartItems.length === 0) {
+            notify(t('payment.alerts.empty_cart'), 'warning');
+            onNavigate('home');
+            return;
+        }
+
         if (!selectedMethod) {
             notify(t('payment.alerts.select_method'));
             return;
@@ -150,7 +193,7 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                 setSuccessPaymentType('offline');
                 setShowSuccessModal(true);
             } else {
-                notify('Błąd podczas zapisywania zamówienia.', 'error');
+                notify(t('payment.alerts.save_order_error'), 'error');
             }
 
             return;
@@ -165,28 +208,34 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                 setSuccessPaymentType('on_delivery');
                 setShowSuccessModal(true);
             } else {
-                notify('Błąd podczas zapisywania zamówienia.', 'error');
+                notify(t('payment.alerts.save_order_error'), 'error');
             }
 
             return;
         }
 
         if (selectedMethod === 'card') {
-            if (!stripe || !elements) return;
+            if (!STRIPE_KEY || !stripe || !elements) {
+                notify(t('payment.alerts.stripe_key_missing'), 'error');
+                return;
+            }
             setIsProcessing(true);
             setPaymentError(null);
 
             try {
-                const response = await apiClient.post('/create-payment-intent', {
-                    amount: sumaDoZaplaty
-                });
-
+                const response = await paymentsApi.createPaymentIntent(sumaDoZaplaty);
                 const data = response.data;
 
                 const cardElement = elements.getElement(CardElement);
+                if (!cardElement) {
+                    notify(t('payment.alerts.card_form_missing'), 'error');
+                    setIsProcessing(false);
+                    return;
+                }
+
                 const paymentResult = await stripe.confirmCardPayment(data.client_secret, {
                     payment_method: {
-                        card: cardElement!,
+                        card: cardElement,
                     }
                 });
 
@@ -212,7 +261,7 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                         setSuccessPaymentType('card');
                         setShowSuccessModal(true);
                     } else {
-                        notify('Płatność przeszła, ale wystąpił błąd przy zapisie zamówienia.', 'error');
+                        notify(t('payment.alerts.payment_success_order_fail'), 'error');
                     }
                 }
             } catch (error: any) {
@@ -226,6 +275,8 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
             setIsProcessing(false);
         }
     };
+
+    const isDarkMode = typeof document !== 'undefined' && (document.body.classList.contains('dark-mode') || localStorage.getItem('theme') === 'dark');
 
     return (
         <div className="page-shell">
@@ -255,28 +306,54 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                     {selectedMethod === 'card' && (
                         <div className="stripe-card-container">
                             <h4 className="stripe-card-title">{t('payment.credit_card_details')}</h4>
-                            <div className="stripe-input-wrapper">
-                                <CardElement options={{
-                                    style: { base: { fontSize: '16px', color: '#424770', '::placeholder': { color: '#aab7c4' } } }
-                                }}/>
-                            </div>
+                            {!STRIPE_KEY ? (
+                                <div className="stripe-config-warning">
+                                    <strong>{t('payment.stripe_warning.title')}</strong>
+                                    {t('payment.stripe_warning.desc')}
+                                    <br />
+                                    <code>VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...</code>
+                                </div>
+                            ) : (
+                                <div className="stripe-input-wrapper">
+                                    <CardElement
+                                        key={isDarkMode ? 'stripe-dark' : 'stripe-light'}
+                                        options={{
+                                            style: {
+                                                base: {
+                                                    fontSize: '16px',
+                                                    color: isDarkMode ? '#ffffff' : '#111827',
+                                                    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                                                    iconColor: isDarkMode ? '#60d3b4' : '#5d4537',
+                                                    '::placeholder': {
+                                                        color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                                    },
+                                                },
+                                                invalid: {
+                                                    color: '#ef4444',
+                                                    iconColor: '#ef4444',
+                                                },
+                                            },
+                                        }}
+                                    />
+                                </div>
+                            )}
                             {paymentError && <div className="stripe-payment-error">❌ {paymentError}</div>}
                         </div>
                     )}
 
                     {selectedMethod === 'offline' && (
                         <div className="offline-payment-box" style={{ marginTop: '20px', padding: '15px', borderRadius: '8px' }}>
-                            <strong>Numer konta do przelewu:</strong>
+                            <strong>{t('payment.offline_box.account_number')}</strong>
                             <p style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: '10px 0 0 0' }}>{BANK_ACCOUNT_NUMBER}</p>
-                            <p style={{ fontSize: '0.9rem', color: '#555' }}>Kwota: {sumaDoZaplaty.toFixed(2)} zł</p>
-                            <p style={{ fontSize: '0.9rem', color: '#555' }}>Tytuł: zamówienie {Date.now()}</p>
+                            <p className="offline-payment-meta">{t('payment.offline_box.amount', { amount: sumaDoZaplaty.toFixed(2) })}</p>
+                            <p className="offline-payment-meta">{t('payment.offline_box.title', { id: Date.now() })}</p>
                         </div>
                     )}
 
                     {selectedMethod === 'on_delivery' && (
                         <div className="delivery-payment-box" style={{ marginTop: '20px', padding: '15px', borderRadius: '8px' }}>
-                            <strong>Płatność przy odbiorze</strong>
-                            <p style={{ margin: '10px 0 0 0' }}>Zapłać gotówką lub kartą przy dostawie.</p>
+                            <strong>{t('payment.delivery_box.title')}</strong>
+                            <p style={{ margin: '10px 0 0 0' }}>{t('payment.delivery_box.desc')}</p>
                         </div>
                     )}
                 </div>
@@ -325,23 +402,23 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                             ✅
                         </div>
 
-                        <h2>Zamówienie złożone!</h2>
+                        <h2>{t('payment.success_modal.title')}</h2>
 
                         {successPaymentType === 'offline' && (
                             <div className="payment-success-text">
 
-                                <p>Prosimy o dokonanie przelewu na numer konta:</p>
+                                <p>{t('payment.offline_box.account_number')}</p>
 
                                 <div className="payment-bank-number">
                                     {BANK_ACCOUNT_NUMBER}
                                 </div>
 
                                 <p>
-                                    Kwota: <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
+                                    {t('payment.offline_box.amount', { amount: sumaDoZaplaty.toFixed(2) })}
                                 </p>
 
                                 <p>
-                                    Po zaksięgowaniu płatności zamówienie zostanie zrealizowane.
+                                    {t('payment.success_modal.offline_msg')}
                                 </p>
                             </div>
                         )}
@@ -350,15 +427,11 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                             <div className="payment-success-text">
 
                                 <p>
-                                    Płatność zostanie pobrana przy odbiorze.
+                                    {t('payment.success_modal.on_delivery_msg')}
                                 </p>
 
                                 <p>
-                                    Kwota do zapłaty: <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
-                                </p>
-
-                                <p>
-                                    Przygotuj gotówkę lub kartę dla dostawcy.
+                                    {t('payment.summary.to_pay')}: <strong>{sumaDoZaplaty.toFixed(2)} {t('payment.summary.currency')}</strong>
                                 </p>
                             </div>
                         )}
@@ -367,17 +440,31 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
                             <div className="payment-success-text">
 
                                 <p>
-                                    Płatność kartą została zakończona pomyślnie.
+                                    {t('payment.success_modal.card_msg')}
                                 </p>
 
                                 <p>
-                                    Kwota: <strong>{sumaDoZaplaty.toFixed(2)} zł</strong>
+                                    {t('payment.summary.to_pay')}: <strong>{sumaDoZaplaty.toFixed(2)} {t('payment.summary.currency')}</strong>
                                 </p>
                             </div>
                         )}
 
+                        {groupOrderData && createdOrderId && (
+                            <button
+                                className="mint-button"
+                                style={{ marginBottom: '10px', width: '100%' }}
+                                onClick={() => {
+                                    setShowSuccessModal(false);
+                                    setShowSettlementModal(true);
+                                }}
+                            >
+                                {t('settlement.view_split_summary_btn', 'Zobacz rozliczenie składki')}
+                            </button>
+                        )}
+
                         <button
-                            className="mint-button"
+                            className="secondary-button"
+                            style={{ width: '100%' }}
                             onClick={() => {
                                 setShowSuccessModal(false);
                                 setSuccessPaymentType(null);
@@ -389,6 +476,18 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
 
                     </div>
                 </div>
+            )}
+
+            {showSettlementModal && createdOrderId && (
+                <GroupSettlementModal
+                    orderId={createdOrderId}
+                    onClose={() => {
+                        setShowSettlementModal(false);
+                        setShowSuccessModal(false);
+                        setSuccessPaymentType(null);
+                        onNavigate('home');
+                    }}
+                />
             )}
         </div>
     );
