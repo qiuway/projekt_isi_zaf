@@ -138,6 +138,7 @@
       "rest_deleted": "Restauracja została usunięta.",
       "rest_delete_error": "Nie udało się usunąć restauracji.",
       "rest_delete_confirm": "Czy na pewno chcesz usunąć tę restaurację?",
+      "invalid_address": "Adres restauracji może zawierać tylko litery, cyfry, spacje oraz znaki: . , - / #",
       "menu_fetch_error": "Nie udało się pobrać menu restauracji.",
       "prod_required": "Wypełnij wymagane pola!",
       "prod_added": "Produkt został dodany do menu.",
@@ -174,6 +175,7 @@
       "no_user": "Brak zalogowanego użytkownika.",
       "save_success": "Zapisano dane profilu pomyślnie!",
       "save_error": "Wystąpił błąd podczas zapisywania.",
+      "invalid_address": "Adres może zawierać tylko litery, cyfry, spacje oraz znaki: . , - / #",
       "server_error": "Błąd połączenia z serwerem.",
       "upload_error": "Błąd podczas wgrywania zdjęcia."
     }
@@ -464,6 +466,7 @@
       "server_error": "Błąd połączenia z serwerem płatności.",
       "empty_cart": "Twój koszyk jest pusty! Dodaj dania przed przejściem do płatności.",
       "save_order_error": "Błąd podczas zapisywania zamówienia.",
+      "invalid_address": "Adres dostawy może zawierać tylko litery, cyfry, spacje oraz znaki: . , - / #",
       "stripe_key_missing": "Klucz Stripe nie został skonfigurowany w Frontend/.env (VITE_STRIPE_PUBLISHABLE_KEY).",
       "card_form_missing": "Nie znaleziono formularza karty.",
       "payment_success_order_fail": "Płatność przeszła, ale wystąpił błąd przy zapisie zamówienia."
@@ -576,6 +579,7 @@
       "btn_view_restaurant": "Otwórz lokal",
       "confirm_delete": "Czy na pewno chcesz usunąć restaurację {{name}} wraz z jej menu?",
       "name_required": "Nazwa restauracji jest wymagana.",
+      "invalid_address": "Adres lokalu może zawierać tylko litery, cyfry, spacje oraz znaki: . , - / #",
       "status_changed": "Status restauracji został zmieniony.",
       "deleted_success": "Restauracja została usunięta.",
       "saved_success": "Restauracja została pomyślnie zaktualizowana.",

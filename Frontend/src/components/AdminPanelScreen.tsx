@@ -89,6 +89,9 @@ export function AdminPanelScreen({ onNavigate }: AdminPanelScreenProps) {
   const [couponZnizka, setCouponZnizka] = useState('');
   const [couponIkona, setCouponIkona] = useState('🏷️');
 
+
+  const [ownUserId, setOwnUserId] = useState(null);
+
   const [confirmAction, setConfirmAction] = useState<null | {
     message: string;
     action: () => void;
@@ -109,6 +112,7 @@ export function AdminPanelScreen({ onNavigate }: AdminPanelScreenProps) {
         onNavigate('home');
         return false;
       }
+      setOwnUserId(res.data.id_uzytkownik);
       return true;
     } catch {
       onNavigate('login');
@@ -185,6 +189,7 @@ export function AdminPanelScreen({ onNavigate }: AdminPanelScreenProps) {
 
   const handleRoleChange = async (userId: number) => {
     const newRole = selectedRoles[userId];
+    if(userId === ownUserId) return;
     try {
       await adminApi.updateUserRole(userId, newRole);
       notify(t('admin.users.role_updated'), 'success');
@@ -251,9 +256,16 @@ export function AdminPanelScreen({ onNavigate }: AdminPanelScreenProps) {
     setIsRestModalOpen(true);
   };
 
+  const ADDRESS_REGEX = /^[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s.,\-/m#]*$/;
+
   const handleSaveRestaurant = async () => {
     if (!formRestNazwa.trim()) {
       notify(t('admin.restaurants.name_required'), 'warning');
+      return;
+    }
+
+    if (formRestAdres && !ADDRESS_REGEX.test(formRestAdres.trim())) {
+      notify(t('admin.restaurants.invalid_address', 'Adres lokalu może zawierać tylko litery, cyfry, spacje oraz znaki: . , - / #'), 'error');
       return;
     }
 

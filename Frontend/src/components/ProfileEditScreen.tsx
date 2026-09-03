@@ -42,9 +42,16 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
         fetchUserData();
     }, [userId]);
 
+    const ADDRESS_REGEX = /^[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s.,\-/m#]*$/;
+
     const handleSaveTextData = async () => {
         if (!userId) {
             notify(t('profile_edit.alerts.no_user'), 'warning');
+            return;
+        }
+
+        if (adres && !ADDRESS_REGEX.test(adres.trim())) {
+            notify(t('profile_edit.alerts.invalid_address'), 'error');
             return;
         }
 
@@ -53,7 +60,7 @@ export function ProfileEditScreen({ onNavigate }: ProfileEditScreenProps) {
             nazwisko,
             email,
             numer_telefonu: telefon ? parseInt(telefon) : null,
-            adres: adres || null,
+            adres: adres ? adres.trim() : null,
         };
 
         try {

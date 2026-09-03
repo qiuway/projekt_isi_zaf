@@ -172,10 +172,22 @@ function InnerPaymentScreen({ onNavigate }: PaymentScreenProps) {
         }
     };
     
+    const ADDRESS_REGEX = /^[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s.,\-/m#]*$/;
+
     const handleConfirmPayment = async () => {
         if (cartItems.length === 0) {
             notify(t('payment.alerts.empty_cart'), 'warning');
             onNavigate('home');
+            return;
+        }
+
+        if (!adres || adres === t('payment.summary.no_address') || !adres.trim()) {
+            notify(t('cart.alerts.missing_address', 'Aby złożyć zamówienie, najpierw uzupełnij adres dostawy.'), 'warning');
+            return;
+        }
+
+        if (!ADDRESS_REGEX.test(adres.trim())) {
+            notify(t('payment.alerts.invalid_address'), 'error');
             return;
         }
 

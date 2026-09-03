@@ -8,7 +8,7 @@ load_dotenv()
 # format: postgresql://uzytkownik:haslo@host:port/nazwa_bazy
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:Opelastra2#@localhost:5432/foodflow"
+    "postgresql://postgres:123@localhost:5432/postgres"
 )
 
 engine = create_engine(DATABASE_URL)

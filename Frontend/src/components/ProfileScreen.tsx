@@ -101,6 +101,8 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
     setIsModalOpen(true);
   };
 
+  const ADDRESS_REGEX = /^[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s.,\-/m#]*$/;
+
   const handleSaveRestaurant = async () => {
         if (!formNazwa.trim()) {
             notify(t('profile.alerts.rest_name_required'), 'warning');
@@ -111,10 +113,15 @@ export function ProfileScreen({ onNavigate }: ProfileScreenProps) {
             notify(t('profile.alerts.rest_fields_required'), 'warning');
             return;
         }
+
+        if (!ADDRESS_REGEX.test(formAdres.trim())) {
+            notify(t('profile.alerts.invalid_address'), 'error');
+            return;
+        }
         const payload = {
-        nazwa: formNazwa, 
-        opis: formOpis || undefined, 
-        adres: formAdres || undefined, 
+        nazwa: formNazwa.trim(), 
+        opis: formOpis.trim() || undefined, 
+        adres: formAdres.trim() || undefined, 
         numer_telefonu: formTel ? parseInt(formTel) : null, 
         czynne: formCzynne 
     };

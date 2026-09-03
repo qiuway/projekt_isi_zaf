@@ -1,5 +1,19 @@
-from pydantic import BaseModel, Field
+import re
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
+
+ADDRESS_REGEX = re.compile(r"^[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s.,\-/m#]*$")
+
+
+def validate_address_field(v: Optional[str]) -> Optional[str]:
+    if v is None:
+        return None
+    trimmed = v.strip()
+    if not trimmed:
+        return None
+    if not ADDRESS_REGEX.match(trimmed):
+        raise ValueError("Adres może zawierać tylko litery, cyfry, spacje oraz znaki: . , - / #")
+    return trimmed
 
 class RestauracjaOut(BaseModel):
     id_restauracja: int
@@ -58,6 +72,11 @@ class UzytkownikUpdate(BaseModel):
     numer_telefonu: int | None = None
     adres: str | None = None
 
+    @field_validator("adres")
+    @classmethod
+    def check_adres(cls, v: str | None) -> str | None:
+        return validate_address_field(v)
+
 class UzytkownikOut(BaseModel):
     id_uzytkownik: int
     imie: str
@@ -77,6 +96,11 @@ class RestauracjaCreateUpdate(BaseModel):
     adres: str | None = None
     numer_telefonu: int | None = None
     czynne: bool = False
+
+    @field_validator("adres")
+    @classmethod
+    def check_adres(cls, v: str | None) -> str | None:
+        return validate_address_field(v)
 
 class KuponOut(BaseModel):
     id_kupon: int
